@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Research Vault</title>
+    <style>
+        /* CSS Styling */
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid #1e293b;
+            padding-bottom: 30px;
+            margin-bottom: 40px;
+        }
+
+        h1 { 
+            color: #38bdf8; 
+            margin: 0; 
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+        }
+
+        header p { 
+            color: #94a3b8; 
+            margin-top: 10px;
+            font-size: 1rem;
+        }
+
+        main {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            color: #f1f5f9;
+            border-left: 4px solid #38bdf8;
+            padding-left: 10px;
+            margin-bottom: 20px;
+        }
+
+        #report-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .report-card {
+            background: #1e293b;
+            margin: 12px 0;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            transition: all 0.3s ease;
+        }
+
+        .report-card:hover {
+            border-color: #38bdf8;
+            background: #24334d;
+            transform: translateY(-2px);
+        }
+
+        .report-card a {
+            color: #f8fafc;
+            text-decoration: none;
+            font-weight: 600;
+            display: block;
+            padding: 20px;
+        }
+
+        .loading, .error-msg {
+            text-align: center;
+            color: #64748b;
+            font-style: italic;
+            padding: 20px;
+        }
+
+        /* Responsive adjustments for mobile */
+        @media (max-width: 480px) {
+            body { padding: 15px; }
+            h1 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>CRYPTO RESEARCH VAULT</h1>
+        <p>Fundamental Analysis & Market Logic</p>
+    </header>
+
+    <main>
+        <section id="analysis-section">
+            <h2>LATEST REPORTS</h2>
+            <ul id="report-list">
+                <li class="loading">Fetching data from GitHub...</li>
+            </ul>
+        </section>
+    </main>
+
+    <script>
+        // CONFIGURATION: Change these to your details
+ const username ='nasirbello043-sudo'; const repo = 'crypto-research-hub'; 
+
+        async function fetchReports() {
+            const listElement = document.getElementById('report-list');
+            
+            try {
+                // Fetch repository contents via GitHub API
+                const response = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/`);
+                
+                if (!response.ok) throw new Error('Repo not found or private');
+
+                const files = await response.json();
+                listElement.innerHTML = ''; // Clear the loading text
+
+                let reportCount = 0;
+
+                files.forEach(file => {
+                    // Filter: Only show .html files and ignore index.html
+                    if (file.name.endsWith('.html') && file.name.toLowerCase() !== 'index.html') {
+                        reportCount++;
+                        
+                        const li = document.createElement('li');
+                        li.className = 'report-card';
+                        
+                        // Clean up filename for display (remove .html and replace dashes with spaces)
+                        const displayName = file.name
+                            .replace('.html', '')
+                            .replace(/-/g, ' ')
+                            .toUpperCase();
+                        
+                        li.innerHTML = `<a href="${file.name}">${displayName}</a>`;
+                        listElement.appendChild(li);
+                    }
+                });
+                
+                if (reportCount === 0) {
+                    listElement.innerHTML = '<li class="loading">No research reports found in repository.</li>';
+                }
+
+            } catch (error) {
+                console.error(error);
+                listElement.innerHTML = '<li class="error-msg">Error: Make sure your Repo is Public and names are correct.</li>';
+            }
+        }
+
+        // Initialize the fetch
+        fetchReports();
+    </script>
+</body>
+  </html>
+  
