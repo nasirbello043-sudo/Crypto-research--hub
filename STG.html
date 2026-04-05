@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stargate Finance Analysis Report</title>
+    <style>
+        :root {
+            --bg: #0b0f1a;
+            --card: #111827;
+            --border: #374151;
+            --accent: #a855f7;
+            --text-p: #d1d5db;
+            --text-h: #f9fafb;
+            --red: #ef4444;
+            --green: #22c55e;
+            --white: #ffffff;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-p);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(168,85,247,0.25);
+        }
+
+        h1, h2, h3 { color: var(--text-h); border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 40px; }
+        h1 { color: var(--accent); border-bottom: 2px solid var(--accent); }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            background: rgba(168,85,247,0.05);
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .comment-box {
+            background: rgba(168, 85, 247, 0.08);
+            border-left: 4px solid var(--accent);
+            padding: 15px;
+            margin: 15px 0;
+            font-style: italic;
+        }
+
+        .rating {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: var(--accent);
+            margin: 10px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th { color: var(--accent); }
+
+        ul { padding-left: 20px; }
+        li { margin-bottom: 8px; }
+
+        .roadmap-table th { background: rgba(168, 85, 247, 0.15); }
+
+        .overall-summary {
+            background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+            padding: 30px;
+            border: 2px solid var(--accent);
+            border-radius: 10px;
+            margin-top: 50px;
+        }
+
+        .flag-red { color: var(--red); font-weight: bold; }
+        .flag-white { color: var(--white); font-weight: bold; }
+        
+        @media (max-width: 600px) {
+            .stat-grid { grid-template-columns: 1fr; }
+            .container { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Stargate Finance (STG) - Complete Fundamental Analysis</h1>
+
+    <h2>Phase 1: Project Overview</h2>
+    <div class="stat-grid">
+        <div><strong>Name:</strong> Stargate Finance</div>
+        <div><strong>Ticker:</strong> STG</div>
+        <div><strong>Rank:</strong> #250</div>
+        <div><strong>Current Price:</strong> $0.1398</div>
+        <div><strong>MCAP:</strong> $92.27M</div>
+        <div><strong>FDV:</strong> $139.36M</div>
+        <div><strong>Circulating Supply:</strong> 660.95M STG</div>
+        <div><strong>Total Supply:</strong> 1.00B STG</div>
+        <div><strong>Max Supply:</strong> 1.00B STG</div>
+        <div><strong>Liquidity Ratio:</strong> 7.83%</div>
+        <div><strong>Volume (24h):</strong> $7.16M</div>
+        <div><strong>Holders</strong>:299.4k
+        </div>
+        <div><strong>Watchlist:</strong> 36,689</div>
+        <div><strong>ATH:</strong> $4.283</div>
+        <div><strong>ATL:</strong> $0.1016</div>
+    </div>
+
+    <div class="comment-box">
+        <strong>Comments:</strong><br>
+        The project having a Max Supply and a Circulating Supply of 66% are both <span class="flag-white">"white flags."</span> The high watchlist and holder count shows strong market interest, which is another <span class="flag-white">white flag.</span> Additionally, the liquidity ratio of ~8-9% is healthy compared to other projects given the current market situation. The only <span class="flag-red">"red flag"</span> is that the top ten addresses hold 78% of the supply.
+    </div>
+    <div class="rating">Rating: 7/10</div>
+
+    <h2>Phase 2: Token Allocation</h2>
+    <ul>
+        <li><strong>Community:</strong> 30.39%</li>
+        <li><strong>Team:</strong> 17.50%</li>
+        <li><strong>Investors:</strong> 17.50%</li>
+        <li><strong>Bonding Curve:</strong> 15.95%</li>
+        <li><strong>Protocol Launch:</strong> 15.00%</li>
+        <li><strong>Initial Emissions Program:</strong> 2.11%</li>
+        <li><strong>Bonding Curve DEXs:</strong> 1.55%</li>
+    </ul>
+
+    <div class="comment-box">
+        <strong>Comments:</strong><br>
+        The token allocation is well-diversified, which is a <span class="flag-white">"white flag."</span> Having 30.39% dedicated to the community and a significant portion for the protocol launch supports ecosystem growth. The 17.50% shares for both the team and investors are standard for a project of this scale, ensuring the team remains motivated without holding an overwhelming majority of the tokens.
+    </div>
+    <div class="rating">Rating: 7/10</div>
+
+    <h2>Phase 3: Team</h2>
+    <ul>
+        <li><strong>Bryan Pellegrino:</strong> Co-Founder and CEO</li>
+        <li><strong>Ryan Zarick:</strong> Co-Founder and CTO</li>
+        <li><strong>Caleb Banister:</strong> Co-Founder</li>
+        <li><strong>0xMaki:</strong> Member / Advisor</li>
+    </ul>
+    <div class="comment-box">
+        <strong>Comments:</strong><br>
+        The team has a very high level of experience in mathematics and computer science, which is a <span class="flag-white">"white flag."</span> They maintain an active presence on X (formerly Twitter), where they have a significant following. People engage with their posts regularly, and they post consistently, which shows strong transparency and leadership.
+    </div>
+    <div class="rating">Rating: 8/10</div>
+
+    <h2>Phase 4: Investors</h2>
+    <ul>
+        <li>Binance Labs</li>
+        <li>LayerZero Labs</li>
+        <li>Coinbase Ventures</li>
+        <li>Gemini</li>
+        <li>OKX Ventures</li>
+        <li>Multicoin Capital</li>
+        <li>Uniswap Labs</li>
+        <li>Samsung Next</li>
+        <li>PayPal Ventures</li>
+    </ul>
+    <div class="comment-box">
+        <strong>Comments:</strong><br>
+        The investors are highly reputable and are among the best in the Web3 space. This strong institutional backing is a significant <span class="flag-white">"white flag"</span> as it provides the project with credibility and long-term support.
+    </div>
+    <div class="rating">Rating: 8/10</div>
+
+    <h2>Phase 5: Social Media</h2>
+    <ul>
+        <li><strong>X (Twitter):</strong> 325k followers</li>
+        <li><strong>Telegram:</strong> 12,459 members</li>
+    </ul>
+    <div class="comment-box">
+        <strong>Comments:</strong><br>
+        Because they have a large following and people are actively engaged with their content, this is a <span class="flag-white">"white flag."</span> They post regularly, which demonstrates consistent communication with the community.
+    </div>
+    <div class="rating">Rating: 7/10</div>
+
+    <h2>Phase 6: Competitors</h2>
+    <ul>
+        <li><strong>Thorchain:</strong> Cross-chain liquidity and asset swapping.</li>
+        <li><strong>Anyswap:</strong> Cross-chain liquidity, DEX, and liquidity bridges.</li>
+        <li><strong>Wormhole:</strong> Cross-chain token and data bridge.</li>
+        <li><strong>RenVM:</strong> Cross-chain liquidity protocol.</li>
+        <li><strong>Polygon (MATIC):</strong> Multichain dApps and bridges.</li>
+        <li><strong>Avalanche:</strong> Cross-chain DeFi and scaling.</li>
+        <li><strong>Cosmos:</strong> Interoperability and communication.</li>
+        <li><strong>Chainlink:</strong> Oracle network with cross-chain capabilities.</li>
+    </ul>
+    <div class="comment-box">
+        <strong>Comments:</strong><br>
+        They have outperformed most of their competitors in many areas, which is a <span class="flag-white">"white flag."</span>
+    </div>
+    <div class="rating">Rating: 7/10</div>
+
+    <h2>Phase 7: Use Cases</h2>
+    <ul>
+        <li>Cross-chain liquidity transfer</li>
+        <li>Asset bridging between blockchains</li>
+        <li>DEX swaps (cross-chain status)</li>
+        <li>Cross-chain staking</li>
+        <li>Interoperable liquidity pools</li>
+        <li>dApp applications across blockchains</li>
+        <li>Governance participation across chains</li>
+    </ul>
+    <div class="comment-box">
+        <strong>Comments:</strong><br>
+        The project has strong and practical use cases. Since most of these focus on swapping—a high-frequency activity where people interact with the protocol daily—this is a solid <span class="flag-white">"white flag."</span>
+    </div>
+    <div class="rating">Rating: 7/10</div>
+
+    <h2>Phase 8: Road Map</h2>
+    <table class="roadmap-table">
+        <thead>
+            <tr>
+                <th>Event</th>
+                <th>Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>STG Token Launch</td><td>March 2022</td><td>Done</td></tr>
+            <tr><td>Expansion to 10+ Chains</td><td>2022–2023</td><td>Done</td></tr>
+            <tr><td>Stargate V2 Launch</td><td>May 2024</td><td>Done</td></tr>
+            <tr><td>Acquisition by LayerZero</td><td>August 2025</td><td>Done</td></tr>
+            <tr><td>STG to ZRO Swap Window</td><td>Ongoing</td><td>Active</td></tr>
+            <tr><td>ZRO L1 Mainnet Launch</td><td>Fall 2026</td><td>Upcoming</td></tr>
+        </tbody>
+    </table>
+
+    <div class="comment-box">
+        <strong>Comments:</strong><br>
+        The road map shows a very strong track record of delivery. The recent acquisition by LayerZero and the ongoing swap window are major <span class="flag-white">"white flags"</span> that provide a clear path forward for the project's evolution, and the project is ambitious.
+    </div>
+    <div class="rating">Rating: 9/10</div>
+
+    <div class="overall-summary">
+        <h2>Overall Comments of the project</h2>
+        <p>STG/STARGET is a web 3 bridging aggregator and one of the potential and popular ones in Web3 and they really try on this project</p>
+        <div style="font-size: 2rem; color: var(--accent); margin-top: 20px;">Rating 59/80</div>
+    </div>
+</div>
+
+</body>
+</html>
