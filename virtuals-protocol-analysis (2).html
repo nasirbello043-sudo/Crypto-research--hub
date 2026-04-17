@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Virtuals Protocol — Fundamental Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #080c10;
+    --surface: #0d1117;
+    --surface2: #111820;
+    --border: #1c2a38;
+    --accent: #00e5ff;
+    --accent2: #7b5cf5;
+    --accent3: #00ffa3;
+    --warn: #ff6b35;
+    --text: #c9d6e3;
+    --text-dim: #5a7a96;
+    --text-bright: #eaf4ff;
+    --glow: rgba(0,229,255,0.12);
+    --glow2: rgba(123,92,245,0.1);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* GRID NOISE BACKGROUND */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.025) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(123,92,245,0.08), transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── HEADER ── */
+  header {
+    padding: 60px 0 48px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  .header-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .header-tag::before {
+    content: '';
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.85); }
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(36px, 6vw, 68px);
+    font-weight: 800;
+    color: var(--text-bright);
+    line-height: 1.05;
+    letter-spacing: -1px;
+    margin-bottom: 10px;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .header-sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-top: 14px;
+  }
+
+  /* STAT STRIP */
+  .stat-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 40px 0;
+  }
+
+  .stat-item {
+    background: var(--surface);
+    padding: 20px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: background 0.2s;
+  }
+
+  .stat-item:hover { background: var(--surface2); }
+
+  .stat-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .stat-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-bright);
+  }
+
+  .stat-value.green { color: var(--accent3); }
+  .stat-value.red { color: var(--warn); }
+  .stat-value.blue { color: var(--accent); }
+  .stat-value.purple { color: var(--accent2); }
+
+  /* ── SECTIONS ── */
+  .section {
+    margin-top: 60px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  .section-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 1px;
+    opacity: 0.7;
+    min-width: 32px;
+  }
+
+  h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-bright);
+    letter-spacing: -0.3px;
+  }
+
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  /* CARD */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 30px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.25s, transform 0.2s;
+  }
+
+  .card:hover {
+    border-color: rgba(0,229,255,0.25);
+    transform: translateY(-2px);
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), transparent);
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+
+  .card:hover::before { opacity: 1; }
+
+  p {
+    color: var(--text);
+    line-height: 1.8;
+    margin-bottom: 14px;
+  }
+
+  p:last-child { margin-bottom: 0; }
+
+  /* TEAM CARDS */
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+    gap: 20px;
+  }
+
+  @media (max-width: 680px) {
+    .team-grid { grid-template-columns: 1fr; }
+  }
+
+  .team-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: border-color 0.25s, transform 0.2s;
+  }
+
+  .team-card:hover {
+    border-color: rgba(0,229,255,0.3);
+    transform: translateY(-3px);
+  }
+
+  .team-card-header {
+    background: linear-gradient(135deg, var(--surface2), var(--bg));
+    padding: 24px 26px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+  }
+
+  .avatar {
+    width: 54px; height: 54px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .avatar::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 50%;
+    border: 1.5px solid;
+    opacity: 0.5;
+  }
+
+  .avatar-a { background: rgba(0,229,255,0.08); color: var(--accent); }
+  .avatar-a::after { border-color: var(--accent); }
+  .avatar-b { background: rgba(123,92,245,0.08); color: var(--accent2); }
+  .avatar-b::after { border-color: var(--accent2); }
+  .avatar-c { background: rgba(0,255,163,0.08); color: var(--accent3); }
+  .avatar-c::after { border-color: var(--accent3); }
+  .avatar-d { background: rgba(255,107,53,0.08); color: var(--warn); }
+  .avatar-d::after { border-color: var(--warn); }
+
+  .team-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-bright);
+    margin-bottom: 3px;
+  }
+
+  .team-role {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .team-body {
+    padding: 22px 26px;
+  }
+
+  .timeline {
+    list-style: none;
+    position: relative;
+    padding-left: 20px;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 6px; top: 8px; bottom: 8px;
+    width: 1px;
+    background: linear-gradient(180deg, var(--accent), var(--accent2), transparent);
+    opacity: 0.3;
+  }
+
+  .timeline li {
+    position: relative;
+    padding: 0 0 16px 16px;
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--text);
+  }
+
+  .timeline li:last-child { padding-bottom: 0; }
+
+  .timeline li::before {
+    content: '';
+    position: absolute;
+    left: -7px; top: 8px;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 1.5px solid var(--bg);
+    box-shadow: 0 0 6px var(--accent);
+  }
+
+  .timeline .year {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 1px;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  /* ROADMAP */
+  .roadmap-grid {
+    display: grid;
+    gap: 14px;
+  }
+
+  .roadmap-item {
+    display: grid;
+    grid-template-columns: 130px 1fr;
+    gap: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 22px;
+    align-items: start;
+    transition: border-color 0.25s;
+  }
+
+  .roadmap-item:hover { border-color: rgba(0,229,255,0.2); }
+
+  .roadmap-item.done { border-left: 3px solid var(--accent3); }
+  .roadmap-item.active { border-left: 3px solid var(--accent); }
+  .roadmap-item.planned { border-left: 3px solid var(--accent2); }
+
+  .roadmap-date {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+    padding-top: 2px;
+  }
+
+  .roadmap-status {
+    display: inline-block;
+    font-size: 9px;
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 4px;
+    margin-top: 6px;
+  }
+
+  .done .roadmap-status { background: rgba(0,255,163,0.1); color: var(--accent3); }
+  .active .roadmap-status { background: rgba(0,229,255,0.1); color: var(--accent); }
+  .planned .roadmap-status { background: rgba(123,92,245,0.1); color: var(--accent2); }
+
+  .roadmap-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-bright);
+    margin-bottom: 5px;
+  }
+
+  .roadmap-desc {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  /* PILLARS GRID */
+  .pillars-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+  }
+
+  .pillar-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    transition: border-color 0.25s, transform 0.2s;
+  }
+
+  .pillar-card:hover {
+    border-color: rgba(0,229,255,0.25);
+    transform: translateY(-2px);
+  }
+
+  .pillar-icon {
+    font-size: 26px;
+    margin-bottom: 12px;
+  }
+
+  .pillar-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 8px;
+    letter-spacing: 0.3px;
+  }
+
+  .pillar-desc {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  /* RISK TABLE */
+  .risk-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+  }
+
+  .risk-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+  }
+
+  .risk-label {
+    font-size: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+
+  .risk-score {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+
+  .risk-score.high { color: var(--warn); }
+  .risk-score.med { color: #f5c518; }
+  .risk-score.low { color: var(--accent3); }
+
+  .risk-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+
+  .risk-fill { height: 100%; border-radius: 2px; }
+  .fill-high { background: var(--warn); }
+  .fill-med { background: #f5c518; }
+  .fill-low { background: var(--accent3); }
+
+  .risk-note {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+
+  /* TAG CHIPS */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .chip {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    padding: 5px 12px;
+    border-radius: 6px;
+    border: 1px solid;
+  }
+
+  .chip-blue { border-color: rgba(0,229,255,0.3); color: var(--accent); background: rgba(0,229,255,0.05); }
+  .chip-purple { border-color: rgba(123,92,245,0.3); color: var(--accent2); background: rgba(123,92,245,0.05); }
+  .chip-green { border-color: rgba(0,255,163,0.3); color: var(--accent3); background: rgba(0,255,163,0.05); }
+  .chip-orange { border-color: rgba(255,107,53,0.3); color: var(--warn); background: rgba(255,107,53,0.05); }
+
+  /* VERDICT BOX */
+  .verdict {
+    background: linear-gradient(135deg, rgba(0,229,255,0.04), rgba(123,92,245,0.04));
+    border: 1px solid rgba(0,229,255,0.2);
+    border-radius: 14px;
+    padding: 32px 36px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .verdict::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+
+  .verdict h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-bright);
+    margin-bottom: 14px;
+  }
+
+  /* FOOTNOTE */
+  .footnote {
+    margin-top: 60px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.8;
+  }
+
+  /* SCROLL ANIMATIONS */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .fade-in.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (max-width: 600px) {
+    .roadmap-item { grid-template-columns: 1fr; gap: 6px; }
+    h1 { font-size: 34px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <header class="fade-in">
+    <div class="header-tag">Fundamental Analysis · $VIRTUAL · April 2026</div>
+    <h1>Virtuals<br/><span>Protocol</span></h1>
+    <p style="max-width:620px; margin-top:16px; color:var(--text-dim); font-size:14px;">
+      A deep-dive into the team, mission, architecture, roadmap, and risk profile of the leading decentralized AI Agent infrastructure on Base, Solana, and beyond.
+    </p>
+    <div class="header-sub">VIRTUAL · Base L2 + Solana + Ronin + Arbitrum · ~$415M Market Cap (Apr 2026)</div>
+  </header>
+
+  <!-- STAT STRIP -->
+  <div class="stat-strip fade-in">
+    <div class="stat-item">
+      <div class="stat-label">ATH Price</div>
+      <div class="stat-value red">$5.07</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Current Price</div>
+      <div class="stat-value">~$0.63</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Market Cap</div>
+      <div class="stat-value blue">~$415M</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Total Supply</div>
+      <div class="stat-value">1B VIRTUAL</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Agents Launched</div>
+      <div class="stat-value green">18,000+</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Protocol Revenue</div>
+      <div class="stat-value green">$60M+ cumulative</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Seed Raise</div>
+      <div class="stat-value purple">$16M</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Team Size</div>
+      <div class="stat-value">~62 staff</div>
+    </div>
+  </div>
+
+  <!-- SECTION 1: PURPOSE -->
+  <div class="section fade-in">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2>Purpose &amp; Mission</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="card">
+      <p>
+        Virtuals Protocol is the foundational infrastructure layer for the on-chain AI Agent economy. Its core thesis: <strong style="color:var(--text-bright)">autonomous AI agents will increasingly perform economic activity currently handled by humans</strong>, and for that transition to scale globally, agents must be able to coordinate, transact, and settle value seamlessly — without intermediaries — across a permissionless, composable medium. Blockchain is that medium.
+      </p>
+      <p>
+        The protocol enables anyone — with zero technical expertise — to create, tokenize, deploy, and monetize AI agents across gaming, entertainment, finance, social media, and beyond. Each agent is a co-owned, revenue-generating entity represented by an ERC-20 token. Holders participate in the agent's earnings. This flips the traditional AI model: instead of closed, siloed AI owned by corporations, Virtuals creates community-owned agents whose economic value flows directly to stakeholders.
+      </p>
+      <p>
+        The project's founding vision evolved from watching Japanese VTubers — virtual content creators — and asking: <em style="color:var(--text-dim)">"What if these virtual personalities were powered by AI, co-owned by fans globally, and generated revenue that was distributed on-chain?" </em> That question became the protocol.
+      </p>
+      <div class="chips">
+        <span class="chip chip-blue">AI Agent Launchpad</span>
+        <span class="chip chip-purple">Agent Tokenization</span>
+        <span class="chip chip-green">Co-ownership Economy</span>
+        <span class="chip chip-orange">On-chain Commerce</span>
+        <span class="chip chip-blue">Entertainment & Gaming</span>
+        <span class="chip chip-purple">DeFAI Infrastructure</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: TEAM -->
+  <div class="section fade-in">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2>Team — Full History</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="team-grid">
+
+      <!-- JANSEN TENG -->
+      <div class="team-card">
+        <div class="team-card-header">
+          <div class="avatar avatar-a">JT</div>
+          <div>
+            <div class="team-name">Jansen Teng</div>
+            <div class="team-role">Co-Founder &amp; CEO</div>
+          </div>
+        </div>
+        <div class="team-body">
+          <ul class="timeline">
+            <li>
+              <span class="year">2015</span>
+              Founded <strong>CIPTA</strong> — a student-led platform connecting Malaysian students in the UK with investors and grants for innovative projects. Served as president of the Imperial College Union Malaysian Society.
+            </li>
+            <li>
+              <span class="year">2016</span>
+              Co-founded <strong>ThinAir Water</strong> — a sustainable water-harvesting startup applying nature-inspired condensation technology. Won multiple early-stage venture competitions.
+            </li>
+            <li>
+              <span class="year">2017–2018</span>
+              Undergraduate researcher at <strong>Imperial College London</strong> — focused on genetic engineering to improve water nucleation. Graduated BSc in <em>Biotechnology &amp; Business Management</em>, 2018.
+            </li>
+            <li>
+              <span class="year">2018–2021</span>
+              Joined <strong>Boston Consulting Group (BCG)</strong>, Kuala Lumpur. Rose from Associate to Senior Associate / Consultant. Specialized in analytics, digital banking licenses, and market studies across Southeast Asian industries.
+            </li>
+            <li>
+              <span class="year">2019–2020</span>
+              Co-founded <strong>DIAM Digital Marketing</strong> and subsequently co-founded <strong>Aidaro</strong> (2020) — an AI and big-data powered home recommendation platform in Malaysia.
+            </li>
+            <li>
+              <span class="year">2021</span>
+              Co-founded <strong>PathDAO</strong> — a blockchain gaming guild (with Wee Kee). Raised $16M in seed funding with a $600M peak valuation from DeFiance Capital, LVT Capital, and NewTribe Capital.
+            </li>
+            <li>
+              <span class="year">2022–2023</span>
+              Navigated PathDAO through a severe bear market downturn (token -99%). Pivoted across multiple business lines: social platforms, NFT apparel, music, lending — none gained market traction.
+            </li>
+            <li>
+              <span class="year">2024–present</span>
+              Pivoted to AI agents in Jan 2024. Rebranded to <strong>Virtuals Protocol</strong>. Launched the platform on Base in October 2024 — crossing $1B market cap within 60 days. Featured at SuperAI Singapore 2024 and Consensus Hong Kong 2026. Active GitHub contributor and podcast speaker on agentic AI economics.
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- WEE KEE TIEW -->
+      <div class="team-card">
+        <div class="team-card-header">
+          <div class="avatar avatar-b">WK</div>
+          <div>
+            <div class="team-name">Tiew Wee Kee (Weekee)</div>
+            <div class="team-role">Co-Founder</div>
+          </div>
+        </div>
+        <div class="team-body">
+          <ul class="timeline">
+            <li>
+              <span class="year">2013–2016</span>
+              Studied at <strong>Imperial College London</strong> — the same institution as Jansen Teng. First encountered Bitcoin and Ethereum while studying; began early crypto investing.
+            </li>
+            <li>
+              <span class="year">2016–2017</span>
+              Pursued a graduate degree at <strong>London Business School</strong>, gaining deep exposure to private equity, finance, and investment strategy.
+            </li>
+            <li>
+              <span class="year">2017–2018</span>
+              Worked as a <strong>Private Equity Analyst</strong> at <strong>Creador</strong> (a Malaysia-headquartered PE firm backing high-growth Asian businesses) and at <strong>AnaCap Financial Partners</strong> (a London-based PE firm focused on European financial services).
+            </li>
+            <li>
+              <span class="year">2018–2020</span>
+              Joined <strong>Boston Consulting Group</strong> as a consultant — overlapping with Jansen Teng in Kuala Lumpur. Worked on analytics-driven strategy engagements across Southeast Asia.
+            </li>
+            <li>
+              <span class="year">2020</span>
+              Transitioned to <strong>SEEK</strong> (one of Asia's largest employment platforms) as <em>Growth Manager for Asia</em>, focusing on user acquisition and market expansion.
+            </li>
+            <li>
+              <span class="year">2020–2021</span>
+              Co-founded <strong>Aidaro</strong> with Jansen Teng — an AI-powered property recommendation engine operating in Malaysia, bridging machine learning with real estate search.
+            </li>
+            <li>
+              <span class="year">2021</span>
+              Co-founded <strong>PathDAO</strong>. Wee Kee led growth and community operations. The gaming guild raised $16M with a $600M peak valuation. The subsequent crypto winter brought the token down 99% to a $6M market floor.
+            </li>
+            <li>
+              <span class="year">2022–2023</span>
+              Sustained team morale through PathDAO's lowest point. Wee Kee explored parallel pivots and was inspired by the growth of Japanese <em>VTubers</em> to conceive an AI-powered virtual idol economy — seeding the Virtuals idea.
+            </li>
+            <li>
+              <span class="year">2024–present</span>
+              Co-leads Virtuals Protocol. Has been the primary spokesperson for business development, community strategy, and ecosystem growth. Spearheaded the AI virtual idol <strong>Luna</strong> concept, which grew to 500K+ TikTok followers and a $66M+ market cap at peak.
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- BRIANNA CHANG -->
+      <div class="team-card">
+        <div class="team-card-header">
+          <div class="avatar avatar-c">BC</div>
+          <div>
+            <div class="team-name">Brianna Chang</div>
+            <div class="team-role">Founding Member</div>
+          </div>
+        </div>
+        <div class="team-body">
+          <ul class="timeline">
+            <li>
+              <span class="year">Pre-2022</span>
+              Worked in the <strong>media industry</strong> as a Group Data Lead, building data architecture, analytics pipelines, and technical product frameworks across large media organizations.
+            </li>
+            <li>
+              <span class="year">Nov 2022</span>
+              Joined Virtuals Protocol as one of its earliest core members — even before the AI pivot. Brought critical <strong>technical product management</strong> and <strong>data infrastructure</strong> expertise during the protocol's most uncertain phase.
+            </li>
+            <li>
+              <span class="year">2024–present</span>
+              Core contributor to GAME framework's technical product roadmap and agent data pipelines. One of the key architects of how agent behavior data is structured, stored, and incentivized on-chain.
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- AI/RESEARCH TEAM -->
+      <div class="team-card">
+        <div class="team-card-header">
+          <div class="avatar avatar-d">AI</div>
+          <div>
+            <div class="team-name">AI &amp; Research Team</div>
+            <div class="team-role">Core Engineering</div>
+          </div>
+        </div>
+        <div class="team-body">
+          <ul class="timeline">
+            <li>
+              <span class="year">Viktor Anchutin</span>
+              AI Engineer. Holds a <strong>Master's in Data Science</strong> from the University of Malaya. Specializes in building scalable ML inference systems for agent cognition.
+            </li>
+            <li>
+              <span class="year">Ong Teng Kheng</span>
+              Senior AI Engineer. Expert in <strong>NLP and generative AI systems</strong>. Key contributor to the GAME (Goal-Action-Mind-Engine) framework's planning and reasoning layers.
+            </li>
+            <li>
+              <span class="year">Wei Zhe Yeoh</span>
+              AI Scientist. Holds an <strong>MSc from Imperial College London</strong>. 5+ years in AI and data science. Works at the intersection of multimodal AI (text, speech, 3D) and on-chain integration.
+            </li>
+            <li>
+              <span class="year">Matthew Stewart</span>
+              <strong>Postdoctoral Researcher at Harvard</strong>. Specializes in AI systems, machine learning theory, and policy. Advises on the theoretical underpinnings of autonomous agent economics.
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- GROWTH & BD -->
+      <div class="team-card">
+        <div class="team-card-header">
+          <div class="avatar avatar-a">GR</div>
+          <div>
+            <div class="team-name">Growth &amp; Business Dev</div>
+            <div class="team-role">Expansion Team</div>
+          </div>
+        </div>
+        <div class="team-body">
+          <ul class="timeline">
+            <li>
+              <span class="year">Sean Kyu Won Kim · Head of Growth</span>
+              Joined Feb 2025. Previously at <strong>Gartner</strong>, where he worked on global enterprise growth strategy. Leads Virtuals' global expansion, developer acquisition, and institutional outreach.
+            </li>
+            <li>
+              <span class="year">Christopher Johnson · Community Lead</span>
+              Based in <strong>San Francisco</strong>. Brings nearly 30 years of marketing and business development experience. Leads community engagement, partner integrations, and Virtuals' US market strategy.
+            </li>
+            <li>
+              <span class="year">Yifei You · Core Contributor</span>
+              Joined Jan 2025. Multilingual (English, Mandarin). Prior CEO experience at <strong>Portus</strong>. Oversees cross-border BD, particularly in Asian markets, and protocol-level partnerships.
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- TEAM OVERVIEW CARD -->
+      <div class="team-card">
+        <div class="team-card-header">
+          <div class="avatar avatar-b">62</div>
+          <div>
+            <div class="team-name">Team Overview</div>
+            <div class="team-role">~62 Staff · Mar 2026</div>
+          </div>
+        </div>
+        <div class="team-body">
+          <ul class="timeline">
+            <li>
+              <span class="year">Headquarters</span>
+              Primarily <strong>Kuala Lumpur, Malaysia</strong> — with distributed members across London, Singapore, and San Francisco.
+            </li>
+            <li>
+              <span class="year">Academic Pedigree</span>
+              Significant representation from <strong>Imperial College London, Harvard, Carnegie Mellon, Cambridge, and London Business School</strong>.
+            </li>
+            <li>
+              <span class="year">Industry Pedigree</span>
+              Multiple alumni from <strong>Boston Consulting Group, Gartner, AnaCap, Creador, and SEEK</strong> — bringing strategy, PE, and growth chops to crypto.
+            </li>
+            <li>
+              <span class="year">Assessment</span>
+              The team's rare blend of <strong>AI research depth, blockchain-native execution, and traditional consulting rigor</strong> is a genuine differentiator. Both founders survived a 99% drawdown and rebuilding — stress-testing the team's conviction and resilience.
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SECTION 3: PROTOCOL PILLARS -->
+  <div class="section fade-in">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2>Protocol Architecture — Four Pillars</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="pillars-grid">
+      <div class="pillar-card">
+        <div class="pillar-icon">🤝</div>
+        <div class="pillar-name">Butler</div>
+        <div class="pillar-desc">The human-to-agent interface. A chat-based entry point where users discover, hire, and delegate tasks to AI agents. Executes ACP contracts for payments, task routing, and on-chain result confirmation.</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-icon">⚙️</div>
+        <div class="pillar-name">ACP</div>
+        <div class="pillar-desc">Agent Commerce Protocol — the commercial backbone. Standardized framework for agent-to-agent transactions using smart contract escrow, cryptographic verification, and a full lifecycle: request → negotiate → escrow → deliver → evaluate → settle.</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-icon">🧠</div>
+        <div class="pillar-name">G.A.M.E.</div>
+        <div class="pillar-desc">Goal-Action-Mind-Engine. The cognitive layer powering agents, built on Llama 3.3 70B, DeepSeek R1/V3, and Qwen 2.5 72B. Enables agents to plan, decide, and act autonomously. Accessible via GAME Cloud (low-code) or GAME SDK (open-source).</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-icon">🦄</div>
+        <div class="pillar-name">Unicorn</div>
+        <div class="pillar-desc">Capital formation layer. The Initial Agent Offering (IAO) launchpad. Each launch allocates 5% supply as ecosystem airdrops — 2% to $VIRTUAL stakers, 3% to active ACP participants. Every new agent launch directly rewards the community.</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-icon">🤖</div>
+        <div class="pillar-name">Virtuals Robotics</div>
+        <div class="pillar-desc">Physical-world extension. SAM became the first on-chain AI agent controlling real-world robots. PrismaX raised $11M to build coordination layers for remote robot operators — bridging digital agents into embodied AI.</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-icon">🗳️</div>
+        <div class="pillar-name">veVIRTUAL Governance</div>
+        <div class="pillar-desc">Launched July 2025. Stake VIRTUAL to receive veVIRTUAL for on-chain DAO governance, protocol treasury votes, and periodic agent token airdrops. Moving toward a fully community-governed protocol.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 4: ROADMAP -->
+  <div class="section fade-in">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2>Roadmap — History &amp; Ahead</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="roadmap-grid">
+
+      <div class="roadmap-item done">
+        <div>
+          <div class="roadmap-date">Oct 2021</div>
+          <div class="roadmap-status">COMPLETE</div>
+        </div>
+        <div>
+          <div class="roadmap-title">PathDAO Founded &amp; $16M Raised</div>
+          <div class="roadmap-desc">Blockchain gaming guild launched. Seed round led by DeFiance Capital and Beam with participation from Master Ventures, LVT Capital, NewTribe Capital, and Stakez Capital at a ~$600M valuation.</div>
+        </div>
+      </div>
+
+      <div class="roadmap-item done">
+        <div>
+          <div class="roadmap-date">Dec 2023</div>
+          <div class="roadmap-status">COMPLETE</div>
+        </div>
+        <div>
+          <div class="roadmap-title">Pivot to AI &amp; Rebrand to Virtuals Protocol</div>
+          <div class="roadmap-desc">Community governance vote approved the pivot. PATH holders airdropped VIRTUAL tokens. New visual identity, website, and strategic direction aligned to decentralized AI agents.</div>
+        </div>
+      </div>
+
+      <div class="roadmap-item done">
+        <div>
+          <div class="roadmap-date">Feb 2024</div>
+          <div class="roadmap-status">COMPLETE</div>
+        </div>
+        <div>
+          <div class="roadmap-title">First Agent Launch — Luna (AI Virtual Idol)</div>
+          <div class="roadmap-desc">Luna, a 24/7 AI-powered virtual K-pop streamer, launched on TikTok accumulating 500K+ followers. Demonstrated the core thesis: AI agents as revenue-generating entertainment assets.</div>
+        </div>
+      </div>
+
+      <div class="roadmap-item done">
+        <div>
+          <div class="roadmap-date">Oct 2024</div>
+          <div class="roadmap-status">COMPLETE</div>
+        </div>
+        <div>
+          <div class="roadmap-title">Platform Launch on Base — AI Agent Creation Goes Live</div>
+          <div class="roadmap-desc">Public launch of the AI agent creation platform on Ethereum's Base L2. Zero technical expertise required. GAME framework introduced. LUNA token launched with 50x price appreciation in under 2 weeks.</div>
+        </div>
+      </div>
+
+      <div class="roadmap-item done">
+        <div>
+          <div class="roadmap-date">Dec 2024</div>
+          <div class="roadmap-status">COMPLETE</div>
+        </div>
+        <div>
+          <div class="roadmap-title">$1B Market Cap — Unicorn Status</div>
+          <div class="roadmap-desc">Protocol crossed $1B market cap. VIRTUAL token rose from $0.03 to a peak of $5.07 — a 169x increase from October. Named the hottest AI blockchain project of the cycle.</div>
+        </div>
+      </div>
+
+      <div class="roadmap-item done">
+        <div>
+          <div class="roadmap-date">Jan 2025</div>
+          <div class="roadmap-status">COMPLETE</div>
+        </div>
+        <div>
+          <div class="roadmap-title">Solana Expansion &amp; Token Burn Program</div>
+          <div class="roadmap-desc">Protocol expanded to Solana blockchain. Introduced Strategic SOL Reserve. Announced buyback and burn of 13M VIRTUAL tokens (~$48M value) to create deflationary pressure and support ecosystem health.</div>
+        </div>
+      </div>
+
+      <div class="roadmap-item done">
+        <div>
+          <div class="roadmap-date">Jul 2025</div>
+          <div class="roadmap-status">COMPLETE</div>
+        </div>
+        <div>
+          <div class="roadmap-title">veVIRTUAL Governance &amp; Virgen Points</div>
+          <div class="roadmap-desc">Launched on-chain DAO governance via veVIRTUAL staking. Introduced Virgen Points — a transparency and fairness model for agent launch access tied to $VIRTUAL holding and ecosystem participation.</div>
+        </div>
+      </div>
+
+      <div class="roadmap-item done">
+        <div>
+          <div class="roadmap-date">Q4 2025</div>
+          <div class="roadmap-status">COMPLETE</div>
+        </div>
+        <div>
+          <div class="roadmap-title">Extensions SDK, Dynamic Fee Sharing &amp; Multi-chain</div>
+          <div class="roadmap-desc">Finalized the Extensions SDK. Launched Dynamic Fee Sharing. Integrated with Ronin blockchain. Developer commits surpassed 3 competitors in Q4 2025 — signaling deep infrastructure investment despite price decline.</div>
+        </div>
+      </div>
+
+      <div class="roadmap-item done">
+        <div>
+          <div class="roadmap-date">Feb 2026</div>
+          <div class="roadmap-status">COMPLETE</div>
+        </div>
+        <div>
+          <div class="roadmap-title">Virtuals Revenue Network Launch — Consensus HK</div>
+          <div class="roadmap-desc">Launched at Consensus Hong Kong. Distributes up to $1M/month to agents selling through ACP. Integrated Coinbase x402 protocol for agent-to-agent payments over HTTP — driving a near-100% VIRTUAL price surge in 4 days.</div>
+        </div>
+      </div>
+
+      <div class="roadmap-item done">
+        <div>
+          <div class="roadmap-date">Mar 2026</div>
+          <div class="roadmap-status">COMPLETE</div>
+        </div>
+        <div>
+          <div class="roadmap-title">ERC-8183 Co-authored with Ethereum Foundation</div>
+          <div class="roadmap-desc">Co-developed ERC-8183 with Ethereum Foundation's dAI team (led by Davide Crapis). Proposed Ethereum standard for trustless, permissionless AI agent transactions — cementing Virtuals as a protocol-level infrastructure player, not just an app.</div>
+        </div>
+      </div>
+
+      <div class="roadmap-item active">
+        <div>
+          <div class="roadmap-date">Apr 2026</div>
+          <div class="roadmap-status">IN PROGRESS</div>
+        </div>
+        <div>
+          <div class="roadmap-title">Arbitrum Integration &amp; XRP Ledger Live</div>
+          <div class="roadmap-desc">Arbitrum integration (live March 2026) adds access to $20B+ TVL and 2.1B+ cumulative transactions. XRP Ledger integration via t54 partnership enables agents to conduct escrowed jobs and settle natively in XRP or RLUSD.</div>
+        </div>
+      </div>
+
+      <div class="roadmap-item planned">
+        <div>
+          <div class="roadmap-date">Q2 2026</div>
+          <div class="roadmap-status">PLANNED</div>
+        </div>
+        <div>
+          <div class="roadmap-title">BNB Chain &amp; XLayer Expansions</div>
+          <div class="roadmap-desc">Planned multi-chain expansion to BNB Chain and OKX's XLayer, broadening agent liquidity access and expanding the addressable ecosystem for ACP commerce.</div>
+        </div>
+      </div>
+
+      <div class="roadmap-item planned">
+        <div>
+          <div class="roadmap-date">2026 Onwards</div>
+          <div class="roadmap-status">PLANNED</div>
+        </div>
+        <div>
+          <div class="roadmap-title">Full Agent Lifecycle Protocol &amp; Agentic Fund of Funds</div>
+          <div class="roadmap-desc">2026 roadmap centers on the full agent lifecycle — from creation to retirement. Partnership with Zyfai and BasisOS to launch an "Agentic Fund of Funds." Butler upgrades: real-time agent activity, streamlined wallet flows, and enhanced task delegation.</div>
+        </div>
+      </div>
+
+      <div class="roadmap-item planned">
+        <div>
+          <div class="roadmap-date">Long-term</div>
+          <div class="roadmap-status">VISION</div>
+        </div>
+        <div>
+          <div class="roadmap-title">Virtuals Robotics — Embodied Agent Economy</div>
+          <div class="roadmap-desc">Extending agent coordination from purely digital to physical-world robotics. PrismaX ($11M raised) building remote robot operator networks. The long-term vision: a fully autonomous AI agent economy spanning digital and physical reality.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SECTION 5: RISK -->
+  <div class="section fade-in">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h2>Risk Assessment</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="risk-grid">
+      <div class="risk-item">
+        <div class="risk-label">Token Price Risk</div>
+        <div class="risk-score high">HIGH</div>
+        <div class="risk-bar"><div class="risk-fill fill-high" style="width:87%"></div></div>
+        <div class="risk-note">Down ~87% from ATH. 90%+ of holders are underwater. Extreme hype-driven volatility at cycle peak.</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-label">Revenue Sustainability</div>
+        <div class="risk-score high">HIGH</div>
+        <div class="risk-bar"><div class="risk-fill fill-high" style="width:80%"></div></div>
+        <div class="risk-note">Monthly revenue peaked at $3.9M (Jan 2025) then crashed to ~$35K (Feb 2025). Recovery is partial. Revenue-to-development disconnect is the core concern.</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-label">Competitive Risk</div>
+        <div class="risk-score med">MED</div>
+        <div class="risk-bar"><div class="risk-fill fill-med" style="width:58%"></div></div>
+        <div class="risk-note">First-mover advantage is real. However, free open-source AI agent frameworks (LangChain, Eliza, etc.) are strong alternatives developers can use without paying protocol fees.</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-label">Execution Risk</div>
+        <div class="risk-score med">MED</div>
+        <div class="risk-bar"><div class="risk-fill fill-med" style="width:50%"></div></div>
+        <div class="risk-note">Strong dev activity in Q4 2025. ERC-8183 co-authorship demonstrates institutional credibility. Q1 2026 contributor retention is the key signal to watch.</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-label">Regulatory Risk</div>
+        <div class="risk-score med">MED</div>
+        <div class="risk-bar"><div class="risk-fill fill-med" style="width:55%"></div></div>
+        <div class="risk-note">Agent token launches operate in a gray area. SEC scrutiny of tokenized assets is evolving. Base L2's Coinbase parentage provides some legitimacy buffer.</div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-label">Team Risk</div>
+        <div class="risk-score low">LOW</div>
+        <div class="risk-bar"><div class="risk-fill fill-low" style="width:28%"></div></div>
+        <div class="risk-note">Founders survived a 99% drawdown and still shipped. Pedigree from BCG, Harvard, Imperial College London, Carnegie Mellon. ~62 staff is substantial for a crypto protocol at this stage.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 6: VERDICT -->
+  <div class="section fade-in">
+    <div class="section-header">
+      <span class="section-num">06</span>
+      <h2>Fundamental Verdict</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="verdict">
+      <h3>Overall: Infrastructure thesis is sound — execution vs. sustainability is the open question</h3>
+      <p>
+        Virtuals Protocol occupies a genuinely unique position: it is not just an AI agent app, it is attempting to become the <strong style="color:var(--text-bright)">NASDAQ of tokenized AI agents</strong> — a permissionless venue for creating, owning, and monetizing autonomous intelligence. The ERC-8183 co-authorship with the Ethereum Foundation, the ACP protocol, and multi-chain expansion to Arbitrum and XRP Ledger in early 2026 demonstrate that the team is building protocol-layer infrastructure, not just hype-driven features.
+      </p>
+      <p>
+        The team's background is exceptional by crypto standards. Both founders have BCG consulting pedigrees, technical degrees from Imperial College London, and — critically — survived rebuilding from a 99% token collapse. This stress test of character and vision is not common among crypto founders. The AI research team (Harvard, Imperial College, Carnegie Mellon) adds genuine technical depth.
+      </p>
+      <p>
+        The core risk is the <strong style="color:var(--warn)">revenue cliff</strong>: daily revenue collapsed from $1M+ in January 2025 to under $35K by late February — a 97% drop. While the 18,000+ agents launched and $60M+ cumulative revenue are real milestones, sustainable ongoing protocol economics remain unproven at scale. The disconnect between strong developer activity and weak revenue generation defines the risk in 2026.
+      </p>
+      <p>
+        For on-chain investors applying the 10-step framework: price action and smart money (Grayscale consideration, 167% APR Aerodrome pool) show institutional interest returning. Holder concentration in whale wallets (~75%) is a significant caution flag. Protocol metrics (TVL-equivalent through agent market caps) have stabilized. The risk/reward at ~$415M market cap vs. a $4.6B ATH is asymmetric — but only for those who believe AI agent commerce as a category will produce sustained on-chain economic activity at scale.
+      </p>
+      <div class="chips" style="margin-top: 20px;">
+        <span class="chip chip-green">Strong Team Pedigree</span>
+        <span class="chip chip-green">First Mover in AI Agents</span>
+        <span class="chip chip-green">ERC-8183 Co-Author</span>
+        <span class="chip chip-blue">Multi-chain Expansion</span>
+        <span class="chip chip-orange">Revenue Sustainability Risk</span>
+        <span class="chip chip-orange">Whale Concentration ~75%</span>
+        <span class="chip chip-orange">Speculative Macro Bet</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTNOTE -->
+  <div class="footnote fade-in">
+    <p>⚠ This analysis is for informational purposes only and does not constitute financial or investment advice. Crypto assets involve substantial risk of loss. Always do your own research (DYOR) before making any investment decisions. Data sourced from Messari, CoinGecko, CoinStats AI, DataWallet, 99Bitcoins, IQ.wiki, and public team profiles — as of April 2026.</p>
+    <p style="margin-top:8px;">Framework: Nasir's 10-Step On-Chain Token Analysis · Report generated April 15, 2026</p>
+  </div>
+
+</div>
+
+<script>
+  // Intersection Observer for scroll animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+  // Stagger team cards
+  document.querySelectorAll('.team-card').forEach((card, i) => {
+    card.style.transitionDelay = `${i * 60}ms`;
+    card.classList.add('fade-in');
+    observer.observe(card);
+  });
+
+  document.querySelectorAll('.roadmap-item, .pillar-card, .risk-item').forEach((el, i) => {
+    el.style.transitionDelay = `${i * 40}ms`;
+    el.classList.add('fade-in');
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
