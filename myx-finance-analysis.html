@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MYX Finance — Deep Fundamental Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080c14;
+    --surface: #0e1520;
+    --surface2: #141d2b;
+    --border: #1e2d45;
+    --accent: #00e5ff;
+    --accent2: #7b5cf0;
+    --accent3: #ff6b35;
+    --gold: #f5c542;
+    --green: #00d68f;
+    --red: #ff4d6d;
+    --text: #e8f0fe;
+    --muted: #6b8cb0;
+    --card-glow: rgba(0,229,255,0.05);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    min-height: 340px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 24px 40px;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,229,255,0.12) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 40% at 80% 80%, rgba(123,92,240,0.1) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(ellipse 100% 100% at 50% 0%, black 40%, transparent 100%);
+  }
+  .hero-inner { position: relative; z-index: 1; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(0,229,255,0.1); border: 1px solid rgba(0,229,255,0.3);
+    border-radius: 999px; padding: 6px 16px; font-size: 12px;
+    color: var(--accent); font-family: 'Space Mono', monospace;
+    letter-spacing: 0.05em; margin-bottom: 20px;
+  }
+  .hero-badge span { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+  .hero h1 {
+    font-family: 'Syne', sans-serif; font-size: clamp(2.2rem, 6vw, 4rem);
+    font-weight: 800; letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #fff 30%, var(--accent) 70%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 12px;
+  }
+  .hero-sub { color: var(--muted); font-size: 0.95rem; max-width: 560px; margin: 0 auto 24px; }
+  .contract-pill {
+    font-family: 'Space Mono', monospace; font-size: 11px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 14px; color: var(--muted);
+    display: inline-block; word-break: break-all; max-width: 440px;
+  }
+  .contract-pill strong { color: var(--accent); }
+
+  /* ── NAV TABS ── */
+  .tabs-wrap { position: sticky; top: 0; z-index: 100; background: rgba(8,12,20,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+  .tabs { display: flex; overflow-x: auto; padding: 0 24px; gap: 4px; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex-shrink: 0; padding: 14px 18px; font-family: 'Syne', sans-serif;
+    font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer;
+    border-bottom: 2px solid transparent; transition: all .2s; white-space: nowrap;
+    background: none; border-top: none; border-left: none; border-right: none;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ── MAIN LAYOUT ── */
+  main { max-width: 1100px; margin: 0 auto; padding: 48px 24px 80px; }
+  .section { display: none; animation: fadeUp .4s ease; }
+  .section.active { display: block; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
+
+  /* ── SECTION HEADER ── */
+  .sec-head { margin-bottom: 36px; }
+  .sec-tag { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--accent); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 8px; }
+  .sec-head h2 { font-family: 'Syne', sans-serif; font-size: clamp(1.4rem, 4vw, 2.2rem); font-weight: 800; }
+  .sec-head p { color: var(--muted); max-width: 700px; margin-top: 8px; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px; padding: 28px;
+    position: relative; overflow: hidden;
+  }
+  .card::before {
+    content: ''; position: absolute; inset: 0;
+    background: var(--card-glow);
+    pointer-events: none; border-radius: inherit;
+  }
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+
+  /* ── COMMENT BOX ── */
+  .comment-box {
+    background: linear-gradient(135deg, rgba(123,92,240,0.08), rgba(0,229,255,0.04));
+    border: 1px solid rgba(123,92,240,0.25);
+    border-left: 3px solid var(--accent2);
+    border-radius: 12px; padding: 20px 24px; margin-top: 20px;
+  }
+  .comment-box .comment-label {
+    font-family: 'Space Mono', monospace; font-size: 10px;
+    color: var(--accent2); letter-spacing: .12em; text-transform: uppercase; margin-bottom: 8px;
+  }
+  .comment-box p { color: #a0b4cc; font-size: 0.9rem; line-height: 1.7; }
+
+  /* ── STAT ROW ── */
+  .stat-row { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 28px; }
+  .stat {
+    flex: 1 1 140px; background: var(--surface2);
+    border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px 20px;
+  }
+  .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+  .stat-value { font-family: 'Syne', sans-serif; font-size: 1.35rem; font-weight: 700; }
+  .stat-value.up { color: var(--green); }
+  .stat-value.down { color: var(--red); }
+  .stat-value.neutral { color: var(--accent); }
+
+  /* ── TEAM CARDS ── */
+  .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
+  .team-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; overflow: hidden;
+    transition: transform .25s, border-color .25s;
+  }
+  .team-card:hover { transform: translateY(-4px); border-color: var(--accent); }
+  .team-card-top {
+    display: flex; align-items: center; gap: 20px;
+    padding: 28px 28px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .team-avatar {
+    width: 72px; height: 72px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800;
+    flex-shrink: 0; position: relative; overflow: hidden;
+  }
+  .team-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+  .team-avatar-fallback {
+    width: 100%; height: 100%; display: flex; align-items: center;
+    justify-content: center; font-family: 'Syne', sans-serif;
+    font-size: 1.6rem; font-weight: 800;
+  }
+  .avatar-1 { background: linear-gradient(135deg, #00e5ff, #7b5cf0); }
+  .avatar-2 { background: linear-gradient(135deg, #ff6b35, #f5c542); }
+  .avatar-3 { background: linear-gradient(135deg, #00d68f, #00e5ff); }
+  .team-name { font-family: 'Syne', sans-serif; font-size: 1.15rem; font-weight: 700; }
+  .team-role {
+    font-size: 12px; color: var(--accent); font-family: 'Space Mono', monospace;
+    letter-spacing: .06em; margin-top: 2px;
+  }
+  .team-body { padding: 20px 28px 28px; }
+  .team-hist-label { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 10px; }
+  .timeline-item { display: flex; gap: 12px; margin-bottom: 12px; }
+  .tl-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 7px; }
+  .tl-dot.gold { background: var(--gold); }
+  .tl-dot.purple { background: var(--accent2); }
+  .tl-content { font-size: 0.88rem; color: #a0b4cc; }
+  .tl-year { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); display: block; margin-bottom: 2px; }
+
+  /* ── ALLOCATION CHART ── */
+  .alloc-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: center; }
+  @media(max-width:640px) { .alloc-wrap { grid-template-columns: 1fr; } }
+  .donut-wrap { position: relative; width: 220px; height: 220px; margin: 0 auto; }
+  .donut-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .donut-center {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    text-align: center;
+  }
+  .donut-total { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800; }
+  .donut-sub { font-size: 11px; color: var(--muted); }
+  .alloc-list { display: flex; flex-direction: column; gap: 12px; }
+  .alloc-item { display: flex; align-items: center; gap: 12px; }
+  .alloc-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .alloc-label { flex: 1; font-size: 0.88rem; color: var(--text); }
+  .alloc-pct { font-family: 'Space Mono', monospace; font-size: 0.85rem; color: var(--muted); }
+  .alloc-bar-wrap { width: 100%; height: 5px; background: var(--border); border-radius: 999px; margin-top: 4px; }
+  .alloc-bar { height: 100%; border-radius: 999px; }
+
+  /* ── ROADMAP ── */
+  .roadmap { position: relative; padding-left: 32px; }
+  .roadmap::before {
+    content: ''; position: absolute; left: 10px; top: 0; bottom: 0;
+    width: 2px; background: linear-gradient(to bottom, var(--accent), var(--accent2), transparent);
+    border-radius: 2px;
+  }
+  .rm-item { position: relative; margin-bottom: 36px; }
+  .rm-dot {
+    position: absolute; left: -27px; top: 4px;
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 2px solid var(--accent); background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .rm-dot.done { background: var(--green); border-color: var(--green); }
+  .rm-dot.live { background: var(--accent); border-color: var(--accent); animation: pulseDot 2s infinite; }
+  .rm-dot.upcoming { background: var(--surface2); border-color: var(--accent2); }
+  .rm-dot.future { background: var(--surface2); border-color: var(--muted); }
+  @keyframes pulseDot { 0%,100%{box-shadow:0 0 0 0 rgba(0,229,255,.4)} 50%{box-shadow:0 0 0 8px rgba(0,229,255,0)} }
+  .rm-dot-inner { width: 6px; height: 6px; border-radius: 50%; }
+  .rm-dot.done .rm-dot-inner { background: #fff; }
+  .rm-date {
+    font-family: 'Space Mono', monospace; font-size: 11px;
+    color: var(--accent); margin-bottom: 4px;
+  }
+  .rm-date.past { color: var(--muted); }
+  .rm-date.future { color: var(--accent2); }
+  .rm-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.05rem; margin-bottom: 6px; }
+  .rm-desc { font-size: 0.88rem; color: #a0b4cc; }
+  .rm-status {
+    display: inline-block; font-size: 10px; padding: 2px 9px;
+    border-radius: 999px; font-family: 'Space Mono', monospace;
+    letter-spacing: .05em; margin-bottom: 6px;
+  }
+  .rm-status.done { background: rgba(0,214,143,.12); color: var(--green); border: 1px solid rgba(0,214,143,.25); }
+  .rm-status.live { background: rgba(0,229,255,.12); color: var(--accent); border: 1px solid rgba(0,229,255,.25); }
+  .rm-status.soon { background: rgba(123,92,240,.12); color: var(--accent2); border: 1px solid rgba(123,92,240,.25); }
+  .rm-status.planned { background: rgba(107,140,176,.1); color: var(--muted); border: 1px solid var(--border); }
+
+  /* ── RISK TABLE ── */
+  .risk-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+  .risk-card {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px 22px;
+  }
+  .risk-card.high { border-left: 3px solid var(--red); }
+  .risk-card.mid { border-left: 3px solid var(--gold); }
+  .risk-card.low { border-left: 3px solid var(--green); }
+  .risk-label { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px; }
+  .risk-label.high { color: var(--red); }
+  .risk-label.mid { color: var(--gold); }
+  .risk-label.low { color: var(--green); }
+  .risk-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; margin-bottom: 6px; }
+  .risk-desc { font-size: 0.85rem; color: #8aadcb; }
+
+  /* ── INVESTORS ── */
+  .inv-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+  .inv-tag {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 999px; padding: 6px 14px;
+    font-size: 0.82rem; color: var(--text); white-space: nowrap;
+  }
+  .inv-tag.lead { border-color: var(--gold); color: var(--gold); background: rgba(245,197,66,0.07); }
+
+  /* ── VERDICT ── */
+  .verdict-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+  .verdict-item {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px; text-align: center;
+  }
+  .verdict-score {
+    font-family: 'Syne', sans-serif; font-size: 2.5rem; font-weight: 800;
+    line-height: 1; margin-bottom: 6px;
+  }
+  .verdict-cat { font-size: 0.8rem; color: var(--muted); }
+  .score-high { color: var(--green); }
+  .score-mid { color: var(--gold); }
+  .score-low { color: var(--red); }
+
+  /* ── UTILITY ── */
+  .divider { height: 1px; background: var(--border); margin: 32px 0; }
+  .tag { display: inline-block; background: rgba(0,229,255,.08); color: var(--accent); border: 1px solid rgba(0,229,255,.2); border-radius: 6px; padding: 3px 10px; font-size: 11px; font-family: 'Space Mono', monospace; margin: 2px; }
+  .tag.purple { background: rgba(123,92,240,.08); color: var(--accent2); border-color: rgba(123,92,240,.2); }
+  .tag.orange { background: rgba(255,107,53,.08); color: var(--accent3); border-color: rgba(255,107,53,.2); }
+  ul.feature-list { list-style: none; padding: 0; }
+  ul.feature-list li { padding: 8px 0; border-bottom: 1px solid var(--border); font-size: .9rem; color: #a0b4cc; display: flex; gap: 10px; align-items: flex-start; }
+  ul.feature-list li::before { content: '→'; color: var(--accent); flex-shrink: 0; margin-top: 1px; }
+  ul.feature-list li:last-child { border-bottom: none; }
+
+  @media(max-width:600px) {
+    .team-card-top { flex-direction: column; text-align: center; }
+    .alloc-wrap { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+    <div class="hero-badge"><span></span> DEEP FUNDAMENTAL ANALYSIS</div>
+    <h1>MYX Finance</h1>
+    <p class="hero-sub">Chain-Abstracted Perpetual DEX · Matching Pool Mechanism · Singapore, 2023</p>
+    <div class="contract-pill"><strong>Contract:</strong> 0xD82544bf0dfe8385eF8FA34D67e6e4940CC63e16</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-wrap">
+  <div class="tabs">
+    <button class="tab active" onclick="show('overview',this)">Overview</button>
+    <button class="tab" onclick="show('team',this)">Team</button>
+    <button class="tab" onclick="show('tokenomics',this)">Tokenomics</button>
+    <button class="tab" onclick="show('roadmap',this)">Roadmap</button>
+    <button class="tab" onclick="show('investors',this)">Investors</button>
+    <button class="tab" onclick="show('risks',this)">Risks</button>
+    <button class="tab" onclick="show('verdict',this)">Verdict</button>
+  </div>
+</div>
+
+<main>
+
+<!-- ══════════════ OVERVIEW ══════════════ -->
+<div id="overview" class="section active">
+  <div class="sec-head">
+    <div class="sec-tag">01 / What is MYX Finance?</div>
+    <h2>The Mission & Value Proposition</h2>
+    <p>MYX Finance aims to democratize alpha — bringing institutional-grade perpetual trading to any trader, on any chain, with any token, without giving up custody.</p>
+  </div>
+
+  <div class="card">
+    <h3 style="font-family:'Syne',sans-serif;font-size:1.1rem;margin-bottom:14px;color:var(--accent)">Core Objective</h3>
+    <ul class="feature-list">
+      <li>Replace the traditional order book model with the <strong>Matching Pool Mechanism (MPM)</strong> — a pooled peer-to-pool-to-peer system that eliminates slippage by automatically netting long and short exposure at the protocol level.</li>
+      <li>Enable trading of perpetual contracts on <strong>any token with an AMM market</strong> — from BTC to the newest meme coin — permissionlessly and without manual bridging.</li>
+      <li>Achieve <strong>CEX-grade execution speed</strong> with a gasless, self-custodied architecture via Universal Account (UA) and chain abstraction, accepting collateral from 20+ chains including Solana.</li>
+      <li>Lower the capital cost of providing liquidity and drive down fees to ~1bp (0.01%), versus the 5–30bp industry norm, to attract volume from both retail and institutions.</li>
+      <li>Build a <strong>modular settlement layer</strong> for omnichain derivatives — effectively becoming infrastructure that other DEXs and aggregators route through.</li>
+    </ul>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat"><div class="stat-label">Total Supply</div><div class="stat-value neutral">1.00B MYX</div></div>
+    <div class="stat"><div class="stat-label">Total Raised</div><div class="stat-value neutral">$10.5M</div></div>
+    <div class="stat"><div class="stat-label">ATH (Sep 2025)</div><div class="stat-value up">$19.03</div></div>
+    <div class="stat"><div class="stat-label">Founded</div><div class="stat-value neutral">2023</div></div>
+    <div class="stat"><div class="stat-label">Unique Traders</div><div class="stat-value up">200K+</div></div>
+    <div class="stat"><div class="stat-label">Max Leverage</div><div class="stat-value neutral">50x</div></div>
+  </div>
+
+  <div class="comment-box" style="margin-top:28px;">
+    <div class="comment-label">🧠 Nasir's Analysis — Purpose</div>
+    <p>MYX's value prop is real and differentiated. The MPM solves a genuine problem: on-chain perpetuals have historically suffered from liquidity fragmentation, high slippage, and poor UX relative to CEXs. Chain abstraction is the right narrative for 2025–2026 as multi-chain fragmentation worsens. However, <strong>the "great protocol, struggling token" dynamic is already visible here too</strong> — protocol mechanics are sound, but fundamentals (revenue, fees, OI) have collapsed post-ATH. The mission is legitimate; execution and token design are where the real questions live.</p>
+  </div>
+
+  <div class="divider"></div>
+  <h3 style="font-family:'Syne',sans-serif;margin-bottom:16px;">Key Technologies</h3>
+  <div class="card-grid">
+    <div class="card">
+      <h4 style="color:var(--accent);font-family:'Syne',sans-serif;margin-bottom:10px;">⚡ Matching Pool Mechanism (MPM)</h4>
+      <p style="font-size:.88rem;color:#a0b4cc;">A shared collateral pool nets long/short exposure internally. No order book, no AMM curve. Result: zero slippage, capital-efficient LP deployment, and funding rates that auto-balance market bias.</p>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--accent2);font-family:'Syne',sans-serif;margin-bottom:10px;">🌐 Universal Account (UA)</h4>
+      <p style="font-size:.88rem;color:#a0b4cc;">Two-layer wallet model — EOA/smart wallet retains custody, delegate-trader key handles execution. Gas abstracted via relayer network. Collateral recognized from 20+ chains without manual bridging.</p>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--accent3);font-family:'Syne',sans-serif;margin-bottom:10px;">🏭 Permissionless Market Factory</h4>
+      <p style="font-size:.88rem;color:#a0b4cc;">Anyone can list a perpetual market for any token that has an existing AMM pool. First perp DEX to offer truly permissionless listing — comparable to Uniswap's model but for derivatives.</p>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--gold);font-family:'Syne',sans-serif;margin-bottom:10px;">🔮 Pyth + Chainlink Oracles</h4>
+      <p style="font-size:.88rem;color:#a0b4cc;">Real-time index pricing via Pyth Oracle ensures transparent, manipulation-resistant settlement. V2 adds Chainlink integration for enhanced reliability across more asset classes.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ TEAM ══════════════ -->
+<div id="team" class="section">
+  <div class="sec-head">
+    <div class="sec-tag">02 / The People Behind MYX</div>
+    <h2>Team Deep Dive</h2>
+    <p>MYX Finance is led by a small, execution-focused team with backgrounds spanning top-tier centralized exchanges, traditional quant finance, and crypto VC ecosystems.</p>
+  </div>
+
+  <div class="team-grid">
+
+    <!-- MARK ZHANG -->
+    <div class="team-card">
+      <div class="team-card-top">
+        <div class="team-avatar avatar-1">
+          <div class="team-avatar-fallback">MZ</div>
+        </div>
+        <div>
+          <div class="team-name">Mark Zhang</div>
+          <div class="team-role">Founder & CEO — also known as Yihao Zhang</div>
+          <div style="margin-top:6px">
+            <span class="tag">Derivatives</span>
+            <span class="tag">Trading Systems</span>
+            <span class="tag">DeFi</span>
+          </div>
+        </div>
+      </div>
+      <div class="team-body">
+        <div class="team-hist-label">Career History</div>
+
+        <div class="timeline-item">
+          <div class="tl-dot"></div>
+          <div class="tl-content">
+            <span class="tl-year">2013 – 2016</span>
+            Earned a <strong>Bachelor of Science in Finance</strong> from the University of Oregon's Lundquist College of Business. Developed foundational knowledge in capital markets, risk, and financial systems.
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-dot gold"></div>
+          <div class="tl-content">
+            <span class="tl-year">~2017 – 2019</span>
+            Joined <strong>Huobi (now HTX)</strong> — one of the world's top-3 centralized exchanges by volume — as <strong>Head of Futures Products</strong>. Gained deep expertise in trading system architecture, derivative product strategy, and liquidity design at massive scale. This is where his understanding of how professional derivatives infrastructure works was forged.
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-dot gold"></div>
+          <div class="tl-content">
+            <span class="tl-year">~2019 – 2022</span>
+            Moved to <strong>OKEx (now OKX)</strong> in a senior leadership role focused on derivative product development and CEX liquidity systems. OKX is consistently a top-3 global derivatives exchange. This gave Zhang a bird's-eye view of what makes a perp exchange work at institutional depth.
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-dot purple"></div>
+          <div class="tl-content">
+            <span class="tl-year">2023 (Q1)</span>
+            Founded <strong>MYX Finance</strong>, incubated by D11-Labs, with the vision of bringing CEX-grade derivatives infrastructure on-chain. Chose a pooled matching model over order book to solve slippage — a design decision informed directly by his CEX experience.
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-dot"></div>
+          <div class="tl-content">
+            <span class="tl-year">Nov 2023</span>
+            Closed <strong>$5M Seed Round</strong> led by HongShan (Sequoia China) at $50M valuation. Investors: ConsenSys, Hack VC, OKX Ventures, Foresight Ventures, GSR, Cypher Capital.
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-dot"></div>
+          <div class="tl-content">
+            <span class="tl-year">Feb 2024</span>
+            Closed <strong>$5M Strategic Round</strong>. Investors: HashKey Capital, D11 Labs, Metalpha, FL Foundation, Woyong. Total raised: $10M+. Platform launched on mainnet.
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-dot"></div>
+          <div class="tl-content">
+            <span class="tl-year">2024 (ongoing)</span>
+            Publicly navigated <strong>BMYX token controversy</strong> (BRC-20 community backlash, KOL incident) — issued apologies, executed 3-phase compensation plan in MYX tokens and USDT. Critics also raised wash trading concerns. Zhang maintained team had not sold BMYX tokens.
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-dot"></div>
+          <div class="tl-content">
+            <span class="tl-year">May 2025</span>
+            Oversaw <strong>TGE on Binance Wallet IDO</strong>. MYX airdrop distributed, token listed and launched to market. Over 200K unique trading addresses by this point.
+          </div>
+        </div>
+
+        <div class="comment-box">
+          <div class="comment-label">🧠 Analysis — Mark Zhang</div>
+          <p><strong>Credibility is real.</strong> Huobi + OKX derivatives experience is exactly the right background to build a perp DEX — he knows what institutional liquidity infrastructure looks like from the inside. However, the BMYX controversy is a red flag regarding community management and transparency. The fact that he handled it with public apologies and compensation rather than disappearing is a positive signal, but it exposed early-stage organizational immaturity. His continued public engagement (Twitter/X, frequent statements) is positive for accountability.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RYAN ZHANG -->
+    <div class="team-card">
+      <div class="team-card-top">
+        <div class="team-avatar avatar-2">
+          <div class="team-avatar-fallback">RZ</div>
+        </div>
+        <div>
+          <div class="team-name">Ryan Zhang</div>
+          <div class="team-role">Chief Product Officer (CPO)</div>
+          <div style="margin-top:6px">
+            <span class="tag">Product Strategy</span>
+            <span class="tag">UX Design</span>
+            <span class="tag purple">Chain Abstraction</span>
+          </div>
+        </div>
+      </div>
+      <div class="team-body">
+        <div class="team-hist-label">Role & Background</div>
+
+        <div class="timeline-item">
+          <div class="tl-dot gold"></div>
+          <div class="tl-content">
+            <span class="tl-year">Background</span>
+            Background rooted in <strong>DeFi product design and Web3 UX</strong>. Part of MYX's founding team. Focused on building the "democratized alpha" user experience — making on-chain perps feel as frictionless as a CEX app.
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-dot"></div>
+          <div class="tl-content">
+            <span class="tl-year">Core Vision</span>
+            Stated publicly: <em>"Our vision is to remove all the friction that keeps everyday traders from competing on equal footing. If a token exists, you should be able to trade it — instantly, from anywhere, without jumping through hoops."</em> — This directly shaped the Universal Account and chain abstraction architecture.
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-dot purple"></div>
+          <div class="tl-content">
+            <span class="tl-year">Key Contributions</span>
+            Driving force behind <strong>chain-abstracted collateral</strong> (20+ chains), <strong>gasless execution</strong> via relayer networks, and the <strong>permissionless market listing</strong> feature. Also architected the VIP staking system and product incentive loops.
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-dot"></div>
+          <div class="tl-content">
+            <span class="tl-year">2025 – Present</span>
+            Overseeing <strong>V2 modular settlement layer</strong> development in partnership with Consensys — the largest architectural upgrade in MYX's history, targeting non-EVM chains and cross-portfolio margining.
+          </div>
+        </div>
+
+        <div class="comment-box">
+          <div class="comment-label">🧠 Analysis — Ryan Zhang</div>
+          <p>The CPO role is critical in a product-led DEX like MYX, and the chain abstraction product philosophy is well-articulated and genuinely forward-thinking. However, <strong>public information on Ryan Zhang's pre-MYX history is sparse</strong> — this is a transparency concern. Investors are betting on a team where the #2 executive has limited verifiable prior track record publicly. Not a dealbreaker, but worth monitoring whether the V2 roadmap executes on time.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXTENDED TEAM -->
+    <div class="team-card">
+      <div class="team-card-top">
+        <div class="team-avatar avatar-3">
+          <div class="team-avatar-fallback">T</div>
+        </div>
+        <div>
+          <div class="team-name">Extended Team</div>
+          <div class="team-role">Engineering, Quant & Operations</div>
+          <div style="margin-top:6px">
+            <span class="tag">Quant Finance</span>
+            <span class="tag orange">Cross-chain Arch</span>
+            <span class="tag purple">Web3 Dev</span>
+          </div>
+        </div>
+      </div>
+      <div class="team-body">
+        <div class="team-hist-label">Team Composition</div>
+
+        <div class="timeline-item">
+          <div class="tl-dot"></div>
+          <div class="tl-content">
+            <span class="tl-year">Engineering</span>
+            Team includes talent from <strong>traditional quant finance firms</strong> and prominent Web3 development teams with proven experience in DeFi and cross-chain architecture. Specific names are not publicly disclosed.
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-dot gold"></div>
+          <div class="tl-content">
+            <span class="tl-year">Audits & Security</span>
+            Protocol has undergone rigorous security reviews: <strong>PeckShield</strong> full audit, <strong>SlowMist Phase 1 &amp; Phase 2</strong> audits. Multi-sig mechanisms and order-book-free architecture reduce attack surface.
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-dot purple"></div>
+          <div class="tl-content">
+            <span class="tl-year">Incubation</span>
+            Project was incubated by <strong>D11-Labs</strong> — a crypto-native incubator that also invested in the Strategic Round. This provided early-stage mentorship and network support in the Singapore DeFi ecosystem.
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="tl-dot"></div>
+          <div class="tl-content">
+            <span class="tl-year">Headcount</span>
+            Operates as a lean startup team. This is typical of Singapore-based DeFi protocols — small, high-output teams relying on smart contract automation rather than headcount.
+          </div>
+        </div>
+
+        <div class="comment-box">
+          <div class="comment-label">🧠 Analysis — Team Transparency</div>
+          <p>The biggest weakness here is <strong>opacity</strong>. Beyond Mark Zhang (CEO) and Ryan Zhang (CPO), no other team members are publicly named or profiled. For a protocol managing hundreds of millions in TVL, this is a real concern. CoinLaunch flagged this explicitly as a weakness in their review. Best-in-class DeFi protocols (dYdX, GMX, Hyperliquid) have more transparent team disclosures. This limits the ability to assess depth, bench strength, and founder departure risk.</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /team-grid -->
+</div>
+
+<!-- ══════════════ TOKENOMICS ══════════════ -->
+<div id="tokenomics" class="section">
+  <div class="sec-head">
+    <div class="sec-tag">03 / Token Economics</div>
+    <h2>MYX Token Allocation & Distribution</h2>
+    <p>1,000,000,000 MYX total fixed supply. No inflation mechanism. Utility: governance, fee discounts, staking for protocol fee revenue share.</p>
+  </div>
+
+  <div class="card" style="margin-bottom:28px;">
+    <div class="alloc-wrap">
+      <!-- Donut SVG -->
+      <div class="donut-wrap">
+        <svg class="donut-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <!-- Ecosystem 40% → 251.33 -->
+          <circle cx="50" cy="50" r="38" fill="none" stroke="#00e5ff" stroke-width="12"
+            stroke-dasharray="95.3 263.3" stroke-dashoffset="0" opacity=".85"/>
+          <!-- Contributors 20% -->
+          <circle cx="50" cy="50" r="38" fill="none" stroke="#7b5cf0" stroke-width="12"
+            stroke-dasharray="47.65 310.95" stroke-dashoffset="-95.3" opacity=".85"/>
+          <!-- Investors 17.5% -->
+          <circle cx="50" cy="50" r="38" fill="none" stroke="#ff6b35" stroke-width="12"
+            stroke-dasharray="41.69 316.91" stroke-dashoffset="-142.95" opacity=".85"/>
+          <!-- Airdrop 14.7% -->
+          <circle cx="50" cy="50" r="38" fill="none" stroke="#f5c542" stroke-width="12"
+            stroke-dasharray="35.03 323.57" stroke-dashoffset="-184.64" opacity=".85"/>
+          <!-- Liquidity 4% -->
+          <circle cx="50" cy="50" r="38" fill="none" stroke="#00d68f" stroke-width="12"
+            stroke-dasharray="9.53 349.07" stroke-dashoffset="-219.67" opacity=".85"/>
+          <!-- Community 2% -->
+          <circle cx="50" cy="50" r="38" fill="none" stroke="#e040fb" stroke-width="12"
+            stroke-dasharray="4.77 353.83" stroke-dashoffset="-229.2" opacity=".85"/>
+          <!-- Reserve 1.8% -->
+          <circle cx="50" cy="50" r="38" fill="none" stroke="#546e7a" stroke-width="12"
+            stroke-dasharray="4.29 354.31" stroke-dashoffset="-233.97" opacity=".85"/>
+        </svg>
+        <div class="donut-center">
+          <div class="donut-total">1B</div>
+          <div class="donut-sub">MYX Fixed Supply</div>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="alloc-list">
+        <div class="alloc-item">
+          <div class="alloc-dot" style="background:#00e5ff"></div>
+          <div style="flex:1">
+            <div class="alloc-label">Ecosystem Incentives</div>
+            <div class="alloc-bar-wrap"><div class="alloc-bar" style="width:40%;background:#00e5ff"></div></div>
+          </div>
+          <div class="alloc-pct">40%</div>
+        </div>
+        <div class="alloc-item">
+          <div class="alloc-dot" style="background:#7b5cf0"></div>
+          <div style="flex:1">
+            <div class="alloc-label">Core Contributors</div>
+            <div class="alloc-bar-wrap"><div class="alloc-bar" style="width:20%;background:#7b5cf0"></div></div>
+          </div>
+          <div class="alloc-pct">20%</div>
+        </div>
+        <div class="alloc-item">
+          <div class="alloc-dot" style="background:#ff6b35"></div>
+          <div style="flex:1">
+            <div class="alloc-label">Investors</div>
+            <div class="alloc-bar-wrap"><div class="alloc-bar" style="width:17.5%;background:#ff6b35"></div></div>
+          </div>
+          <div class="alloc-pct">17.5%</div>
+        </div>
+        <div class="alloc-item">
+          <div class="alloc-dot" style="background:#f5c542"></div>
+          <div style="flex:1">
+            <div class="alloc-label">Airdrop (TGE unlocked)</div>
+            <div class="alloc-bar-wrap"><div class="alloc-bar" style="width:14.7%;background:#f5c542"></div></div>
+          </div>
+          <div class="alloc-pct">14.7%</div>
+        </div>
+        <div class="alloc-item">
+          <div class="alloc-dot" style="background:#00d68f"></div>
+          <div style="flex:1">
+            <div class="alloc-label">Initial Liquidity</div>
+            <div class="alloc-bar-wrap"><div class="alloc-bar" style="width:4%;background:#00d68f"></div></div>
+          </div>
+          <div class="alloc-pct">4%</div>
+        </div>
+        <div class="alloc-item">
+          <div class="alloc-dot" style="background:#e040fb"></div>
+          <div style="flex:1">
+            <div class="alloc-label">Community / IDO</div>
+            <div class="alloc-bar-wrap"><div class="alloc-bar" style="width:2%;background:#e040fb"></div></div>
+          </div>
+          <div class="alloc-pct">2%</div>
+        </div>
+        <div class="alloc-item">
+          <div class="alloc-dot" style="background:#546e7a"></div>
+          <div style="flex:1">
+            <div class="alloc-label">Reserves</div>
+            <div class="alloc-bar-wrap"><div class="alloc-bar" style="width:1.8%;background:#546e7a"></div></div>
+          </div>
+          <div class="alloc-pct">1.8%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vesting details -->
+  <div class="card-grid">
+    <div class="card">
+      <h4 style="font-family:'Syne',sans-serif;margin-bottom:12px;color:var(--accent)">Vesting Schedule Summary</h4>
+      <ul class="feature-list">
+        <li><strong>Ecosystem (40%)</strong> — 14% unlocked at TGE, remainder vested linearly over 7 years. Long-tail inflation pressure, but spread over a very long horizon.</li>
+        <li><strong>Core Contributors (20%)</strong> — 15-month cliff post-TGE, then linear vesting. (Updated from original 12-month cliff.)</li>
+        <li><strong>Investors (17.5%)</strong> — 9-month cliff post-TGE, followed by 24-month linear vesting. (Updated from 6-month cliff.)</li>
+        <li><strong>Airdrop (14.7%)</strong> — Fully unlocked at TGE on May 6, 2025. Major sell pressure event at launch.</li>
+        <li><strong>Liquidity (4%)</strong> — Unlocked at TGE to seed initial DEX pools.</li>
+        <li><strong>IDO / Community (2%)</strong> — Public sale via Binance Wallet, TGE unlock.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4 style="font-family:'Syne',sans-serif;margin-bottom:12px;color:var(--accent3)">Unlock Pressure Analysis</h4>
+      <ul class="feature-list">
+        <li><strong>March 6, 2026</strong> — ~9.72M MYX tokens scheduled to unlock (~$9.67M at recent prices). This is the largest near-term unlock event and a key sell pressure catalyst.</li>
+        <li><strong>Current Circulating Supply</strong> — ~281.8M MYX (28.2% of total supply as of April 2026).</li>
+        <li><strong>FDV vs. Market Cap Gap</strong> — FDV significantly exceeds current market cap, meaning large dilution remains ahead as supply unlocks over years.</li>
+        <li><strong>Cliff extensions</strong> — Team pushed back both Investor and Contributor cliffs by 3 months from original schedule. A positive signal of alignment, but noteworthy that it was changed post-TGE.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="comment-box" style="margin-top:24px;">
+    <div class="comment-label">🧠 Nasir's Tokenomics Assessment</div>
+    <p>Applying your unlock pressure framework: the tokenomics here have <strong>significant structural headwinds</strong>. The 14.7% airdrop fully unlocked at TGE was a massive sell event — consistent with the post-launch price collapse from ATH. The investor 9-month cliff means the first institutional unlock waves are arriving ~Q1-Q2 2026. The large community allocation (40%) sounds holder-friendly but is 7 years of linear issuance — meaning perpetual sell pressure from ecosystem rewards. The one genuinely positive aspect is <strong>no inflationary minting</strong> — this is a fixed 1B supply. Overall: <strong>mid-tier tokenomics</strong>. Community-heavy allocation is good for decentralization narrative, bad for near-term price support without strong demand absorption from protocol revenue — which has been anemic post-ATH.</p>
+  </div>
+</div>
+
+<!-- ══════════════ ROADMAP ══════════════ -->
+<div id="roadmap" class="section">
+  <div class="sec-head">
+    <div class="sec-tag">04 / From Launch to the Future</div>
+    <h2>Full Roadmap</h2>
+    <p>MYX's journey from incubation to modular omnichain settlement layer — every milestone, completed and planned.</p>
+  </div>
+
+  <div class="roadmap">
+
+    <div class="rm-item">
+      <div class="rm-dot done"><div class="rm-dot-inner"></div></div>
+      <div class="rm-date past">Q4 2023 — COMPLETED</div>
+      <span class="rm-status done">✓ Done</span>
+      <div class="rm-title">Seed Round & Protocol Inception</div>
+      <div class="rm-desc">$5M seed round closed led by HongShan (Sequoia China) at $50M valuation. Team assembled, MPM mechanism designed and tested. D11-Labs incubation established. ConsenSys, Hack VC, OKX Ventures, GSR among early backers.</div>
+    </div>
+
+    <div class="rm-item">
+      <div class="rm-dot done"><div class="rm-dot-inner"></div></div>
+      <div class="rm-date past">Q1 2024 — COMPLETED</div>
+      <span class="rm-status done">✓ Done</span>
+      <div class="rm-title">Mainnet Launch on Linea & Arbitrum</div>
+      <div class="rm-desc">MYX Finance went live on mainnet February 18, 2024. USDC-margined perpetual contracts launched with up to 50x leverage. Pyth Oracle integration for real-time pricing. PeckShield audit completed. First users onboarded to the MPM-powered trading engine.</div>
+    </div>
+
+    <div class="rm-item">
+      <div class="rm-dot done"><div class="rm-dot-inner"></div></div>
+      <div class="rm-date past">Q1 2024 — COMPLETED</div>
+      <span class="rm-status done">✓ Done</span>
+      <div class="rm-title">Strategic Round — $5M</div>
+      <div class="rm-desc">Additional $5M closed from HashKey Capital, D11 Labs, Metalpha, FL Foundation, Woyong. Total raised reaches $10M+. Funds allocated toward user education, trading tool development, and ecosystem expansion.</div>
+    </div>
+
+    <div class="rm-item">
+      <div class="rm-dot done"><div class="rm-dot-inner"></div></div>
+      <div class="rm-date past">Q2–Q3 2024 — COMPLETED</div>
+      <span class="rm-status done">✓ Done</span>
+      <div class="rm-title">Project Origin Airdrop Campaigns (Seasons 1–3)</div>
+      <div class="rm-desc">Three consecutive airdrop seasons rewarding early traders and LPs. Season 3 ("Silurian Period") launched July 2024, distributing 5M MYX + 5M ZKP tokens. Platform exceeded 33,000 users and $200M daily volume by July 2024. SlowMist Phase 1 & 2 audits completed.</div>
+    </div>
+
+    <div class="rm-item">
+      <div class="rm-dot done"><div class="rm-dot-inner"></div></div>
+      <div class="rm-date past">Q4 2024 — COMPLETED</div>
+      <span class="rm-status done">✓ Done</span>
+      <div class="rm-title">BNB Chain Expansion + Chain Abstraction Architecture</div>
+      <div class="rm-desc">Expanded to BNB Chain (opBNB and BSC). Universal Account (UA) architecture deployed — enabling single account access across chains without manual bridging. 20+ chain collateral recognition live. 170,000+ unique trading addresses on Linea and BNB Chain.</div>
+    </div>
+
+    <div class="rm-item">
+      <div class="rm-dot done"><div class="rm-dot-inner"></div></div>
+      <div class="rm-date past">May 6, 2025 — COMPLETED</div>
+      <span class="rm-status done">✓ Done</span>
+      <div class="rm-title">TGE — Binance Wallet IDO & Token Launch</div>
+      <div class="rm-desc">$MYX token launched via exclusive IDO on Binance Wallet. Airdrop query page published, 14.7% airdrop supply (147M MYX) fully unlocked at TGE. Token entered open markets. VIP system activated — automatic fee discounts for MYX holders. 200K+ unique traders at time of launch. TVL reached ~$42M pre-IDO.</div>
+    </div>
+
+    <div class="rm-item">
+      <div class="rm-dot done"><div class="rm-dot-inner"></div></div>
+      <div class="rm-date past">Sep 2025 — COMPLETED</div>
+      <span class="rm-status done">✓ Done</span>
+      <div class="rm-title">ATH of $19.03 — Peak Market Cap ~$3.57B FDV</div>
+      <div class="rm-desc">MYX token reached all-time high of $19.03 on September 11, 2025. Controversy followed with criticism of "airdrop insider" allocation and allegations of price manipulation. Market cap reached top-100 territory briefly. Subsequent collapse of 98%+ to ~$0.25 range by early 2026.</div>
+    </div>
+
+    <div class="rm-item">
+      <div class="rm-dot done"><div class="rm-dot-inner"></div></div>
+      <div class="rm-date past">Q4 2025 — COMPLETED</div>
+      <span class="rm-status done">✓ Done</span>
+      <div class="rm-title">Chainlink Oracle Integration</div>
+      <div class="rm-desc">Enhanced price feed security via Chainlink oracles alongside existing Pyth integration. Improved reliability for perpetual contract settlement, especially for longer-tail assets and cross-chain pricing.</div>
+    </div>
+
+    <div class="rm-item">
+      <div class="rm-dot live"><div class="rm-dot-inner"></div></div>
+      <div class="rm-date">Q4 2025 – Q1 2026 — IN PROGRESS</div>
+      <span class="rm-status live">● Live / Active</span>
+      <div class="rm-title">Copy Trading & Securities Firm Integration</div>
+      <div class="rm-desc">Implementing copy trading feature enabling users to mirror professional trader strategies. Front-end integration with traditional securities brokerage interfaces — a significant step toward institutional-retail hybrid access and regulated market bridges.</div>
+    </div>
+
+    <div class="rm-item">
+      <div class="rm-dot upcoming"><div class="rm-dot-inner"></div></div>
+      <div class="rm-date">Q1 2026 — IMMINENT</div>
+      <span class="rm-status soon">⬡ Soon</span>
+      <div class="rm-title">V2 Launch — Modular Settlement Layer</div>
+      <div class="rm-desc">Major protocol overhaul in partnership with ConsenSys (now largest investor). Key V2 features: (1) Portfolio/cross-margin allowing collateral reuse across multiple positions, (2) Dynamic Margin with 50x leverage on V2 engine, (3) Gasless trading via updated relayer network, (4) Non-EVM chain support including Solana expansion, (5) Full cross-chain position leverage. This transforms MYX from a DEX into settlement infrastructure.</div>
+    </div>
+
+    <div class="rm-item">
+      <div class="rm-dot future"><div class="rm-dot-inner"></div></div>
+      <div class="rm-date future">Q2–Q3 2026 — PLANNED</div>
+      <span class="rm-status planned">◦ Planned</span>
+      <div class="rm-title">Cross-Chain Full Position Leverage</div>
+      <div class="rm-desc">Enable traders to use gains/collateral in one position to offset margin requirements in another, regardless of the chain the asset originated on. True cross-chain portfolio margining — a feature no other DEX currently offers at scale.</div>
+    </div>
+
+    <div class="rm-item">
+      <div class="rm-dot future"><div class="rm-dot-inner"></div></div>
+      <div class="rm-date future">2026 (TBD) — PLANNED</div>
+      <span class="rm-status planned">◦ Planned</span>
+      <div class="rm-title">Permissionless Market Factory Expansion</div>
+      <div class="rm-desc">Automate the market-creation workflow further. Any token with an AMM pool on any supported chain can have a perpetual market listed without governance approval — similar to Uniswap V3 for spot, but for derivatives. Expand to all major EVM ecosystems and Solana.</div>
+    </div>
+
+    <div class="rm-item">
+      <div class="rm-dot future"><div class="rm-dot-inner"></div></div>
+      <div class="rm-date future">2026–2027 — LONG TERM</div>
+      <span class="rm-status planned">◦ Planned</span>
+      <div class="rm-title">DAO Governance Activation</div>
+      <div class="rm-desc">Full transition of protocol fee parameters, risk settings, and chain expansion decisions to MYX token holders. Staking rewards tied to protocol revenue share — creating a productive asset model rather than a purely speculative token.</div>
+    </div>
+
+  </div><!-- /roadmap -->
+
+  <div class="comment-box">
+    <div class="comment-label">🧠 Nasir's Roadmap Assessment</div>
+    <p>The roadmap is <strong>ambitious and well-sequenced</strong> — they went from concept to $42M TVL and 200K users in ~18 months, which is solid execution. The V2 modular settlement layer pivot is strategically smart: it repositions MYX from "another perp DEX" to "infrastructure" — a much more defensible and scalable moat. The ConsenSys partnership for V2 is credible validation. However, <strong>red flags exist</strong>: (1) Protocol revenue and fees collapsed 95%+ post-ATH, suggesting the volume was momentum-driven, not sticky. (2) The ATH controversy and airdrop scandal hurt reputation. (3) Near-term unlock pressure in Q1 2026. The key question is whether V2 can revive real trading volume — without that, the token economics don't work regardless of how good the roadmap looks on paper.</p>
+  </div>
+</div>
+
+<!-- ══════════════ INVESTORS ══════════════ -->
+<div id="investors" class="section">
+  <div class="sec-head">
+    <div class="sec-tag">05 / Funding & Backers</div>
+    <h2>Investor Network</h2>
+    <p>$10.5M raised across two rounds from some of the most credible names in crypto venture capital.</p>
+  </div>
+
+  <div class="card" style="margin-bottom:24px;">
+    <h4 style="font-family:'Syne',sans-serif;font-size:1rem;color:var(--muted);margin-bottom:16px;">SEED ROUND — Nov 2023 — $5M — Valuation $50M</h4>
+    <div class="inv-grid">
+      <span class="inv-tag lead">★ HongShan (Sequoia China) — LEAD</span>
+      <span class="inv-tag">ConsenSys Mesh</span>
+      <span class="inv-tag">Hack VC</span>
+      <span class="inv-tag">OKX Ventures</span>
+      <span class="inv-tag">GSR Markets</span>
+      <span class="inv-tag">Foresight Ventures</span>
+      <span class="inv-tag">Cypher Capital</span>
+      <span class="inv-tag">Bing Ventures</span>
+      <span class="inv-tag">Lecca Venture</span>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:24px;">
+    <h4 style="font-family:'Syne',sans-serif;font-size:1rem;color:var(--muted);margin-bottom:16px;">STRATEGIC ROUND — Feb 2024 — $5M</h4>
+    <div class="inv-grid">
+      <span class="inv-tag lead">★ HashKey Capital — LEAD</span>
+      <span class="inv-tag">D11 Labs</span>
+      <span class="inv-tag">Metalpha</span>
+      <span class="inv-tag">FL Foundation</span>
+      <span class="inv-tag">Woyong</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4 style="font-family:'Syne',sans-serif;font-size:1rem;color:var(--accent2);margin-bottom:16px;">CONSENSYS — Largest Investor Post-2025 (Strategic Backing for V2)</h4>
+    <p style="font-size:.88rem;color:#a0b4cc;">ConsenSys (builders of MetaMask, Infura, Linea) became MYX's largest investor in a February 2025 strategic round tied to the V2 modular settlement layer. This is significant: ConsenSys provides both capital and deep infrastructure access — Linea L2, developer tools, and distribution to MetaMask's 30M+ user base.</p>
+  </div>
+
+  <div class="comment-box" style="margin-top:24px;">
+    <div class="comment-label">🧠 Investor Quality Assessment</div>
+    <p>The investor roster is <strong>genuinely impressive</strong> for a protocol of this age. HongShan (Sequoia China), HashKey Capital, ConsenSys, and GSR are tier-1 validators in crypto. GSR in particular is a top-tier market maker — their involvement suggests they had early conviction on liquidity provision. ConsenSys becoming the largest investor for V2 is the most significant signal: they're not just money, they're infrastructure. The strategic alignment with Linea (ConsenSys's L2) makes MYX a potential flagship application for the Linea ecosystem, which opens distribution channels that money alone can't buy. <strong>Investor quality: A-tier.</strong> The question is whether investors have already exited their positions post-ATH — which the unlock schedule analysis suggests many may have begun doing.</p>
+  </div>
+</div>
+
+<!-- ══════════════ RISKS ══════════════ -->
+<div id="risks" class="section">
+  <div class="sec-head">
+    <div class="sec-tag">06 / Risk Assessment</div>
+    <h2>Comprehensive Risk Analysis</h2>
+    <p>Applying your 10-step framework — here are the key risk vectors for MYX.</p>
+  </div>
+
+  <div class="risk-grid">
+    <div class="risk-card high">
+      <div class="risk-label high">🔴 HIGH RISK</div>
+      <div class="risk-title">Revenue Collapse Post-ATH</div>
+      <div class="risk-desc">Protocol fees dropped 95% in one week post-ATH. Annualized revenue was ~$10,900 by late 2025 vs. hundreds of millions in implied TVL. Without organic fee generation, token staking yields are unsustainable and the entire demand model breaks.</div>
+    </div>
+    <div class="risk-card high">
+      <div class="risk-label high">🔴 HIGH RISK</div>
+      <div class="risk-title">Token Unlock Pressure</div>
+      <div class="risk-desc">~9.72M MYX unlocking March 6, 2026 ($9.67M at recent prices). Investor cliff of 9 months post-May 2025 TGE means Q1-Q2 2026 is the peak unlock risk window. Combined with price ~99% below ATH, holders may sell aggressively.</div>
+    </div>
+    <div class="risk-card high">
+      <div class="risk-label high">🔴 HIGH RISK</div>
+      <div class="risk-title">Reputation & Controversy</div>
+      <div class="risk-desc">BMYX token controversy, KOL incident, airdrop insider scandal ($170M alleged), and wash trading allegations have all surfaced. Community trust is fragile. CEX-grade protocols need squeaky-clean reputations to attract institutional flow.</div>
+    </div>
+    <div class="risk-card mid">
+      <div class="risk-label mid">🟡 MEDIUM RISK</div>
+      <div class="risk-title">MPM Untested at Scale</div>
+      <div class="risk-desc">The Matching Pool Mechanism has not yet been tested through a full bear market cycle or a true black swan event (flash crash, oracle failure). Long-term effectiveness of funding rate / rebate model to maintain balanced long/short positions is unvalidated.</div>
+    </div>
+    <div class="risk-card mid">
+      <div class="risk-label mid">🟡 MEDIUM RISK</div>
+      <div class="risk-title">Chain Abstraction Attack Surface</div>
+      <div class="risk-desc">Advanced multi-chain architecture (20+ chain collateral, account abstraction) introduces new smart contract and bridge attack surfaces. V2 expansion to non-EVM chains like Solana adds further complexity. Multiple audit layers help but don't eliminate risk.</div>
+    </div>
+    <div class="risk-card mid">
+      <div class="risk-label mid">🟡 MEDIUM RISK</div>
+      <div class="risk-title">Competitive Intensity</div>
+      <div class="risk-desc">Hyperliquid, dYdX V4, GMX V2, Drift, and LogX all compete in the perp DEX space with strong communities and liquidity. Hyperliquid in particular has demonstrated superior TVL retention and user stickiness. MYX needs V2 to be a genuine differentiator.</div>
+    </div>
+    <div class="risk-card low">
+      <div class="risk-label low">🟢 LOWER RISK</div>
+      <div class="risk-title">Smart Contract Security</div>
+      <div class="risk-desc">Three rounds of audits (PeckShield, SlowMist x2) have been completed. Order-book-free architecture reduces certain manipulation vectors. Multi-sig controls in place. No major exploit to date — a positive track record for a young protocol.</div>
+    </div>
+    <div class="risk-card low">
+      <div class="risk-label low">🟢 LOWER RISK</div>
+      <div class="risk-title">Investor Quality</div>
+      <div class="risk-desc">Tier-1 VCs (HongShan, ConsenSys, HashKey) provide operational credibility, introduce distribution channels, and have reputational skin in the game. ConsenSys's V2 partnership ensures at least one key stakeholder is deeply aligned with long-term execution.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ VERDICT ══════════════ -->
+<div id="verdict" class="section">
+  <div class="sec-head">
+    <div class="sec-tag">07 / Final Assessment</div>
+    <h2>Nasir's Verdict — MYX Finance</h2>
+    <p>Applying the 10-step onchain analysis framework to render a holistic fundamental view.</p>
+  </div>
+
+  <div class="verdict-grid" style="margin-bottom:28px;">
+    <div class="verdict-item">
+      <div class="verdict-score score-low">6/10</div>
+      <div class="verdict-cat">Price Action & Tokenomics</div>
+    </div>
+    <div class="verdict-item">
+      <div class="verdict-score score-mid">7/10</div>
+      <div class="verdict-cat">Team Quality</div>
+    </div>
+    <div class="verdict-item">
+      <div class="verdict-score score-high">8/10</div>
+      <div class="verdict-cat">Technology & Innovation</div>
+    </div>
+    <div class="verdict-item">
+      <div class="verdict-score score-mid">7/10</div>
+      <div class="verdict-cat">Investor Quality</div>
+    </div>
+    <div class="verdict-item">
+      <div class="verdict-score score-low">5/10</div>
+      <div class="verdict-cat">Protocol Revenue</div>
+    </div>
+    <div class="verdict-item">
+      <div class="verdict-score score-mid">6/10</div>
+      <div class="verdict-cat">Roadmap Confidence</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="font-family:'Syne',sans-serif;color:var(--accent);margin-bottom:16px;">Overall Fundamental Summary</h3>
+    <ul class="feature-list">
+      <li><strong>The Technology is Real.</strong> MPM, chain abstraction, Universal Account, and permissionless listing are all genuine innovations. MYX isn't vaporware — it has run for 18+ months with hundreds of millions in cumulative volume.</li>
+      <li><strong>The Team Has CEX Pedigree.</strong> Mark Zhang's Huobi + OKX background is directly relevant and gives credibility to the product decisions. But team transparency beyond the top 2 executives is a persistent weakness.</li>
+      <li><strong>The Token is Structurally Challenged.</strong> 99% drawdown from ATH, collapsing revenue, ongoing unlock pressure, and airdrop controversy all weigh on MYX as a token — even if the protocol itself has merit.</li>
+      <li><strong>V2 is the Make-or-Break Catalyst.</strong> The modular settlement layer + ConsenSys partnership is a legitimate bull case. If V2 ships on time and drives real institutional volume, MYX could re-rate significantly. If it delays, the narrative collapses.</li>
+      <li><strong>Watch These Signals:</strong> (1) Protocol fee recovery on DeFiLlama, (2) Open Interest trend post-V2, (3) Wallet flows around the March 2026 unlock event, (4) Whether ConsenSys/Linea is actively routing users to MYX.</li>
+    </ul>
+  </div>
+
+  <div class="comment-box" style="margin-top:24px;border-left-color:var(--accent);">
+    <div class="comment-label" style="color:var(--accent);">🎯 Bottom Line</div>
+    <p>MYX Finance is a <strong>high-conviction technology bet that currently has a broken token</strong>. The protocol architecture is among the most sophisticated in the perp DEX space. The backer lineup is legitimate. But the token has suffered structural damage: ATH controversy, revenue collapse, airdrop sell pressure, and upcoming unlock events create significant near-term headwinds. <strong>For a trader:</strong> this is a speculative V2 play — small position, defined downside, watch for the March 2026 unlock absorption and early V2 volume metrics. <strong>For a fundamental investor:</strong> wait for revenue recovery confirmation on DeFiLlama before sizing in. The technology earns the attention; the current fundamentals demand patience.</p>
+  </div>
+
+  <div style="margin-top:28px;text-align:center;color:var(--muted);font-size:.8rem;font-family:'Space Mono',monospace;">
+    Analysis by Nasir · April 18, 2026 · Data sourced from Bitget, IQ.wiki, CoinMarketCap, RootData, DeFiLlama, CoinLaunch<br>
+    This is not financial advice. Always DYOR.
+  </div>
+</div>
+
+</main>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
