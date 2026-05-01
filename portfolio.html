@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio — Nasir Bello</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Exo+2:wght@200;300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#020810; --bg2:#05101f; --nav-bg:rgba(2,8,16,0.9);
+  --modal-bg:#060d1c; --card-bg:#05101f;
+  --card-border:rgba(0,245,255,0.08);
+  --tw:#ddeeff; --tm:#5a9bbf; --td:#2a5570;
+  --c:#00f5ff; --g:#ffd700; --r:#ff0040; --p:#bf00ff;
+  --divider:rgba(0,245,255,0.08);
+  --input-bg:rgba(0,0,0,0.35);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--tw);font-family:'Exo 2',sans-serif;min-height:100vh;overflow-x:hidden;}
+
+/* BACK NAV */
+.back-nav {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 18px;
+  background:var(--nav-bg);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--divider);
+}
+.back-btn {
+  font-family:'Share Tech Mono',monospace;
+  font-size:0.65rem; letter-spacing:2px;
+  color:var(--c); background:rgba(0,245,255,0.04);
+  border:1px solid rgba(0,245,255,0.2);
+  padding:8px 14px; border-radius:4px;
+  cursor:pointer; transition:all 0.2s;
+  text-decoration:none; display:flex; align-items:center; gap:7px;
+}
+.back-btn:hover { background:rgba(0,245,255,0.1); box-shadow:0 0 12px rgba(0,245,255,0.15); }
+.back-nav-brand {
+  font-family:'Orbitron',monospace;
+  font-size:0.65rem; font-weight:700; letter-spacing:3px;
+  color:var(--c); opacity:0.6;
+}
+
+/* MAIN WRAPPER */
+.port-wrapper {
+  padding-top:60px;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  max-width:680px;
+  margin:0 auto;
+}
+
+/* animated background */
+.port-anim-bg {
+  position:fixed; inset:0; z-index:0;
+  animation:bgShift 14s ease infinite;
+}
+@keyframes bgShift {
+  0%   { background:linear-gradient(135deg,#020810,#051020,#020810); }
+  33%  { background:linear-gradient(135deg,#040510,#020a1a,#050210); }
+  66%  { background:linear-gradient(135deg,#020d10,#021520,#020810); }
+  100% { background:linear-gradient(135deg,#020810,#051020,#020810); }
+}
+
+/* SPLASH */
+.port-splash {
+  position:fixed; inset:0; z-index:200;
+  display:flex; align-items:center; justify-content:center; overflow:hidden;
+}
+.port-splash-bg {
+  position:absolute; inset:0;
+  background-image:url('https://i.ibb.co/hFGNGKvL/images-2.jpg');
+  background-size:cover; background-position:center;
+  animation:splashZoom 3.5s ease forwards;
+}
+@keyframes splashZoom { from{transform:scale(1)} to{transform:scale(1.12)} }
+.port-splash-overlay {
+  position:absolute; inset:0;
+  background:linear-gradient(135deg,rgba(0,0,20,0.6),rgba(0,10,30,0.5),rgba(0,0,20,0.75));
+}
+.port-splash-grid {
+  position:absolute; inset:0;
+  background-image:linear-gradient(rgba(0,245,255,0.07) 1px,transparent 1px),linear-gradient(90deg,rgba(0,245,255,0.07) 1px,transparent 1px);
+  background-size:30px 30px;
+}
+.port-splash-particles { position:absolute; inset:0; z-index:2; pointer-events:none; }
+.splash-particle {
+  position:absolute; border-radius:50%;
+  animation:spFloat linear infinite;
+}
+@keyframes spFloat {
+  0%  { transform:translateY(0) scale(1); opacity:0.8; }
+  100%{ transform:translateY(-120vh) scale(0); opacity:0; }
+}
+.port-splash-content {
+  position:relative; z-index:3; text-align:center; padding:30px 20px;
+  animation:splashFadeIn 0.8s ease forwards;
+}
+@keyframes splashFadeIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+.psc-eyebrow { font-family:'Share Tech Mono',monospace; font-size:0.65rem; letter-spacing:4px; color:rgba(0,245,255,0.7); margin-bottom:16px; }
+.psc-name { font-family:'Orbitron',monospace; font-weight:900; font-size:clamp(1.8rem,8vw,3rem); letter-spacing:3px; color:#fff; text-shadow:0 0 20px rgba(0,245,255,0.9),0 0 50px rgba(0,245,255,0.5); min-height:3.5rem; }
+.psc-role { font-family:'Share Tech Mono',monospace; font-size:0.62rem; letter-spacing:2px; color:rgba(255,215,0,0.8); margin-top:10px; }
+.psc-bar-wrap { width:220px; height:2px; background:rgba(255,255,255,0.1); border-radius:2px; margin:22px auto; }
+.psc-bar { height:100%; background:linear-gradient(90deg,var(--c),var(--p)); border-radius:2px; width:0; transition:width 0.05s linear; box-shadow:0 0 8px var(--c); }
+.psc-skip { font-family:'Share Tech Mono',monospace; font-size:0.65rem; letter-spacing:2px; color:rgba(255,255,255,0.4); margin-top:24px; cursor:pointer; transition:color 0.2s; animation:blink2 2s ease-in-out infinite; }
+.psc-skip:hover { color:var(--c); }
+@keyframes blink2 { 0%,100%{opacity:0.4} 50%{opacity:1} }
+
+/* MAIN CONTENT */
+.port-content { position:relative; z-index:1; display:none; flex-direction:column; animation:contentIn 0.6s ease; }
+@keyframes contentIn { from{opacity:0} to{opacity:1} }
+
+/* HEADER */
+.port-header {
+  position:relative; height:200px; overflow:hidden;
+  flex-shrink:0;
+}
+.port-hdr-img {
+  position:absolute; inset:0;
+  background-image:url('https://i.ibb.co/hFGNGKvL/images-2.jpg');
+  background-size:cover; background-position:center;
+  filter:brightness(0.42) saturate(1.1);
+  animation:hdrPan 20s ease-in-out infinite alternate;
+}
+@keyframes hdrPan { from{background-position:0% center} to{background-position:100% center} }
+.port-hdr-overlay {
+  position:absolute; inset:0;
+  background:linear-gradient(to bottom,rgba(0,0,20,0.2) 0%,rgba(2,8,16,0.88) 100%);
+}
+.port-hdr-grid {
+  position:absolute; inset:0;
+  background-image:linear-gradient(rgba(0,245,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,245,255,0.05) 1px,transparent 1px);
+  background-size:24px 24px;
+}
+.port-hdr-inner {
+  position:absolute; bottom:18px; left:18px; right:18px; z-index:2;
+  display:flex; align-items:center; gap:14px;
+}
+.port-hdr-avatar {
+  width:60px; height:60px; border-radius:50%; object-fit:cover;
+  border:2px solid var(--c); box-shadow:0 0 16px rgba(0,245,255,0.4); flex-shrink:0;
+}
+.port-hdr-name { font-family:'Orbitron',monospace; font-size:1rem; font-weight:900; color:#fff; letter-spacing:1px; text-shadow:0 0 10px rgba(0,245,255,0.5); }
+.port-hdr-role { font-family:'Share Tech Mono',monospace; font-size:0.56rem; letter-spacing:1.5px; color:rgba(255,215,0,0.8); margin:3px 0 8px; }
+.port-hdr-links { display:flex; gap:6px; flex-wrap:wrap; }
+.port-link { font-family:'Share Tech Mono',monospace; font-size:0.56rem; letter-spacing:1px; color:var(--c); border:1px solid rgba(0,245,255,0.2); padding:3px 8px; border-radius:2px; background:rgba(0,245,255,0.04); text-decoration:none; transition:all 0.2s; }
+.port-link:hover { background:rgba(0,245,255,0.12); }
+.port-status { position:absolute; top:14px; right:14px; z-index:5; display:inline-flex; align-items:center; gap:6px; font-family:'Share Tech Mono',monospace; font-size:0.58rem; letter-spacing:1.5px; color:var(--c); background:rgba(0,0,20,0.65); border:1px solid rgba(0,245,255,0.2); padding:5px 10px; border-radius:3px; }
+.port-status-dot { width:5px; height:5px; border-radius:50%; background:#39ff14; box-shadow:0 0 6px #39ff14; animation:dp 2s ease-in-out infinite; }
+@keyframes dp { 0%,100%{box-shadow:0 0 6px #39ff14} 50%{box-shadow:0 0 14px #39ff14} }
+
+/* SCROLL BODY */
+.port-scroll { padding:0 0 40px; }
+.port-section { padding:18px 18px 4px; }
+.port-section-title { font-family:'Orbitron',monospace; font-size:0.68rem; font-weight:700; letter-spacing:2px; color:var(--c); margin-bottom:14px; display:flex; align-items:center; gap:8px; padding-bottom:8px; border-bottom:1px solid var(--divider); }
+
+/* PROJECT */
+.port-proj-card { background:rgba(0,245,255,0.02); border:1px solid var(--divider); border-radius:5px; overflow:hidden; margin-bottom:14px; }
+.port-proj-header { display:flex; justify-content:space-between; align-items:center; padding:14px 16px; cursor:pointer; transition:background 0.2s; }
+.port-proj-header:hover { background:rgba(0,245,255,0.04); }
+.port-proj-name { font-family:'Orbitron',monospace; font-size:0.72rem; font-weight:700; letter-spacing:1px; color:var(--tw); }
+.port-proj-sub { font-family:'Share Tech Mono',monospace; font-size:0.58rem; letter-spacing:1px; color:var(--td); margin-top:3px; }
+.port-proj-arrow { color:var(--c); font-size:1rem; transition:transform 0.3s; }
+.port-proj-arrow.open { transform:rotate(90deg); }
+.port-proj-body { max-height:0; overflow:hidden; transition:max-height 0.5s ease; padding:0 16px; }
+.port-proj-body.open { max-height:1200px; padding-bottom:16px; }
+.port-proj-img-placeholder { height:80px; background:linear-gradient(135deg,#030e1c,#061525); border:1px solid rgba(0,245,255,0.1); border-radius:4px; display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom:12px; }
+.port-proj-desc { font-size:0.84rem; color:var(--tm); line-height:1.75; font-weight:300; margin-bottom:13px; }
+.port-proj-details { background:rgba(0,0,0,0.2); border-radius:3px; padding:10px 12px; margin-bottom:13px; }
+.port-detail-row { display:flex; gap:10px; margin-bottom:6px; align-items:flex-start; }
+.port-detail-row:last-child { margin-bottom:0; }
+.pdr-label { font-family:'Share Tech Mono',monospace; font-size:0.58rem; letter-spacing:1px; color:var(--td); flex-shrink:0; width:55px; }
+.pdr-val { font-size:0.82rem; color:var(--tw); }
+.port-feat-title { font-family:'Share Tech Mono',monospace; font-size:0.6rem; letter-spacing:2px; color:var(--g); margin-bottom:8px; }
+.port-features { display:flex; flex-direction:column; gap:5px; }
+.port-feat { font-size:0.8rem; color:var(--tm); line-height:1.5; }
+.port-proj-tags { display:flex; gap:6px; flex-wrap:wrap; margin-top:12px; }
+.port-proj-tag { font-family:'Share Tech Mono',monospace; font-size:0.54rem; letter-spacing:1px; color:var(--g); border:1px solid rgba(255,215,0,0.2); padding:2px 7px; border-radius:2px; background:rgba(255,215,0,0.04); }
+.port-proj-link { display:inline-flex; align-items:center; gap:5px; font-family:'Share Tech Mono',monospace; font-size:0.6rem; letter-spacing:1px; color:var(--c); text-decoration:none; border:1px solid rgba(0,245,255,0.15); padding:6px 12px; border-radius:2px; margin-top:12px; transition:all 0.2s; background:rgba(0,245,255,0.03); }
+.port-proj-link:hover { background:rgba(0,245,255,0.1); }
+
+/* SKILLS */
+.skills-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+.skill-item { background:rgba(0,245,255,0.02); border:1px solid var(--divider); border-radius:3px; padding:11px 13px; }
+.skill-item:hover { border-color:rgba(0,245,255,0.18); }
+.skill-name { font-family:'Orbitron',monospace; font-size:0.6rem; font-weight:700; letter-spacing:1px; color:var(--tw); margin-bottom:7px; }
+.skill-bar-track { height:3px; background:rgba(255,255,255,0.06); border-radius:2px; overflow:hidden; }
+.skill-bar-fill { height:100%; border-radius:2px; background:linear-gradient(90deg,var(--c),var(--p)); box-shadow:0 0 6px var(--c); animation:fillBar 1.4s ease forwards; width:0; }
+@keyframes fillBar { to{width:var(--w)} }
+.skill-level { font-family:'Share Tech Mono',monospace; font-size:0.54rem; letter-spacing:1px; color:var(--td); margin-top:4px; }
+
+/* ABOUT */
+.port-about-card { background:rgba(0,245,255,0.02); border:1px solid var(--divider); border-radius:4px; padding:16px; }
+.port-about-text { font-size:0.85rem; color:var(--tm); line-height:1.8; font-weight:300; margin-bottom:16px; }
+.port-about-stats { display:flex; border-top:1px solid var(--divider); padding-top:14px; }
+.port-stat { flex:1; text-align:center; border-right:1px solid var(--divider); }
+.port-stat:last-child { border-right:none; }
+.port-stat-val { font-family:'Orbitron',monospace; font-size:1.2rem; font-weight:900; color:var(--c); text-shadow:0 0 10px var(--c); }
+.port-stat-label { font-family:'Share Tech Mono',monospace; font-size:0.52rem; letter-spacing:1px; color:var(--td); margin-top:3px; }
+
+/* VISION */
+.port-vision-box { background:rgba(0,245,255,0.02); border:1px solid rgba(0,245,255,0.1); border-left:3px solid var(--c); border-radius:4px; padding:16px; }
+.port-vision-quote { font-family:'Orbitron',monospace; font-size:0.72rem; font-weight:700; color:rgba(255,215,0,0.8); font-style:italic; margin-bottom:14px; letter-spacing:1px; }
+.port-vision-items { display:flex; flex-direction:column; gap:10px; }
+.port-vision-item { display:flex; gap:10px; align-items:flex-start; }
+.pvi-dot { color:var(--g); font-size:0.65rem; flex-shrink:0; margin-top:3px; }
+.port-vision-item strong { color:var(--tw); font-size:0.85rem; display:block; margin-bottom:2px; }
+.port-vision-item p { font-size:0.8rem; color:var(--tm); font-weight:300; line-height:1.6; }
+
+/* INTERESTS */
+.port-interest-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.port-interest-card { background:rgba(0,245,255,0.02); border:1px solid var(--divider); border-radius:4px; padding:14px; transition:border-color 0.2s; }
+.port-interest-card:hover { border-color:rgba(0,245,255,0.2); }
+.anime-card { border-color:rgba(191,0,255,0.2); background:rgba(191,0,255,0.03); }
+.anime-card:hover { border-color:rgba(191,0,255,0.4); }
+.pic-icon { font-size:1.4rem; margin-bottom:7px; }
+.pic-name { font-family:'Orbitron',monospace; font-size:0.62rem; font-weight:700; letter-spacing:1px; color:var(--tw); margin-bottom:6px; }
+.pic-desc { font-size:0.78rem; color:var(--tm); line-height:1.65; font-weight:300; }
+.anime-tags { display:flex; gap:4px; flex-wrap:wrap; margin-top:8px; }
+.atag { font-family:'Share Tech Mono',monospace; font-size:0.52rem; letter-spacing:1px; color:var(--p); border:1px solid rgba(191,0,255,0.25); padding:2px 6px; border-radius:2px; background:rgba(191,0,255,0.06); }
+
+/* CONTACT */
+.port-contact-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.port-contact-item { display:flex; align-items:center; gap:10px; padding:12px 13px; background:rgba(0,245,255,0.02); border:1px solid var(--divider); border-radius:3px; text-decoration:none; color:inherit; transition:border-color 0.2s; }
+.port-contact-item:hover { border-color:rgba(0,245,255,0.2); }
+.pcon-ic { font-size:1rem; flex-shrink:0; }
+.pcon-lb { font-family:'Share Tech Mono',monospace; font-size:0.55rem; letter-spacing:1.5px; color:var(--td); }
+.pcon-vl { font-size:0.78rem; color:var(--tw); font-weight:600; margin-top:2px; word-break:break-all; }
+
+/* footer */
+.port-footer { text-align:center; padding:20px; border-top:1px solid var(--divider); margin-top:10px; }
+.port-footer p { font-family:'Share Tech Mono',monospace; font-size:0.58rem; letter-spacing:1.5px; color:var(--td); }
+.port-footer span { color:var(--c); }
+</style>
+</head>
+<body>
+<div class="port-anim-bg"></div>
+
+<!-- BACK NAV -->
+<nav class="back-nav">
+  <a class="back-btn" href="index.html">← BACK TO VAULT</a>
+  <div class="back-nav-brand">PORTFOLIO</div>
+</nav>
+
+<!-- SPLASH -->
+<div class="port-splash" id="port-splash">
+  <div class="port-splash-bg"></div>
+  <div class="port-splash-particles" id="port-particles"></div>
+  <div class="port-splash-overlay"></div>
+  <div class="port-splash-grid"></div>
+  <div class="port-splash-content">
+    <div class="psc-eyebrow">◈ LOADING PROFILE ◈</div>
+    <div class="psc-name" id="psc-name"></div>
+    <div class="psc-role">TRADER · DEVELOPER · RESEARCHER · ANIME LOVER</div>
+    <div class="psc-bar-wrap"><div class="psc-bar" id="psc-bar"></div></div>
+    <div class="psc-skip" onclick="skipSplash()">TAP TO ENTER →</div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="port-wrapper">
+<div class="port-content" id="port-content">
+
+  <!-- header -->
+  <div class="port-header">
+    <div class="port-hdr-img"></div>
+    <div class="port-hdr-overlay"></div>
+    <div class="port-hdr-grid"></div>
+    <div class="port-hdr-inner">
+      <img class="port-hdr-avatar" src="https://i.ibb.co/pBJBDqN5/images-3.jpg" alt="Nasir Bello" onerror="this.style.background='#0d2235'">
+      <div>
+        <div class="port-hdr-name">NASIR BELLO</div>
+        <div class="port-hdr-role">TRADER · DEVELOPER · RESEARCHER</div>
+        <div class="port-hdr-links">
+          <a class="port-link" href="https://github.com/nasirbello043-sudo" target="_blank">⬡ GITHUB</a>
+          <a class="port-link" href="mailto:nasirbello008@gmail.com">✉ EMAIL</a>
+          <a class="port-link" href="tel:+2348130594985">☎ CALL</a>
+        </div>
+      </div>
+    </div>
+    <div class="port-status"><div class="port-status-dot"></div>AVAILABLE FOR COLLABORATION</div>
+  </div>
+
+  <div class="port-scroll">
+
+    <!-- PROJECTS -->
+    <div class="port-section">
+      <div class="port-section-title">// PROJECTS</div>
+      <div class="port-proj-card">
+        <div class="port-proj-header" onclick="toggleProj(0)">
+          <div><div class="port-proj-name">CRYPTO RESEARCH VAULT</div><div class="port-proj-sub">Web Platform · 2025–2026</div></div>
+          <div class="port-proj-arrow" id="parr-0">▸</div>
+        </div>
+        <div class="port-proj-body" id="pbody-0">
+          <div class="port-proj-img-placeholder"><span style="font-size:2rem">🔐</span><span style="font-family:'Orbitron',monospace;font-size:0.6rem;letter-spacing:2px;color:rgba(0,245,255,0.5)">LIVE PLATFORM</span></div>
+          <p class="port-proj-desc">A professional-grade web platform for publishing and accessing deep cryptocurrency fundamental analysis. Built entirely from scratch — pure HTML, CSS, and JavaScript, no frameworks.</p>
+          <div class="port-proj-details">
+            <div class="port-detail-row"><span class="pdr-label">TYPE</span><span class="pdr-val">Full-Stack Web Application</span></div>
+            <div class="port-detail-row"><span class="pdr-label">STACK</span><span class="pdr-val">HTML · CSS · JavaScript · GitHub API · Canvas API</span></div>
+            <div class="port-detail-row"><span class="pdr-label">STATUS</span><span class="pdr-val" style="color:#39ff14">● LIVE &amp; ACTIVE</span></div>
+            <div class="port-detail-row"><span class="pdr-label">HOST</span><span class="pdr-val">GitHub Pages</span></div>
+          </div>
+          <div class="port-feat-title">KEY FEATURES</div>
+          <div class="port-features">
+            <div class="port-feat">⬡ Live GitHub API integration — reports load automatically</div>
+            <div class="port-feat">⬡ PDF whitepaper viewer built-in</div>
+            <div class="port-feat">⬡ Dual theme system (Dark / Light Mode)</div>
+            <div class="port-feat">⬡ Animated Web3 hex-grid background with particle nodes</div>
+            <div class="port-feat">⬡ Electric spark poster cards with 5 colour themes</div>
+            <div class="port-feat">⬡ Hamburger drawer navigation</div>
+            <div class="port-feat">⬡ Responsive — 3 cols mobile · 5 cols desktop</div>
+            <div class="port-feat">⬡ Cinematic portfolio page with typewriter splash</div>
+            <div class="port-feat">⬡ Bug reporting system via mailto</div>
+          </div>
+          <div class="port-proj-tags">
+            <span class="port-proj-tag">HTML5</span><span class="port-proj-tag">CSS3</span><span class="port-proj-tag">JavaScript ES6</span>
+            <span class="port-proj-tag">GitHub API</span><span class="port-proj-tag">Canvas API</span><span class="port-proj-tag">Web3 Design</span><span class="port-proj-tag">Responsive</span>
+          </div>
+          <a class="port-proj-link" href="index.html">↗ VISIT THE VAULT</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- SKILLS -->
+    <div class="port-section">
+      <div class="port-section-title">// SKILLS &amp; EXPERTISE</div>
+      <div class="skills-grid">
+        <div class="skill-item"><div class="skill-name">TRADING</div><div class="skill-bar-track"><div class="skill-bar-fill" style="--w:85%"></div></div><div class="skill-level">ADVANCED · 85%</div></div>
+        <div class="skill-item"><div class="skill-name">CRYPTO RESEARCH</div><div class="skill-bar-track"><div class="skill-bar-fill" style="--w:88%"></div></div><div class="skill-level">ADVANCED · 88%</div></div>
+        <div class="skill-item"><div class="skill-name">HTML / CSS</div><div class="skill-bar-track"><div class="skill-bar-fill" style="--w:75%"></div></div><div class="skill-level">INTERMEDIATE · 75%</div></div>
+        <div class="skill-item"><div class="skill-name">JAVASCRIPT</div><div class="skill-bar-track"><div class="skill-bar-fill" style="--w:60%"></div></div><div class="skill-level">GROWING · 60%</div></div>
+        <div class="skill-item" style="grid-column:1/-1"><div class="skill-name">OTHER LANGUAGES</div><div class="skill-bar-track"><div class="skill-bar-fill" style="--w:15%;background:linear-gradient(90deg,var(--g),var(--r))"></div></div><div class="skill-level">IN PROGRESS — MASTERY INCOMING ⚡</div></div>
+      </div>
+    </div>
+
+    <!-- ABOUT -->
+    <div class="port-section">
+      <div class="port-section-title">// ABOUT THE DEVELOPER</div>
+      <div class="port-about-card">
+        <p class="port-about-text">Based in <strong>Kontagora, Niger State, Nigeria</strong> — I am a self-taught crypto trader, researcher, and web developer navigating the decentralized frontier. Every line of code I write and every market I analyse is a step toward building tools that make complex financial data accessible to everyone.</p>
+        <div class="port-about-stats">
+          <div class="port-stat"><div class="port-stat-val">5+</div><div class="port-stat-label">REPORTS</div></div>
+          <div class="port-stat"><div class="port-stat-val">1</div><div class="port-stat-label">LIVE PLATFORM</div></div>
+          <div class="port-stat"><div class="port-stat-val">∞</div><div class="port-stat-label">DRIVE</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VISION -->
+    <div class="port-section">
+      <div class="port-section-title">// VISION &amp; GOALS</div>
+      <div class="port-vision-box">
+        <div class="port-vision-quote">"Turning complexity into clarity — one block at a time."</div>
+        <div class="port-vision-items">
+          <div class="port-vision-item"><span class="pvi-dot">◆</span><div><strong>Precision Research</strong><p>Automating real-time data collection to stay ahead of the curve.</p></div></div>
+          <div class="port-vision-item"><span class="pvi-dot">◆</span><div><strong>The Sentinel</strong><p>Implementing advanced security to protect assets and information.</p></div></div>
+          <div class="port-vision-item"><span class="pvi-dot">◆</span><div><strong>Master Analysis</strong><p>Decoding complex blockchain data into simplified, high-value intelligence.</p></div></div>
+          <div class="port-vision-item"><span class="pvi-dot">◆</span><div><strong>AI-Driven Suite</strong><p>Long-term goal: build a full AI-powered research ecosystem for the crypto space.</p></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INTERESTS -->
+    <div class="port-section">
+      <div class="port-section-title">// INTERESTS &amp; PERSONALITY</div>
+      <div class="port-interest-grid">
+        <div class="port-interest-card anime-card"><div class="pic-icon">⚔</div><div class="pic-name">ANIME FAN</div><div class="pic-desc">Passionate about anime — the storytelling, world-building, and never-give-up spirit mirrors the drive I bring to trading and development.</div><div class="anime-tags"><span class="atag">ACTION</span><span class="atag">SHONEN</span><span class="atag">STRATEGY</span><span class="atag">THRILLER</span></div></div>
+        <div class="port-interest-card"><div class="pic-icon">📊</div><div class="pic-name">MARKET ANALYST</div><div class="pic-desc">Deep dives into on-chain data, liquidity flows, DeFi mechanics, and AI-integrated blockchain protocols.</div></div>
+        <div class="port-interest-card"><div class="pic-icon">💻</div><div class="pic-name">SELF-TAUGHT CODER</div><div class="pic-desc">Started with zero knowledge — built a full Web3 platform through relentless learning. Targeting Python, Rust, and beyond.</div></div>
+        <div class="port-interest-card"><div class="pic-icon">🌐</div><div class="pic-name">WEB3 BELIEVER</div><div class="pic-desc">DeFi, blockchain, and decentralized intelligence are not trends — they are the new foundation of finance.</div></div>
+      </div>
+    </div>
+
+    <!-- CONTACT -->
+    <div class="port-section">
+      <div class="port-section-title">// CONTACT &amp; CONNECT</div>
+      <div class="port-contact-grid">
+        <a class="port-contact-item" href="mailto:nasirbello008@gmail.com"><span class="pcon-ic">📧</span><div><div class="pcon-lb">EMAIL</div><div class="pcon-vl">nasirbello008@gmail.com</div></div></a>
+        <a class="port-contact-item" href="tel:+2348130594985"><span class="pcon-ic">📱</span><div><div class="pcon-lb">PHONE</div><div class="pcon-vl">08130594985</div></div></a>
+        <a class="port-contact-item" href="https://github.com/nasirbello043-sudo" target="_blank"><span class="pcon-ic">🔗</span><div><div class="pcon-lb">GITHUB</div><div class="pcon-vl">nasirbello043-sudo</div></div></a>
+        <div class="port-contact-item"><span class="pcon-ic">📍</span><div><div class="pcon-lb">LOCATION</div><div class="pcon-vl">Kontagora, Niger State, NG</div></div></div>
+      </div>
+    </div>
+
+  </div><!-- end port-scroll -->
+
+  <div class="port-footer">
+    <p>© 2026 <span>NASIR BELLO</span> · ALL RIGHTS RESERVED</p>
+  </div>
+
+</div><!-- end port-content -->
+</div><!-- end port-wrapper -->
+
+<script>
+// SPLASH
+function skipSplash(){
+  const splash=document.getElementById('port-splash');
+  const cont=document.getElementById('port-content');
+  splash.style.transition='opacity 0.6s';
+  splash.style.opacity='0';
+  setTimeout(()=>{ splash.style.display='none'; cont.style.display='flex'; triggerSkillBars(); },600);
+}
+function triggerSkillBars(){
+  setTimeout(()=>{
+    document.querySelectorAll('.skill-bar-fill').forEach(b=>{
+      b.style.animation='none'; b.offsetHeight; b.style.animation='fillBar 1.4s ease forwards';
+    });
+  },200);
+}
+function toggleProj(idx){
+  const body=document.getElementById('pbody-'+idx);
+  const arr=document.getElementById('parr-'+idx);
+  if(body) body.classList.toggle('open');
+  if(arr) arr.classList.toggle('open');
+}
+// launch on page load
+window.addEventListener('load', ()=>{
+  const pc=document.getElementById('port-particles');
+  if(pc){
+    for(let i=0;i<35;i++){
+      const p=document.createElement('div');
+      p.className='splash-particle';
+      const size=Math.random()*4+2;
+      const col=Math.random()<0.5?'rgba(0,245,255,':'rgba(191,0,255,';
+      p.style.cssText=`width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${80+Math.random()*40}%;background:${col}${Math.random()*0.7+0.3});animation-duration:${Math.random()*4+3}s;animation-delay:${Math.random()*2}s;`;
+      pc.appendChild(p);
+    }
+  }
+  const nameEl=document.getElementById('psc-name');
+  const bar=document.getElementById('psc-bar');
+  const full='NASIR BELLO'; let i=0;
+  if(nameEl) nameEl.textContent='';
+  const iv=setInterval(()=>{
+    if(nameEl && i<full.length){ nameEl.textContent+=full[i]; i++; }
+    if(bar) bar.style.width=((i/full.length)*100)+'%';
+    if(i>=full.length){ clearInterval(iv); setTimeout(skipSplash,1800); }
+  },80);
+});
+</script>
+</body>
+</html>
