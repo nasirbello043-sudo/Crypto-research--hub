@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEI Network — Deep Fundamental Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050810;
+    --surface: #0b1120;
+    --surface2: #111827;
+    --border: #1e2d4a;
+    --sei-red: #e84142;
+    --sei-orange: #f97316;
+    --sei-cyan: #22d3ee;
+    --sei-green: #10b981;
+    --sei-yellow: #fbbf24;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --dim: #94a3b8;
+    --accent: #3b82f6;
+    --glow: rgba(232,65,66,0.18);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    min-height: 380px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 24px 48px;
+    overflow: hidden;
+  }
+  .hero::before {
+    content:'';
+    position:absolute; inset:0;
+    background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(232,65,66,0.22) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 40% at 20% 80%, rgba(34,211,238,0.08) 0%, transparent 60%);
+    pointer-events:none;
+  }
+  .hero-badge {
+    display:inline-flex; align-items:center; gap:8px;
+    background: rgba(232,65,66,0.15); border:1px solid rgba(232,65,66,0.4);
+    border-radius:100px; padding:5px 16px; margin-bottom:22px;
+    font-size:11px; letter-spacing:2px; color:var(--sei-red); text-transform:uppercase;
+    animation: fadeDown 0.7s ease;
+  }
+  .hero-badge span { width:6px; height:6px; border-radius:50%; background:var(--sei-red); animation:pulse 1.5s infinite; }
+  .hero-title {
+    font-family:'Syne', sans-serif; font-size:clamp(36px,7vw,80px); font-weight:800;
+    line-height:1.05; letter-spacing:-2px;
+    background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 40%, var(--sei-red) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    animation: fadeDown 0.8s ease 0.1s both;
+  }
+  .hero-subtitle {
+    margin-top:16px; font-size:13px; color:var(--muted); letter-spacing:1px;
+    animation: fadeDown 0.8s ease 0.2s both;
+  }
+  .hero-price-row {
+    display:flex; gap:32px; flex-wrap:wrap; justify-content:center; margin-top:32px;
+    animation: fadeDown 0.8s ease 0.3s both;
+  }
+  .hero-stat { text-align:center; }
+  .hero-stat .val { font-family:'Syne',sans-serif; font-size:24px; font-weight:700; color:#fff; }
+  .hero-stat .lbl { font-size:10px; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-top:2px; }
+  .hero-stat .change-pos { color:var(--sei-green); font-size:12px; }
+  .hero-stat .change-neg { color:var(--sei-red); font-size:12px; }
+
+  /* NAV */
+  .toc {
+    background: var(--surface); border-bottom:1px solid var(--border);
+    position:sticky; top:0; z-index:100; overflow-x:auto; white-space:nowrap;
+  }
+  .toc-inner { display:flex; gap:0; padding:0 24px; }
+  .toc a {
+    display:inline-block; padding:14px 20px; color:var(--muted);
+    text-decoration:none; font-size:11px; letter-spacing:1.5px; text-transform:uppercase;
+    border-bottom:2px solid transparent; transition:all 0.2s;
+  }
+  .toc a:hover { color:var(--sei-red); border-bottom-color:var(--sei-red); }
+
+  /* LAYOUT */
+  .container { max-width:1200px; margin:0 auto; padding:48px 24px; }
+  .section { margin-bottom:72px; }
+  .section-header {
+    display:flex; align-items:center; gap:16px; margin-bottom:32px; padding-bottom:16px;
+    border-bottom:1px solid var(--border);
+  }
+  .section-num { font-family:'Syne',sans-serif; font-size:48px; font-weight:800; color:var(--sei-red); opacity:0.25; line-height:1; }
+  .section-title { font-family:'Syne',sans-serif; font-size:22px; font-weight:700; color:#fff; }
+  .section-sub { font-size:11px; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-top:2px; }
+
+  /* CARDS */
+  .grid-2 { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:20px; }
+  .grid-3 { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
+  .grid-4 { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; }
+  .card {
+    background: var(--surface); border:1px solid var(--border); border-radius:12px;
+    padding:20px; position:relative; overflow:hidden; transition:border-color 0.2s;
+  }
+  .card:hover { border-color: rgba(232,65,66,0.4); }
+  .card-accent { border-left:3px solid var(--sei-red); }
+  .card-cyan { border-left:3px solid var(--sei-cyan); }
+  .card-green { border-left:3px solid var(--sei-green); }
+  .card-yellow { border-left:3px solid var(--sei-yellow); }
+  .card-label { font-size:10px; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:8px; }
+  .card-value { font-family:'Syne',sans-serif; font-size:26px; font-weight:700; color:#fff; }
+  .card-sub { font-size:11px; color:var(--dim); margin-top:6px; }
+  .tag-pos { display:inline-block; background:rgba(16,185,129,0.15); color:var(--sei-green); border-radius:4px; padding:2px 8px; font-size:11px; }
+  .tag-neg { display:inline-block; background:rgba(232,65,66,0.15); color:var(--sei-red); border-radius:4px; padding:2px 8px; font-size:11px; }
+  .tag-warn { display:inline-block; background:rgba(251,191,36,0.15); color:var(--sei-yellow); border-radius:4px; padding:2px 8px; font-size:11px; }
+
+  /* PROGRESS BARS */
+  .bar-row { margin-bottom:16px; }
+  .bar-label { display:flex; justify-content:space-between; margin-bottom:6px; font-size:12px; }
+  .bar-track { height:8px; background:rgba(255,255,255,0.07); border-radius:4px; overflow:hidden; }
+  .bar-fill { height:100%; border-radius:4px; transition:width 1s ease; }
+  .bar-red { background: linear-gradient(90deg, var(--sei-red), var(--sei-orange)); }
+  .bar-cyan { background: linear-gradient(90deg, var(--sei-cyan), var(--accent)); }
+  .bar-green { background: linear-gradient(90deg, var(--sei-green), #6ee7b7); }
+  .bar-yellow { background: linear-gradient(90deg, var(--sei-yellow), #fde68a); }
+  .bar-purple { background: linear-gradient(90deg, #8b5cf6, #c4b5fd); }
+
+  /* TABLE */
+  .data-table { width:100%; border-collapse:collapse; }
+  .data-table th { text-align:left; padding:10px 16px; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); border-bottom:1px solid var(--border); }
+  .data-table td { padding:12px 16px; border-bottom:1px solid rgba(30,45,74,0.5); font-size:12px; }
+  .data-table tr:last-child td { border-bottom:none; }
+  .data-table tr:hover td { background:rgba(255,255,255,0.02); }
+
+  /* TEAM */
+  .team-card {
+    background: var(--surface2); border:1px solid var(--border); border-radius:16px;
+    padding:28px; display:flex; gap:24px; align-items:flex-start;
+    transition:border-color 0.2s, box-shadow 0.2s;
+  }
+  .team-card:hover { border-color:rgba(232,65,66,0.4); box-shadow:0 0 40px rgba(232,65,66,0.08); }
+  .team-photo {
+    width:80px; height:80px; border-radius:50%; object-fit:cover; flex-shrink:0;
+    border:2px solid rgba(232,65,66,0.4);
+  }
+  .team-photo-fallback {
+    width:80px; height:80px; border-radius:50%; flex-shrink:0;
+    border:2px solid rgba(232,65,66,0.4);
+    background: linear-gradient(135deg, var(--sei-red), var(--sei-orange));
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Syne',sans-serif; font-size:26px; font-weight:800; color:#fff;
+  }
+  .team-name { font-family:'Syne',sans-serif; font-size:18px; font-weight:700; color:#fff; }
+  .team-role { font-size:11px; color:var(--sei-cyan); letter-spacing:1.5px; text-transform:uppercase; margin:4px 0 12px; }
+  .team-bio { font-size:12px; color:var(--dim); line-height:1.8; }
+  .team-tags { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+  .team-tag { background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.25); color:#93c5fd; border-radius:4px; padding:3px 10px; font-size:10px; letter-spacing:1px; }
+
+  /* VERDICT */
+  .verdict-box {
+    background: linear-gradient(135deg, rgba(232,65,66,0.1) 0%, rgba(16,185,129,0.05) 100%);
+    border:1px solid rgba(232,65,66,0.3); border-radius:16px; padding:32px;
+    position:relative; overflow:hidden;
+  }
+  .verdict-box::before {
+    content:'VERDICT';
+    position:absolute; right:32px; top:50%; transform:translateY(-50%);
+    font-family:'Syne',sans-serif; font-size:80px; font-weight:800;
+    color:rgba(255,255,255,0.03); letter-spacing:10px; user-select:none;
+  }
+  .verdict-score { font-family:'Syne',sans-serif; font-size:64px; font-weight:800; color:var(--sei-yellow); line-height:1; }
+  .verdict-label { font-size:11px; color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin-top:4px; }
+
+  /* RISK MATRIX */
+  .risk-item { display:flex; align-items:flex-start; gap:12px; margin-bottom:14px; }
+  .risk-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; margin-top:5px; }
+  .risk-high { background:var(--sei-red); }
+  .risk-med { background:var(--sei-yellow); }
+  .risk-low { background:var(--sei-green); }
+  .risk-text { font-size:12px; color:var(--dim); }
+  .risk-title { color:var(--text); font-weight:500; }
+
+  /* SOURCE */
+  .source-row { font-size:10px; color:var(--muted); display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+  .source-badge { background:rgba(255,255,255,0.05); border:1px solid var(--border); border-radius:4px; padding:2px 8px; }
+
+  /* COMPARE */
+  .compare-chain { text-align:center; }
+  .compare-name { font-family:'Syne',sans-serif; font-size:14px; font-weight:700; }
+  .compare-val { font-size:20px; font-weight:700; font-family:'Syne',sans-serif; }
+
+  /* ANIMATIONS */
+  @keyframes fadeDown { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  @keyframes shimmer { 0%{left:-100%} 100%{left:200%} }
+
+  /* DIVIDER */
+  .divider { height:1px; background:linear-gradient(90deg,transparent,var(--border),transparent); margin:32px 0; }
+
+  /* HIGHLIGHTS */
+  .highlight { color:var(--sei-red); }
+  .highlight-cyan { color:var(--sei-cyan); }
+  .highlight-green { color:var(--sei-green); }
+  .highlight-yellow { color:var(--sei-yellow); }
+
+  /* QUOTE */
+  .quote-block {
+    border-left:3px solid var(--sei-cyan); padding:12px 20px;
+    background:rgba(34,211,238,0.05); border-radius:0 8px 8px 0; margin:16px 0;
+    font-style:italic; color:var(--dim); font-size:12px;
+  }
+
+  /* FOOTER */
+  footer { text-align:center; padding:48px 24px; border-top:1px solid var(--border); color:var(--muted); font-size:11px; }
+
+  @media(max-width:600px){
+    .team-card { flex-direction:column; }
+    .hero-price-row { gap:20px; }
+    .toc-inner { padding:0 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge"><span></span> Live Fundamental Analysis · April 2026</div>
+  <div class="hero-title">SEI NETWORK</div>
+  <div class="hero-subtitle">IBC/71F11BC0AF8E526B80E44172EBA9D3F0A8E03950BB882325435691EBC9450B1D</div>
+  <div class="hero-price-row">
+    <div class="hero-stat">
+      <div class="val">$0.0636</div>
+      <div class="lbl">Current Price</div>
+      <div class="change-pos">▲ 3.91% (24h)</div>
+    </div>
+    <div class="hero-stat">
+      <div class="val">$445M</div>
+      <div class="lbl">Market Cap</div>
+      <div class="change-neg">Rank #89</div>
+    </div>
+    <div class="hero-stat">
+      <div class="val">$43M</div>
+      <div class="lbl">Current TVL</div>
+      <div class="change-neg">↓ from $688M ATH</div>
+    </div>
+    <div class="hero-stat">
+      <div class="val">$1.141</div>
+      <div class="lbl">All-Time High</div>
+      <div class="change-neg">▼ 94.4% from ATH</div>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="toc">
+  <div class="toc-inner">
+    <a href="#overview">Overview</a>
+    <a href="#market">Market Data</a>
+    <a href="#technology">Technology</a>
+    <a href="#tokenomics">Tokenomics</a>
+    <a href="#ecosystem">Ecosystem</a>
+    <a href="#team">Team</a>
+    <a href="#competition">Competition</a>
+    <a href="#risks">Risks</a>
+    <a href="#verdict">Verdict</a>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- ===== 01 OVERVIEW ===== -->
+  <section class="section" id="overview">
+    <div class="section-header">
+      <div class="section-num">01</div>
+      <div>
+        <div class="section-title">Project Overview</div>
+        <div class="section-sub">Protocol Summary & Mission</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card card-accent">
+        <div class="card-label">What is SEI?</div>
+        <p style="color:var(--dim);font-size:12px;line-height:1.9">
+          Sei is a <span class="highlight">Layer 1 blockchain</span> engineered specifically for high-speed financial transactions — the first parallelized EVM chain. It combines the massive developer network of Ethereum with performance characteristics rivaling Solana. Co-founded in 2021/2022 by <span class="highlight-cyan">Jayendra Jog</span> and <span class="highlight-cyan">Jeff Feng</span>, Sei launched its mainnet in <strong>August 2023</strong> and has since undergone a critical architectural pivot toward a full EVM environment.
+        </p>
+        <div class="divider"></div>
+        <div class="card-label">Core Mission</div>
+        <p style="color:var(--dim);font-size:12px;line-height:1.9">
+          To become the premier financial-grade blockchain — the settlement layer for global onchain finance, serving DeFi, gaming, RWAs, and AI-agent economies through unmatched parallelized execution and sub-second finality.
+        </p>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="card card-cyan">
+          <div class="card-label">Blockchain Architecture</div>
+          <div class="card-value" style="font-size:16px;">Parallelized EVM L1</div>
+          <div class="card-sub">Originally Cosmos SDK + Tendermint → Now EVM-Only (SIP-3, April 2026)</div>
+        </div>
+        <div class="card card-green">
+          <div class="card-label">Performance Target (Giga Upgrade)</div>
+          <div class="card-value">200,000+ TPS</div>
+          <div class="card-sub">Sub-400ms finality via Autobahn consensus · Devnet validated Aug 2025</div>
+        </div>
+        <div class="card card-yellow">
+          <div class="card-label">Network Activity (Q3 2025)</div>
+          <div class="card-value">116M txns</div>
+          <div class="card-sub">+138% QoQ · Avg 805K daily addresses · 28M+ lifetime addresses</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="quote-block" style="margin-top:24px;">
+      "Sei has processed more than five billion transactions across more than 90 million wallets and has become the #1 EVM chain by number of active users." — CoinMarketCap / Sei About Page
+    </div>
+
+    <div class="source-row">
+      <span class="source-badge">CoinMarketCap</span>
+      <span class="source-badge">BSC News</span>
+      <span class="source-badge">Messari Q1 2025</span>
+      <span class="source-badge">Sei Giga Whitepaper</span>
+    </div>
+  </section>
+
+  <!-- ===== 02 MARKET DATA ===== -->
+  <section class="section" id="market">
+    <div class="section-header">
+      <div class="section-num">02</div>
+      <div>
+        <div class="section-title">Market Data</div>
+        <div class="section-sub">Price · Caps · Volume · Historical Ranges</div>
+      </div>
+    </div>
+
+    <div class="grid-4" style="margin-bottom:24px;">
+      <div class="card">
+        <div class="card-label">Price (Apr 26 2026)</div>
+        <div class="card-value">$0.0636</div>
+        <div class="card-sub"><span class="tag-pos">+3.91% 24h</span></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Market Cap</div>
+        <div class="card-value">$445M</div>
+        <div class="card-sub">Rank #89</div>
+      </div>
+      <div class="card">
+        <div class="card-label">FDV</div>
+        <div class="card-value">$638M</div>
+        <div class="card-sub">Fully Diluted Value</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Volume 24h</div>
+        <div class="card-value">$35.7M</div>
+        <div class="card-sub">Vol/MCap: ~8%</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Circulating Supply</div>
+        <div class="card-value">6.97B</div>
+        <div class="card-sub">69.7% of 10B max</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Max Supply</div>
+        <div class="card-value">10.00B</div>
+        <div class="card-sub">Fixed cap</div>
+      </div>
+      <div class="card">
+        <div class="card-label">All-Time High</div>
+        <div class="card-value" style="font-size:20px;">$1.141</div>
+        <div class="card-sub"><span class="tag-neg">-94.4% from ATH</span></div>
+      </div>
+      <div class="card">
+        <div class="card-label">All-Time Low</div>
+        <div class="card-value" style="font-size:20px;">$0.00799</div>
+        <div class="card-sub"><span class="tag-pos">+695% from ATL</span></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px;">
+      <div class="card-label">Performance Across Timeframes</div>
+      <div style="margin-top:16px;">
+        <div class="bar-row">
+          <div class="bar-label"><span>24 Hours</span><span class="tag-pos">+3.91%</span></div>
+          <div class="bar-track"><div class="bar-fill bar-green" style="width:55%"></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label"><span>7 Days</span><span class="tag-pos">+13.91%</span></div>
+          <div class="bar-track"><div class="bar-fill bar-green" style="width:65%"></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label"><span>30 Days</span><span class="tag-pos">+13.97%</span></div>
+          <div class="bar-track"><div class="bar-fill bar-green" style="width:66%"></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label"><span>90 Days</span><span class="tag-neg">-39.01%</span></div>
+          <div class="bar-track"><div class="bar-fill bar-red" style="width:40%"></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label"><span>YTD 2026</span><span class="tag-neg">-45.02%</span></div>
+          <div class="bar-track"><div class="bar-fill bar-red" style="width:30%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-label">Technical Signals (4H Chart)</div>
+        <table class="data-table" style="margin-top:10px;">
+          <tr><td style="color:var(--dim)">MA(7)</td><td>$0.06136</td><td><span class="tag-pos">Price Above</span></td></tr>
+          <tr><td style="color:var(--dim)">MA(30)</td><td>$0.06124</td><td><span class="tag-pos">Price Above</span></td></tr>
+          <tr><td style="color:var(--dim)">MA(200)</td><td>$0.05618</td><td><span class="tag-pos">Price Above</span></td></tr>
+          <tr><td style="color:var(--dim)">RSI(14)</td><td>63.73</td><td><span class="tag-warn">Near Overbought</span></td></tr>
+          <tr><td style="color:var(--dim)">MACD</td><td>-0.00006</td><td><span class="tag-neg">Slightly Bearish</span></td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-label">Key Price Levels</div>
+        <table class="data-table" style="margin-top:10px;">
+          <tr><td style="color:var(--dim)">24h High</td><td class="highlight-green">$0.06411</td><td>Resistance</td></tr>
+          <tr><td style="color:var(--dim)">24h Low</td><td style="color:#f87171">$0.05982</td><td>Support</td></tr>
+          <tr><td style="color:var(--dim)">Key Resistance</td><td class="highlight-yellow">$0.060–$0.068</td><td>Breakout Zone</td></tr>
+          <tr><td style="color:var(--dim)">Strong Support</td><td class="highlight-cyan">$0.050</td><td>Major Floor</td></tr>
+          <tr><td style="color:var(--dim)">Bear Target</td><td style="color:#f87171">$0.020</td><td>Demand Zone</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 03 TECHNOLOGY ===== -->
+  <section class="section" id="technology">
+    <div class="section-header">
+      <div class="section-num">03</div>
+      <div>
+        <div class="section-title">Technology & Architecture</div>
+        <div class="section-sub">Technical Differentiation & Roadmap</div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:24px;">
+      <div>
+        <div class="card card-accent" style="margin-bottom:16px;">
+          <div class="card-label">Twin-Turbo Consensus</div>
+          <p style="font-size:12px;color:var(--dim);line-height:1.8;margin-top:6px;">
+            Sei's foundational consensus mechanism is a hybrid of Tendermint BFT and proprietary optimizations. It enables <span class="highlight">sub-400ms block finality</span> — making instant transaction confirmation a reality for trading applications. Unlike Ethereum's ~12s blocks or even Solana's ~400ms theoretical latency, Sei commits to deterministic finality at sub-second speeds with no probabilistic risk.
+          </p>
+        </div>
+        <div class="card card-cyan">
+          <div class="card-label">Optimistic Parallelization</div>
+          <p style="font-size:12px;color:var(--dim);line-height:1.8;margin-top:6px;">
+            Sei executes non-conflicting transactions simultaneously rather than sequentially. This is the key differentiator from Ethereum's single-threaded EVM. By assuming transactions don't conflict and resolving collisions after the fact, Sei achieves <span class="highlight-cyan">~12,500+ TPS</span> currently, scaling to 200,000+ TPS with the Giga upgrade.
+          </p>
+        </div>
+      </div>
+      <div>
+        <div class="card card-green" style="margin-bottom:16px;">
+          <div class="card-label">Native Order-Matching Engine</div>
+          <p style="font-size:12px;color:var(--dim);line-height:1.8;margin-top:6px;">
+            Sei is the only blockchain with a native on-chain CLOB (Central Limit Order Book) engine built into the protocol layer. This eliminates off-chain intermediaries for DEXs, provides <span class="highlight-green">MEV protection</span> via batch auctions, and enables frontrunning resistance — features absent on Ethereum and Solana at the base layer.
+          </p>
+        </div>
+        <div class="card card-yellow">
+          <div class="card-label">EVM-Only Architecture (SIP-3)</div>
+          <p style="font-size:12px;color:var(--dim);line-height:1.8;margin-top:6px;">
+            In April 2026, Sei completed its migration from a dual Cosmos/EVM chain to a pure EVM L1 via governance proposal SIP-3. This removed CosmWasm overhead and allows Sei to fully leverage Ethereum's developer tooling (Solidity, Hardhat, MetaMask) while retaining Sei's native performance advantages. This was a <span class="highlight-yellow">critical strategic pivot</span> for ecosystem growth.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card card-accent" style="margin-bottom:20px;">
+      <div class="card-label">🚀 Giga Upgrade — The Endgame (2025–2026)</div>
+      <div class="grid-3" style="margin-top:16px;">
+        <div>
+          <div style="color:var(--sei-red);font-family:'Syne',sans-serif;font-size:20px;font-weight:700;">Autobahn Consensus</div>
+          <div style="font-size:11px;color:var(--dim);margin-top:4px;">Asynchronous multi-proposer block production. Multiple validators propose blocks simultaneously. Validated on devnet at 200K+ TPS in August 2025.</div>
+        </div>
+        <div>
+          <div style="color:var(--sei-cyan);font-family:'Syne',sans-serif;font-size:20px;font-weight:700;">SeiDB Storage</div>
+          <div style="font-size:11px;color:var(--dim);margin-top:4px;">Custom-built storage layer replacing CosmosDB. Optimized for high-frequency reads/writes required by trading and gaming dApps. Reduces I/O bottlenecks at scale.</div>
+        </div>
+        <div>
+          <div style="color:var(--sei-green);font-family:'Syne',sans-serif;font-size:20px;font-weight:700;">AI Integration</div>
+          <div style="font-size:11px;color:var(--dim);margin-top:4px;">MCP (Model Context Protocol) allows AI agents like ChatGPT and Claude to interact directly with Sei blockchain via natural language — first L1 with native AI-to-blockchain interoperability.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Technical Milestones Timeline</div>
+      <table class="data-table" style="margin-top:12px;">
+        <thead><tr><th>Date</th><th>Milestone</th><th>Impact</th></tr></thead>
+        <tbody>
+          <tr><td class="highlight">Aug 2023</td><td>Mainnet Launch</td><td><span class="tag-pos">Live</span></td></tr>
+          <tr><td class="highlight">2024</td><td>SEI v2 — EVM + CosmWasm dual layer</td><td><span class="tag-pos">Bullish</span></td></tr>
+          <tr><td class="highlight">Feb 2025</td><td>ElizaOS AI integration goes live</td><td><span class="tag-pos">Bullish</span></td></tr>
+          <tr><td class="highlight">Jun 2025</td><td>TVL surpasses $1B, MetaMask integration (100M users)</td><td><span class="tag-pos">Major</span></td></tr>
+          <tr><td class="highlight">Aug 2025</td><td>Giga devnet validates 200K TPS</td><td><span class="tag-pos">Milestone</span></td></tr>
+          <tr><td class="highlight">Nov 2025</td><td>seictl node operator tool released</td><td><span class="tag-pos">Bullish</span></td></tr>
+          <tr><td class="highlight">Jan 2026</td><td>Zero-fee swaps live (+258% volume surge)</td><td><span class="tag-pos">Bullish</span></td></tr>
+          <tr><td class="highlight">Apr 2026</td><td>Full EVM-only migration complete (SIP-3)</td><td><span class="tag-pos">Strategic</span></td></tr>
+          <tr><td class="highlight">2026+</td><td>Giga mainnet rollout with Autobahn consensus</td><td><span class="tag-warn">Pending</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 04 TOKENOMICS ===== -->
+  <section class="section" id="tokenomics">
+    <div class="section-header">
+      <div class="section-num">04</div>
+      <div>
+        <div class="section-title">Tokenomics</div>
+        <div class="section-sub">Supply · Allocations · Unlock Schedule · Staking</div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:24px;">
+      <div class="card">
+        <div class="card-label">Token Allocation Breakdown</div>
+        <div style="margin-top:16px;">
+          <div class="bar-row">
+            <div class="bar-label"><span>🟠 Ecosystem Reserve</span><span>27.00%</span></div>
+            <div class="bar-track"><div class="bar-fill bar-yellow" style="width:27%"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label"><span>🟣 Private Sale Investors</span><span>20.00%</span></div>
+            <div class="bar-track"><div class="bar-fill bar-purple" style="width:20%"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label"><span>🔵 Staking Rewards</span><span>15.00%</span></div>
+            <div class="bar-track"><div class="bar-fill bar-cyan" style="width:15%"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label"><span>🟢 Team (Years 2–4)</span><span>15.20%</span></div>
+            <div class="bar-track"><div class="bar-fill bar-green" style="width:15.2%"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label"><span>🟩 Foundation</span><span>9.00%</span></div>
+            <div class="bar-track"><div class="bar-fill bar-green" style="width:9%"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label"><span>🔴 Team (Years 5–6)</span><span>4.80%</span></div>
+            <div class="bar-track"><div class="bar-fill bar-red" style="width:4.8%"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label"><span>🔵 Strategic Allocation</span><span>3.00%</span></div>
+            <div class="bar-track"><div class="bar-fill bar-cyan" style="width:3%"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label"><span>🟢 Airdrop</span><span>3.00%</span></div>
+            <div class="bar-track"><div class="bar-fill bar-green" style="width:3%"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label"><span>🟡 Binance Launchpool</span><span>3.00%</span></div>
+            <div class="bar-track"><div class="bar-fill bar-yellow" style="width:3%"></div></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="card card-accent">
+          <div class="card-label">Supply Metrics</div>
+          <table class="data-table" style="margin-top:8px;">
+            <tr><td style="color:var(--dim)">Max Supply</td><td style="font-weight:600;">10,000,000,000</td></tr>
+            <tr><td style="color:var(--dim)">Circulating</td><td>~6,970,000,000</td></tr>
+            <tr><td style="color:var(--dim)">% Unlocked</td><td><span class="tag-warn">~63–70%</span></td></tr>
+            <tr><td style="color:var(--dim)">TGE Unlock</td><td>1.80B (18%)</td></tr>
+            <tr><td style="color:var(--dim)">Full Unlock</td><td>August 2031</td></tr>
+          </table>
+        </div>
+        <div class="card card-yellow">
+          <div class="card-label">Staking Economics</div>
+          <div class="card-value">5–18% APY</div>
+          <div class="card-sub">Validator APY rising to 9%+ · Incentivizes locking supply · Reduces circulating pressure</div>
+        </div>
+        <div class="card card-green">
+          <div class="card-label">Stablecoin Supply Growth</div>
+          <div class="card-value">+100%</div>
+          <div class="card-sub">Stablecoin market cap grew 100%+ (Mar–Jul 2025) · USDC + CCTP V2 integrated</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card card-accent">
+      <div class="card-label">⚠️ Unlock Risk Assessment</div>
+      <div class="grid-2" style="margin-top:16px;gap:16px;">
+        <div>
+          <p style="font-size:12px;color:var(--dim);line-height:1.9">
+            SEI follows a <span class="highlight">linear vesting schedule</span> with monthly unlocks on the 15th of each month. The peak unlock periods were 2024–2025, where monthly emissions exceeded <span class="highlight">150–200M tokens/month</span>. By 2026–2027, this stabilizes to ~112–132M tokens/month as Foundation and early investor allocations conclude.
+          </p>
+          <p style="font-size:12px;color:var(--dim);line-height:1.9;margin-top:10px;">
+            The next major unlock is <span class="highlight-yellow">March 15, 2026</span> (Ecosystem Reserve). ~37% of supply remains locked — representing significant future dilution risk if demand doesn't absorb it.
+          </p>
+        </div>
+        <div>
+          <div class="bar-row">
+            <div class="bar-label"><span style="color:var(--sei-red)">HIGH RISK</span><span>Investor Sell Pressure</span></div>
+            <div class="bar-track"><div class="bar-fill bar-red" style="width:80%"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label"><span style="color:var(--sei-yellow)">MEDIUM</span><span>Team Vesting (Yr 5-6)</span></div>
+            <div class="bar-track"><div class="bar-fill bar-yellow" style="width:55%"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-label"><span style="color:var(--sei-green)">LOWER</span><span>Post-2027 Monthly Rate</span></div>
+            <div class="bar-track"><div class="bar-fill bar-green" style="width:35%"></div></div>
+          </div>
+          <div style="margin-top:10px;">
+            <span class="tag-neg">Bearish Signal: TVL fell from $688M to ~$43M by Apr 2026</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="source-row" style="margin-top:12px;">
+      <span class="source-badge">Tokenomist.ai</span>
+      <span class="source-badge">MEXC Tokenomics</span>
+      <span class="source-badge">CryptoRank</span>
+      <span class="source-badge">DefiLlama Unlocks</span>
+    </div>
+  </section>
+
+  <!-- ===== 05 ECOSYSTEM ===== -->
+  <section class="section" id="ecosystem">
+    <div class="section-header">
+      <div class="section-num">05</div>
+      <div>
+        <div class="section-title">Ecosystem & Adoption</div>
+        <div class="section-sub">TVL · DeFi · Gaming · RWA · Institutional</div>
+      </div>
+    </div>
+
+    <div class="card card-accent" style="margin-bottom:24px;">
+      <div class="card-label">TVL Journey — DefiLlama Data</div>
+      <div class="grid-4" style="margin-top:16px;">
+        <div style="text-align:center;">
+          <div style="color:var(--muted);font-size:11px;">Feb 2024</div>
+          <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--dim);">$13M</div>
+          <div style="font-size:10px;color:var(--muted);">Baseline</div>
+        </div>
+        <div style="text-align:center;border-left:1px solid var(--border);">
+          <div style="color:var(--muted);font-size:11px;">Mar 2025</div>
+          <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--sei-yellow);">$300M</div>
+          <div style="font-size:10px;color:var(--muted);">+2,200%</div>
+        </div>
+        <div style="text-align:center;border-left:1px solid var(--border);">
+          <div style="color:var(--muted);font-size:11px;">Jun–Jul 2025</div>
+          <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--sei-green);">$1.32B ATH</div>
+          <div style="font-size:10px;color:var(--muted);">Peak adoption</div>
+        </div>
+        <div style="text-align:center;border-left:1px solid var(--border);">
+          <div style="color:var(--muted);font-size:11px;">Apr 2026</div>
+          <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--sei-red);">$43M</div>
+          <div style="font-size:10px;color:var(--muted);">↓ -97% from ATH</div>
+        </div>
+      </div>
+      <div class="quote-block" style="margin-top:20px;">
+        ⚠️ Critical Concern: TVL collapsed from the $688M–$1.32B range back to ~$43M by April 2026. This disconnect between network activity metrics and capital retained is a major fundamental red flag. Zero-fee swap launch (Apr 2026) saw TVL DROP 7.32% even as price rose 10%, suggesting speculative not sticky capital.
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:24px;">
+      <div class="card">
+        <div class="card-label">Major DeFi Protocols on SEI</div>
+        <table class="data-table" style="margin-top:10px;">
+          <thead><tr><th>Protocol</th><th>Category</th><th>TVL Peak</th></tr></thead>
+          <tbody>
+            <tr><td class="highlight-cyan">Yei Finance</td><td>Money Market</td><td class="highlight-green">$270M+ USDC</td></tr>
+            <tr><td class="highlight-cyan">Takara Lend</td><td>Lending</td><td class="highlight-green">$100M+</td></tr>
+            <tr><td class="highlight-cyan">DragonSwap</td><td>DEX / CLOB</td><td style="color:var(--dim)">Anchor DEX</td></tr>
+            <tr><td class="highlight-cyan">Filament Finance</td><td>Perps DEX</td><td style="color:var(--dim)">Top 60 globally</td></tr>
+            <tr><td class="highlight-cyan">Splashing Protocol</td><td>Liquid Staking</td><td style="color:var(--dim)">10M SEI staked</td></tr>
+            <tr><td class="highlight-cyan">Oxium</td><td>CLOB Perps</td><td style="color:var(--dim)">$3.96B Q3 vol</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-label">Network Metrics (Cross-Platform Data)</div>
+        <table class="data-table" style="margin-top:10px;">
+          <thead><tr><th>Metric</th><th>Value</th><th>Source</th></tr></thead>
+          <tbody>
+            <tr><td>Daily Active Addr.</td><td>805K avg</td><td style="color:var(--muted)">Messari Q3</td></tr>
+            <tr><td>Total Wallets</td><td>28M+</td><td style="color:var(--muted)">Artemis</td></tr>
+            <tr><td>Q3 2025 Transactions</td><td>116M (+138%)</td><td style="color:var(--muted)">Messari</td></tr>
+            <tr><td>Q3 Spot Volume</td><td>$3.96B (+75%)</td><td style="color:var(--muted)">Artemis</td></tr>
+            <tr><td>Perps Volume Growth</td><td>+19,527% QoQ</td><td style="color:var(--muted)">Ainvest</td></tr>
+            <tr><td>Gaming TX (Q1 2025)</td><td>354K/day</td><td style="color:var(--muted)">Messari Q1</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card card-cyan">
+        <div class="card-label">🎮 Gaming Ecosystem</div>
+        <p style="font-size:12px;color:var(--dim);line-height:1.8;margin-top:8px;">
+          Gaming is Sei's breakout vertical — driving daily transactions that surpassed all other categories combined in Q1 2025. Active titles include <span class="highlight-cyan">World of Dypians</span>, <span class="highlight-cyan">Archer Hunter</span>, <span class="highlight-cyan">AstroKarts</span>, <span class="highlight-cyan">Bombpixel</span>, and <span class="highlight-cyan">Enchanted Isles</span>. The 79% gaming activity spike in Q1 2025 validates Sei's sub-second finality as game-ready infrastructure.
+        </p>
+      </div>
+      <div class="card card-green">
+        <div class="card-label">🏦 Institutional & RWA Traction</div>
+        <p style="font-size:12px;color:var(--dim);line-height:1.8;margin-top:8px;">
+          Sei has secured ~<span class="highlight-green">$30M in committed RWA</span> from institutional players including BlackRock, Hamilton Lane, and Apollo as part of its "Market Infrastructure Grid" strategy. Canary Capital filed for the first <span class="highlight-green">Staked SEI ETF</span> with the SEC. Japan's FSA granted regulatory approval. Wyoming shortlisted Sei (alongside Aptos) for the WYST state stablecoin. BitGo added custody and staking support.
+        </p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px;">
+      <div class="card-label">📱 MetaMask & Xiaomi Partnerships</div>
+      <div class="grid-2" style="margin-top:12px;gap:12px;">
+        <div>
+          <div style="color:var(--sei-yellow);font-family:'Syne',sans-serif;font-weight:700;">MetaMask Integration (Aug 2025)</div>
+          <p style="font-size:12px;color:var(--dim);line-height:1.8;margin-top:6px;">
+            Opening Sei to MetaMask's 100 million global users. Wallet count surged 76% monthly to 8.3M after integration.
+          </p>
+        </div>
+        <div>
+          <div style="color:var(--sei-orange);font-family:'Syne',sans-serif;font-weight:700;">Xiaomi Partnership</div>
+          <p style="font-size:12px;color:var(--dim);line-height:1.8;margin-top:6px;">
+            Sei pre-installed on Xiaomi devices (36.9% European market, 24.2% India). Stablecoin payments in 20,000+ retail stores. Massive mass-market Web3 onboarding play.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="source-row" style="margin-top:12px;">
+      <span class="source-badge">DefiLlama</span>
+      <span class="source-badge">Messari Q1 & Q3 2025</span>
+      <span class="source-badge">Artemis Analytics</span>
+      <span class="source-badge">OKX Analysis</span>
+      <span class="source-badge">BSC News</span>
+    </div>
+  </section>
+
+  <!-- ===== 06 TEAM ===== -->
+  <section class="section" id="team">
+    <div class="section-header">
+      <div class="section-num">06</div>
+      <div>
+        <div class="section-title">Team Biographies</div>
+        <div class="section-sub">Founders & Core Leadership</div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:20px;">
+
+      <!-- Jayendra Jog -->
+      <div class="team-card">
+        <img src="https://media.licdn.com/dms/image/v2/C5603AQFfhRXQ3z0r6A/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1517441571124?e=1753315200&v=beta&t=gB5VgFgFgFgFgFgFgFgFgFgFgFgFgFgFgFgFgFgFg" 
+             alt="Jayendra Jog" class="team-photo"
+             onerror="this.outerHTML='<div class=\'team-photo-fallback\'>JJ</div>'">
+        <div>
+          <div class="team-name">Jayendra Jog</div>
+          <div class="team-role">Co-Founder & CEO — Sei Labs</div>
+          <div class="team-bio">
+            Jayendra "Jay" Jog is the technical visionary behind Sei Network. Born and raised in the San Francisco Bay Area, he was drawn to technology from an early age — coding by high school and landing internships at SAP and Facebook before university. He earned his <strong>B.S. in Computer Science from UCLA in 2018</strong>, where he was selected for the prestigious <strong>2017 KPCB (Kleiner Perkins) Engineering Fellows Program</strong> — chosen from nearly 2,000 nationwide applicants.
+            <br><br>
+            His fellowship placed him at <strong>Pinterest</strong> (pre-IPO), where small teams had outsized business impact — an experience that permanently shaped his preference for high-leverage engineering. He then joined <strong>Robinhood</strong> as a Software Engineer post-IPO, contributing to critical infrastructure including the KYC onboarding flow, a new phone-number registration system, and a Kafka-powered asynchronous task queue — directly touching the high-throughput, low-latency financial systems that Sei would later be built to replace.
+            <br><br>
+            The <strong>2021 GameStop trading halt</strong> — which Jog witnessed from inside Robinhood — was the inflection point. Watching a centralized platform restrict user trades radicalized him toward decentralization. In 2021/2022, he co-founded Sei Labs with Jeff Feng, raising <strong>$35M</strong> to build a decentralized trading infrastructure. The company grew to a valuation with SEI token market cap peaking at <strong>$2.7B</strong>. 
+            <br><br>
+            Jog is a <strong>Forbes 30 Under 30</strong> honoree and a vocal advocate for EVM scaling at the L1 layer, authoring op-eds in CoinTelegraph arguing that L2s fragment liquidity and that high-performance L1s are the correct scaling path.
+          </div>
+          <div class="team-tags">
+            <span class="team-tag">UCLA CS</span>
+            <span class="team-tag">KPCB Fellow</span>
+            <span class="team-tag">Ex-Robinhood SWE</span>
+            <span class="team-tag">Ex-Pinterest</span>
+            <span class="team-tag">Forbes 30 Under 30</span>
+            <span class="team-tag">$35M Raised</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Jeff Feng -->
+      <div class="team-card">
+        <div class="team-photo-fallback">JF</div>
+        <div>
+          <div class="team-name">Jeff Feng</div>
+          <div class="team-role">Co-Founder — Sei Labs</div>
+          <div class="team-bio">
+            Jeff Feng is the business and financial architecture strategist behind Sei Network, bringing Wall Street rigor into the blockchain world. He holds a <strong>B.S. in Business Administration from UC Berkeley's Haas School of Business</strong> and began his career as a <strong>Data Analyst at Yelp</strong> before transitioning to finance.
+            <br><br>
+            Feng spent approximately <strong>three years at Goldman Sachs</strong> as a TMT (Technology, Media & Telecom) investment banker, gaining deep exposure to institutional capital markets, deal structures, and financial systems architecture — insight that would directly inform Sei's order-matching engine design and its product-market fit for institutional traders.
+            <br><br>
+            He then moved into <strong>venture capital at Coatue Management</strong> (Bay Area), one of the most sophisticated technology-focused hedge funds and VC firms in the world, where he developed his investment thesis around decentralized finance infrastructure. At Coatue, Feng identified the structural inefficiency in crypto markets: existing chains were not purpose-built for the performance requirements of serious financial trading.
+            <br><br>
+            In 2022, he co-founded Sei Labs alongside Jayendra Jog — his complementary partner with deep engineering expertise. Feng's role has focused on <strong>investor relations, go-to-market strategy, institutional partnerships</strong>, and the broader ecosystem fundraising that secured backing from Multicoin Capital, Jump Crypto, Coinbase Ventures, Delphi Digital, and Circle Ventures.
+          </div>
+          <div class="team-tags">
+            <span class="team-tag">UC Berkeley Haas</span>
+            <span class="team-tag">Ex-Goldman Sachs IBD</span>
+            <span class="team-tag">Ex-Coatue VC</span>
+            <span class="team-tag">Ex-Yelp</span>
+            <span class="team-tag">Multicoin-Backed</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Justin Barlow -->
+      <div class="team-card">
+        <div class="team-photo-fallback">JB</div>
+        <div>
+          <div class="team-name">Justin Barlow</div>
+          <div class="team-role">Head of Business Development & Head of Investments</div>
+          <div class="team-bio">
+            Justin Barlow holds dual roles as Head of BD and Head of Investments at Sei Labs — a rare combination that positions him as both a dealmaker and an allocator. In the BD capacity, he leads partnership development across exchanges, wallets, DeFi protocols, and gaming studios that are building on Sei. His investment hat gives him direct responsibility over Sei's ecosystem fund, which deploys capital into early-stage projects building on the network.
+            <br><br>
+            Barlow's background spans traditional finance and the crypto-native ecosystem, giving him fluency in both worlds. His dual mandate reflects Sei's positioning at the intersection of institutional-grade infrastructure and emerging Web3 applications. He has been central to securing key partnerships including ZeroHash (institutional trading API), LayerZero (cross-chain), and early-stage gaming studios that have driven Sei's gaming ecosystem growth.
+          </div>
+          <div class="team-tags">
+            <span class="team-tag">BD Strategy</span>
+            <span class="team-tag">Ecosystem Fund</span>
+            <span class="team-tag">DeFi Partnerships</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Jack Lipstone -->
+      <div class="team-card">
+        <div class="team-photo-fallback">JL</div>
+        <div>
+          <div class="team-name">Jack Lipstone</div>
+          <div class="team-role">Head of DeFi Business Development</div>
+          <div class="team-bio">
+            Jack Lipstone leads DeFi-specific business development at Sei Labs, with a mandate to attract and onboard decentralized finance protocols to the network. Given that Sei's core value proposition is purpose-built financial infrastructure, Lipstone's role is strategically critical — the quality of DeFi protocols he attracts directly determines Sei's TVL, volume metrics, and long-term protocol revenue.
+            <br><br>
+            His focus areas include lending markets (Yei Finance, Takara Lend), perpetual DEXs (Filament Finance, Oxium), liquid staking protocols, and stablecoin integrations. Lipstone works closely with the USDC/CCTP V2 integration partners and has been involved in positioning Sei as a stablecoin-friendly environment. His deep DeFi network within the Cosmos and EVM ecosystems has been instrumental in the cross-chain liquidity growth Sei experienced through 2025.
+          </div>
+          <div class="team-tags">
+            <span class="team-tag">DeFi Specialist</span>
+            <span class="team-tag">Protocol Onboarding</span>
+            <span class="team-tag">TVL Growth</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chad Hugghins -->
+      <div class="team-card">
+        <div class="team-photo-fallback">CH</div>
+        <div>
+          <div class="team-name">Chad Hugghins</div>
+          <div class="team-role">Head of Marketing</div>
+          <div class="team-bio">
+            Chad Hugghins oversees Sei Network's global marketing strategy, brand presence, and community communications. In the hyper-competitive L1 landscape — where narrative and community strength are as important as technology — Hugghins plays a critical role in positioning Sei distinctively against Solana, Aptos, and Sui.
+            <br><br>
+            His work encompasses developer marketing (attracting builders to the EVM ecosystem), consumer-facing campaigns (particularly for gaming and NFT verticals), and institutional communications supporting regulatory milestones like the Japan FSA approval and the Wyoming WYST stablecoin candidacy. The MetaMask integration announcement — which drove an 8.3M wallet surge — was a significant marketing execution milestone under his purview. He has built a marketing function that bridges crypto-native Twitter/X communities with more traditional financial media outreach.
+          </div>
+          <div class="team-tags">
+            <span class="team-tag">Brand Strategy</span>
+            <span class="team-tag">Community Growth</span>
+            <span class="team-tag">Developer Marketing</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Julian Tan -->
+      <div class="team-card">
+        <div class="team-photo-fallback">JT</div>
+        <div>
+          <div class="team-name">Julian Tan</div>
+          <div class="team-role">Head of Grants & Head of Liquidity</div>
+          <div class="team-bio">
+            Julian Tan holds a uniquely powerful dual mandate: managing Sei's grants program and overseeing liquidity strategy. The grants role means he controls the ecosystem's builder incentive pipeline — deciding which projects and teams receive funding from the Ecosystem Reserve (27% of total supply). The quality of his grant selection directly impacts Sei's protocol diversity and long-term ecosystem health.
+            <br><br>
+            His liquidity mandate is equally critical: Tan works to ensure deep, stable liquidity across Sei's DEX ecosystem, particularly through mechanisms like the Splashing Protocol liquid staking pool and market-making agreements with major exchanges. Given that one of Sei's core weaknesses has been TVL retention (collapsing from $688M to ~$43M in 2026), Tan's liquidity role is under significant scrutiny. His work with institutional liquidity providers and yield programs attempts to attract sticky capital rather than mercenary liquidity.
+          </div>
+          <div class="team-tags">
+            <span class="team-tag">Ecosystem Grants</span>
+            <span class="team-tag">Liquidity Strategy</span>
+            <span class="team-tag">Market Making</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Jamie H. Finn -->
+      <div class="team-card">
+        <div class="team-photo-fallback">JF</div>
+        <div>
+          <div class="team-name">Jamie H. Finn</div>
+          <div class="team-role">Strategic Advisor</div>
+          <div class="team-bio">
+            Jamie H. Finn serves as Strategic Advisor to Sei Labs, providing senior counsel on business strategy, regulatory positioning, and institutional adoption pathways. Advisors of this caliber typically bring board-level relationships and regulatory expertise that internal teams lack.
+            <br><br>
+            In the context of Sei's current strategic priorities — Japan FSA regulatory compliance, SEC engagement around the Canary Capital Staked SEI ETF, and Wyoming WYST stablecoin selection — an experienced strategic advisor is invaluable. Finn's advisory contributions likely include introductions to institutional investors, regulatory strategy around the ETF filing, and strategic framing for Sei's "Market Infrastructure Grid" positioning toward BlackRock, Hamilton Lane, and Apollo partnerships.
+          </div>
+          <div class="team-tags">
+            <span class="team-tag">Strategic Advisory</span>
+            <span class="team-tag">Regulatory Relations</span>
+            <span class="team-tag">Institutional Access</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card card-accent" style="margin-top:24px;">
+      <div class="card-label">Investor Backing (Fundraising)</div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;">
+        <span style="background:rgba(232,65,66,0.1);border:1px solid rgba(232,65,66,0.3);border-radius:6px;padding:8px 16px;font-size:12px;color:var(--text);">🔴 Multicoin Capital</span>
+        <span style="background:rgba(232,65,66,0.1);border:1px solid rgba(232,65,66,0.3);border-radius:6px;padding:8px 16px;font-size:12px;color:var(--text);">🔴 Jump Crypto</span>
+        <span style="background:rgba(232,65,66,0.1);border:1px solid rgba(232,65,66,0.3);border-radius:6px;padding:8px 16px;font-size:12px;color:var(--text);">🔴 Coinbase Ventures</span>
+        <span style="background:rgba(232,65,66,0.1);border:1px solid rgba(232,65,66,0.3);border-radius:6px;padding:8px 16px;font-size:12px;color:var(--text);">🔴 Circle Ventures</span>
+        <span style="background:rgba(232,65,66,0.1);border:1px solid rgba(232,65,66,0.3);border-radius:6px;padding:8px 16px;font-size:12px;color:var(--text);">🔴 Delphi Digital</span>
+        <span style="background:rgba(232,65,66,0.1);border:1px solid rgba(232,65,66,0.3);border-radius:6px;padding:8px 16px;font-size:12px;color:var(--text);">🔴 Total Raised: ~$35M+</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 07 COMPETITION ===== -->
+  <section class="section" id="competition">
+    <div class="section-header">
+      <div class="section-num">07</div>
+      <div>
+        <div class="section-title">Competitive Landscape</div>
+        <div class="section-sub">SEI vs. Solana · Aptos · Sui · Ethereum L2s</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:24px;">
+      <div class="card-label">Chain Comparison Matrix</div>
+      <div style="overflow-x:auto;margin-top:12px;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th style="color:var(--sei-red)">SEI</th>
+              <th>Solana</th>
+              <th>Aptos</th>
+              <th>Sui</th>
+              <th>Ethereum</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="color:var(--dim)">TPS (Current)</td>
+              <td class="highlight">12,500+</td>
+              <td>~3,000–5,000</td>
+              <td>~10,000</td>
+              <td>~12,000</td>
+              <td>~15–30</td>
+            </tr>
+            <tr>
+              <td style="color:var(--dim)">TPS (Target)</td>
+              <td class="highlight">200,000+</td>
+              <td>~65,000</td>
+              <td>~150,000</td>
+              <td>~300,000</td>
+              <td>N/A (L2s)</td>
+            </tr>
+            <tr>
+              <td style="color:var(--dim)">Finality</td>
+              <td class="highlight">&lt;400ms</td>
+              <td>~400ms</td>
+              <td>~1s</td>
+              <td>~500ms</td>
+              <td>~12s</td>
+            </tr>
+            <tr>
+              <td style="color:var(--dim)">VM Compatibility</td>
+              <td class="highlight">EVM (Full)</td>
+              <td>Sealevel (BPF)</td>
+              <td>Move VM</td>
+              <td>Move VM</td>
+              <td>EVM</td>
+            </tr>
+            <tr>
+              <td style="color:var(--dim)">Market Cap (Apr 2026)</td>
+              <td class="highlight">$445M</td>
+              <td>~$49B</td>
+              <td>~$2B</td>
+              <td>~$3B</td>
+              <td>~$200B+</td>
+            </tr>
+            <tr>
+              <td style="color:var(--dim)">TVL (Apr 2026)</td>
+              <td style="color:var(--sei-red)">$43M</td>
+              <td>~$8B+</td>
+              <td>~$1B</td>
+              <td>~$1.5B</td>
+              <td>~$50B+</td>
+            </tr>
+            <tr>
+              <td style="color:var(--dim)">Native Order Book</td>
+              <td class="highlight">✅ Yes</td>
+              <td>❌ No</td>
+              <td>❌ No</td>
+              <td>❌ No</td>
+              <td>❌ No</td>
+            </tr>
+            <tr>
+              <td style="color:var(--dim)">MEV Protection</td>
+              <td class="highlight">✅ Built-in</td>
+              <td>⚠️ Partial</td>
+              <td>⚠️ Partial</td>
+              <td>⚠️ Partial</td>
+              <td>⚠️ Protocol-level</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card card-accent">
+        <div class="card-label">SEI Competitive Advantages</div>
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px;">
+          <div class="risk-item"><div class="risk-dot risk-low"></div><div class="risk-text"><span class="risk-title">Native CLOB Engine:</span> Only blockchain with built-in order matching — fair execution without intermediaries, preventing MEV exploitation at the protocol level.</div></div>
+          <div class="risk-item"><div class="risk-dot risk-low"></div><div class="risk-text"><span class="risk-title">Parallelized EVM:</span> EVM-compatible but parallel — attracts Ethereum's 500,000+ developer base while offering Solana-class speed. The best of both worlds.</div></div>
+          <div class="risk-item"><div class="risk-dot risk-low"></div><div class="risk-text"><span class="risk-title">Trading-First Architecture:</span> Every protocol decision optimizes for financial applications — not a general-purpose chain that trading is added onto.</div></div>
+          <div class="risk-item"><div class="risk-dot risk-low"></div><div class="risk-text"><span class="risk-title">Regulatory Positioning:</span> Japan FSA approval, Wyoming WYST candidate, Canary ETF filing — unprecedented regulatory traction for a small-cap L1.</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-label">SEI Competitive Weaknesses</div>
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px;">
+          <div class="risk-item"><div class="risk-dot risk-high"></div><div class="risk-text"><span class="risk-title">Liquidity Fragmentation:</span> TVL at $43M vs. Solana's $8B+ — Sei simply doesn't have the liquidity depth to attract serious institutional DeFi volumes today.</div></div>
+          <div class="risk-item"><div class="risk-dot risk-high"></div><div class="risk-text"><span class="risk-title">Brand Recognition:</span> Solana's developer brand and culture are entrenched. Reorienting the EVM dev community toward SEI requires sustained effort and incentives.</div></div>
+          <div class="risk-item"><div class="risk-dot risk-med"></div><div class="risk-text"><span class="risk-title">Mainnet Immaturity:</span> Only launched August 2023. Limited stress-tested history compared to Solana (2020) or Ethereum (2015).</div></div>
+          <div class="risk-item"><div class="risk-dot risk-med"></div><div class="risk-text"><span class="risk-title">Giga Not Yet Live:</span> The 200K TPS headline is devnet-only. Mainnet Giga rollout is the inflection point — until then, performance claims are theoretical.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 08 RISKS ===== -->
+  <section class="section" id="risks">
+    <div class="section-header">
+      <div class="section-num">08</div>
+      <div>
+        <div class="section-title">Risk Assessment</div>
+        <div class="section-sub">Bearish Factors · Catalysts · Bull vs. Bear</div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:24px;">
+      <div class="card">
+        <div class="card-label" style="color:var(--sei-red)">🔴 High Risks (Bearish)</div>
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:12px;">
+          <div class="risk-item"><div class="risk-dot risk-high"></div><div class="risk-text"><span class="risk-title">TVL Collapse:</span> TVL dropped from $688M–$1.32B ATH to ~$43M by April 2026 — a 97% collapse. This is the single most alarming fundamental signal.</div></div>
+          <div class="risk-item"><div class="risk-dot risk-high"></div><div class="risk-text"><span class="risk-title">Token Unlock Pressure:</span> 37% of supply still locked. Monthly unlocks of 112–200M tokens continue through 2031. Each unlock is potential sell pressure.</div></div>
+          <div class="risk-item"><div class="risk-dot risk-high"></div><div class="risk-text"><span class="risk-title">Price vs. ATH:</span> At $0.0636, SEI is 94.4% below its $1.141 ATH. Recovering to ATH requires ~18x from current levels — a very high bar.</div></div>
+          <div class="risk-item"><div class="risk-dot risk-high"></div><div class="risk-text"><span class="risk-title">Competition Dominance:</span> Solana has entrenched network effects in DeFi trading. Even with superior technology, winning market share is extremely difficult.</div></div>
+          <div class="risk-item"><div class="risk-dot risk-med"></div><div class="risk-text"><span class="risk-title">Giga Execution Risk:</span> 200K TPS on devnet ≠ mainnet. Delayed or buggy rollout would crater sentiment significantly.</div></div>
+          <div class="risk-item"><div class="risk-dot risk-med"></div><div class="risk-text"><span class="risk-title">Mercenary Capital:</span> TVL growth driven by incentives rather than organic activity — zero-fee swaps caused TVL to DROP while price rose, signaling fragile capital.</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-label" style="color:var(--sei-green)">🟢 Bull Catalysts (Upside)</div>
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:12px;">
+          <div class="risk-item"><div class="risk-dot risk-low"></div><div class="risk-text"><span class="risk-title">Giga Mainnet Launch:</span> Successful 200K TPS mainnet could be the single biggest catalyst — repositioning SEI as the fastest production EVM chain globally.</div></div>
+          <div class="risk-item"><div class="risk-dot risk-low"></div><div class="risk-text"><span class="risk-title">Staked SEI ETF Approval:</span> Canary Capital's SEC filing, if approved, unlocks institutional capital flows and massive legitimacy uplift.</div></div>
+          <div class="risk-item"><div class="risk-dot risk-low"></div><div class="risk-text"><span class="risk-title">Wyoming WYST Selection:</span> Being chosen as the blockchain for the first US state-backed stablecoin would be transformational for adoption and regulatory credibility.</div></div>
+          <div class="risk-item"><div class="risk-dot risk-low"></div><div class="risk-text"><span class="risk-title">Xiaomi Mass Adoption:</span> Pre-installed wallets on millions of devices is a genuine crypto onboarding funnel unlike anything other L1s have attempted.</div></div>
+          <div class="risk-item"><div class="risk-dot risk-low"></div><div class="risk-text"><span class="risk-title">RWA Institutional Inflow:</span> BlackRock/Apollo/Hamilton Lane $30M committed RWA is a beachhead — if this scales, it fundamentally changes the demand profile for SEI.</div></div>
+          <div class="risk-item"><div class="risk-dot risk-low"></div><div class="risk-text"><span class="risk-title">AI Agent Economy:</span> First L1 with native MCP/AI agent integration — if AI-driven DeFi takes off, SEI is the most ready infrastructure.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card card-yellow">
+      <div class="card-label">Price Target Scenarios (Based on Cross-Platform Analysis)</div>
+      <div class="grid-3" style="margin-top:16px;">
+        <div style="text-align:center; padding:16px; background:rgba(239,68,68,0.08); border-radius:8px;">
+          <div style="font-size:11px;color:var(--sei-red);letter-spacing:1px;text-transform:uppercase;">Bear Case</div>
+          <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#f87171;margin:8px 0;">$0.020</div>
+          <div style="font-size:11px;color:var(--muted)">Demand zone target if $0.050 support fails. Continued TVL bleed + macro risk-off.</div>
+        </div>
+        <div style="text-align:center; padding:16px; background:rgba(251,191,36,0.08); border-radius:8px;">
+          <div style="font-size:11px;color:var(--sei-yellow);letter-spacing:1px;text-transform:uppercase;">Base Case 2026</div>
+          <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--sei-yellow);margin:8px 0;">$0.10–$0.20</div>
+          <div style="font-size:11px;color:var(--muted)">Recovery above $0.060 resistance triggers mean reversion. Giga partial deployment + ETF progress.</div>
+        </div>
+        <div style="text-align:center; padding:16px; background:rgba(16,185,129,0.08); border-radius:8px;">
+          <div style="font-size:11px;color:var(--sei-green);letter-spacing:1px;text-transform:uppercase;">Bull Case Long-Term</div>
+          <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--sei-green);margin:8px 0;">$1.26–$1.45</div>
+          <div style="font-size:11px;color:var(--muted)">CoinPedia 2032 forecast. Requires Giga success + ETF + sustained RWA adoption. Previous ATH was $1.14.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 09 VERDICT ===== -->
+  <section class="section" id="verdict">
+    <div class="section-header">
+      <div class="section-num">09</div>
+      <div>
+        <div class="section-title">Fundamental Verdict</div>
+        <div class="section-sub">Analyst Score & Investment Framework</div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:24px;">
+      <div class="verdict-box">
+        <div style="font-family:'Syne',sans-serif;font-size:13px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;">Overall Fundamental Score</div>
+        <div class="verdict-score">5.8</div>
+        <div class="verdict-label">Out of 10 — Speculative / High Risk</div>
+        <div class="divider" style="margin:20px 0;"></div>
+        <p style="font-size:12px;color:var(--dim);line-height:1.9;">
+          SEI has world-class technology, a battle-tested team with elite pedigree, and genuinely differentiated architecture. The institutional catalyst pipeline (ETF, WYST, RWAs, Japan FSA) is legitimately bullish. However, the <span class="highlight">TVL collapse from $1.3B to $43M</span>, ongoing token unlock pressure, the 94% drawdown from ATH, and Giga being unproven on mainnet make this a <strong>high-risk, high-conviction speculative play</strong> at current prices — not a safe fundamental buy.
+        </p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="card">
+          <div class="card-label">Score Breakdown</div>
+          <div style="margin-top:12px;">
+            <div class="bar-row">
+              <div class="bar-label"><span>Technology</span><span style="color:var(--sei-green)">8.5/10</span></div>
+              <div class="bar-track"><div class="bar-fill bar-green" style="width:85%"></div></div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label"><span>Team Quality</span><span style="color:var(--sei-green)">8.0/10</span></div>
+              <div class="bar-track"><div class="bar-fill bar-green" style="width:80%"></div></div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label"><span>Institutional Traction</span><span style="color:var(--sei-cyan)">7.5/10</span></div>
+              <div class="bar-track"><div class="bar-fill bar-cyan" style="width:75%"></div></div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label"><span>Tokenomics</span><span style="color:var(--sei-yellow)">4.5/10</span></div>
+              <div class="bar-track"><div class="bar-fill bar-yellow" style="width:45%"></div></div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label"><span>TVL / Capital Retention</span><span style="color:var(--sei-red)">2.5/10</span></div>
+              <div class="bar-track"><div class="bar-fill bar-red" style="width:25%"></div></div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-label"><span>Market Position</span><span style="color:var(--sei-yellow)">4.0/10</span></div>
+              <div class="bar-track"><div class="bar-fill bar-yellow" style="width:40%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card card-green">
+        <div class="card-label">✅ For (Bullish Arguments)</div>
+        <ul style="margin-top:10px;padding-left:16px;color:var(--dim);font-size:12px;line-height:2;">
+          <li>94% below ATH = asymmetric upside if catalysts play out</li>
+          <li>World-class team (Goldman, Robinhood, Coatue, UC Berkeley/UCLA)</li>
+          <li>Only parallelized EVM L1 with native order book</li>
+          <li>ETF filing + Japan approval = institutional rails being built</li>
+          <li>Giga upgrade = potential performance moat no other chain has</li>
+          <li>Xiaomi partnership = real-world mass adoption vector</li>
+          <li>$30M RWA institutional commitments with BlackRock/Apollo</li>
+          <li>Zero-fee swaps live = UX moat for retail traders</li>
+        </ul>
+      </div>
+      <div class="card card-accent">
+        <div class="card-label">❌ Against (Bearish Arguments)</div>
+        <ul style="margin-top:10px;padding-left:16px;color:var(--dim);font-size:12px;line-height:2;">
+          <li>TVL at $43M — 97% collapse from ATH is catastrophic</li>
+          <li>37% supply still unlocked → persistent sell pressure until 2031</li>
+          <li>Capital leaving even when price rises (speculative not sticky)</li>
+          <li>Giga 200K TPS only proven on devnet — mainnet execution unproven</li>
+          <li>Solana dominates onchain trading with 20x+ the liquidity</li>
+          <li>EVM-only pivot may alienate remaining Cosmos-native users</li>
+          <li>YTD 2026 -45% performance vs. market</li>
+          <li>Only 2023 mainnet launch — limited stress-test history</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:24px; border:1px solid rgba(251,191,36,0.3); background:rgba(251,191,36,0.05);">
+      <div class="card-label" style="color:var(--sei-yellow);">⚡ Framework Summary — Applying Your 10-Step Onchain Analysis</div>
+      <div class="grid-2" style="margin-top:14px; gap:8px;">
+        <div style="font-size:12px;color:var(--dim);line-height:1.8">
+          <strong style="color:var(--text);">Step 1 — Price/Volume:</strong> Recovering short-term (+14% 7D), 4H above all MAs, RSI 63.7 = momentum but near overbought.<br>
+          <strong style="color:var(--text);">Step 2 — Holder Distribution:</strong> 63–70% supply circulating. Concentration in Ecosystem Reserve (27%) poses governance risk.<br>
+          <strong style="color:var(--text);">Step 3 — Onchain Activity:</strong> 805K DAA, 116M Q3 txns — network IS being used but not retaining capital.<br>
+          <strong style="color:var(--text);">Step 4 — Liquidity Depth:</strong> CRITICAL WEAKNESS. $43M TVL vs. peers at $1B–$8B+. Thin liquidity = volatility.<br>
+          <strong style="color:var(--text);">Step 5 — Token Distribution/Unlocks:</strong> Monthly unlocks through 2031. Stabilizing 2026–2027 but still headwinds.
+        </div>
+        <div style="font-size:12px;color:var(--dim);line-height:1.8">
+          <strong style="color:var(--text);">Step 6 — Smart Money:</strong> Multicoin + Jump + Coinbase Ventures + BlackRock/Apollo shows conviction from top-tier players.<br>
+          <strong style="color:var(--text);">Step 7 — Exchange Flows:</strong> $35.7M 24h volume, Vol/MCap ~8% = healthy. Zero-fee launch = 258% volume spike.<br>
+          <strong style="color:var(--text);">Step 8 — Protocol Metrics:</strong> TVL severely underperforming but Q3 spot volume $3.96B shows real usage.<br>
+          <strong style="color:var(--text);">Step 9 — Market Sentiment:</strong> Mixed — 36% bullish, 64% bearish by technical indicators. Short-term bottom forming.<br>
+          <strong style="color:var(--text);">Step 10 — Risk Assessment:</strong> HIGH RISK. Best suited as a speculative position sized for potential total loss, with outsized upside if Giga + ETF catalysts materialize.
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div style="margin-bottom:16px; font-family:'Syne',sans-serif; font-size:16px; color:var(--dim);">SEI Network Deep Fundamental Analysis</div>
+  <div style="margin-bottom:8px;">Data Sources: CoinMarketCap · DefiLlama · CoinGecko · Messari · Artemis Analytics · Tokenomist.ai · OKX Research · BSC News · Ainvest · AltcoinBuzz · LinkedIn · Crunchbase</div>
+  <div style="margin-bottom:16px;">Contract: <span style="color:var(--sei-cyan);">ibc/71F11BC0AF8E526B80E44172EBA9D3F0A8E03950BB882325435691EBC9450B1D</span></div>
+  <div style="color:rgba(100,116,139,0.7)">⚠️ This is not financial advice. Cryptocurrency investments carry extreme risk including total loss of capital. Conduct your own due diligence.</div>
+  <div style="margin-top:12px; color:rgba(100,116,139,0.5);">Generated April 26, 2026 · For Educational Purposes Only</div>
+</footer>
+
+</body>
+</html>
