@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARB — Fundamental Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue: #1a6fff;
+    --accent: #00d4ff;
+    --danger: #ff4444;
+    --success: #00e676;
+    --warning: #ffab00;
+    --card: rgba(8, 20, 50, 0.82);
+    --border: rgba(26, 111, 255, 0.22);
+    --text: #e8f0ff;
+    --muted: #7a9acc;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Mono', monospace; color: var(--text); min-height: 100vh; position: relative; }
+  #bg { position: fixed; inset: 0; background-image: url('https://i.ibb.co/b5hWM0LD/images-4.jpg'); background-size: cover; background-position: center; z-index: -2; }
+  #bg::after { content: ''; position: absolute; inset: 0; background: rgba(4,10,28,0.82); z-index: -1; }
+  header { background: linear-gradient(180deg,rgba(5,15,45,0.98),rgba(5,15,45,0.94)); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(16px); }
+  .hdr-main { display: flex; align-items: center; gap: 13px; padding: 13px 18px 10px; flex-wrap: wrap; }
+  .hdr-logo { width: 46px; height: 46px; border-radius: 11px; object-fit: cover; border: 2px solid var(--blue); box-shadow: 0 0 16px rgba(26,111,255,0.45); flex-shrink: 0; }
+  .hdr-info { flex: 1; min-width: 0; }
+  .hdr-name { font-family: 'Syne',sans-serif; font-size: 1.25rem; font-weight: 800; color: #fff; line-height: 1; }
+  .hdr-sub { font-size: 0.58rem; color: var(--accent); letter-spacing: 2.5px; text-transform: uppercase; margin-top: 3px; }
+  .hdr-price { text-align: right; flex-shrink: 0; }
+  .hdr-price .pv { font-family: 'Syne',sans-serif; font-size: 1.15rem; font-weight: 700; color: #fff; }
+  .hdr-price .rk { font-size: 0.62rem; color: var(--accent); letter-spacing: 1px; margin-top: 2px; }
+  .contract-strip { background: rgba(0,0,0,0.42); border-top: 1px solid rgba(26,111,255,0.1); padding: 5px 18px; font-size: 0.57rem; color: var(--muted); display: flex; align-items: center; gap: 7px; overflow: hidden; }
+  .contract-strip span { color: var(--accent); font-size: 0.59rem; word-break: break-all; }
+  .nav-tabs { display: flex; overflow-x: auto; border-top: 1px solid var(--border); scrollbar-width: none; }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .nav-tab { flex-shrink: 0; padding: 9px 15px; font-size: 0.6rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap; background: none; border-top: none; border-left: none; border-right: none; font-family: 'DM Mono',monospace; }
+  .nav-tab:hover { color: var(--text); }
+  .nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .hero { background: linear-gradient(135deg,rgba(10,35,100,0.65),rgba(0,30,70,0.48)); border-bottom: 1px solid var(--border); padding: 26px 18px 20px; text-align: center; position: relative; overflow: hidden; }
+  .hero::before { content:''; position: absolute; top:-60px; left:50%; transform:translateX(-50%); width:400px; height:200px; background: radial-gradient(ellipse,rgba(26,111,255,0.14) 0%,transparent 70%); pointer-events: none; }
+  .live-badge { display: inline-flex; align-items: center; gap: 7px; background: rgba(255,68,68,0.11); border: 1px solid rgba(255,68,68,0.32); border-radius: 20px; padding: 5px 13px; font-size: 0.6rem; color: #ff7777; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; }
+  .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--danger); animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.8)} }
+  .hero-title { font-family: 'Syne',sans-serif; font-size: 2.6rem; font-weight: 800; color: #fff; line-height: .9; letter-spacing: -1px; margin-bottom: 5px; }
+  .hero-title span { color: var(--accent); }
+  .hero-sub { font-size: 0.6rem; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 8px; }
+  .contract-scroll { font-size: 0.57rem; color: rgba(26,111,255,0.45); letter-spacing: .8px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; margin-bottom: 18px; padding: 0 10px; }
+  .hero-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 420px; margin: 0 auto; }
+  .hs { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 11px; padding: 13px; }
+  .hs .v { font-family: 'Syne',sans-serif; font-size: 1.3rem; font-weight: 800; color: #fff; line-height: 1; }
+  .hs .l { font-size: 0.56rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 3px; }
+  .hs .c { font-size: 0.62rem; margin-top: 3px; }
+  .up{color:var(--success)} .down{color:var(--danger)} .warn{color:var(--warning)}
+  #main { max-width: 960px; margin: 0 auto; padding: 18px 14px 60px; }
+  .tab-page { display: none; }
+  .tab-page.active { display: block; }
+  .section { background: var(--card); border: 1px solid var(--border); border-radius: 15px; padding: 18px 16px; margin-bottom: 14px; backdrop-filter: blur(10px); box-shadow: 0 4px 28px rgba(0,0,0,0.32); }
+  .sec-title { font-family: 'Syne',sans-serif; font-size: 0.72rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 2.5px; display: flex; align-items: center; gap: 9px; margin-bottom: 14px; }
+  .sec-title .num { width: 24px; height: 24px; background: rgba(26,111,255,0.14); border: 1px solid var(--border); border-radius: 6px; display:flex; align-items:center; justify-content:center; font-size: 0.6rem; color: var(--accent); flex-shrink: 0; }
+  .sec-title::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,var(--border),transparent); }
+  .g-auto { display: grid; grid-template-columns: repeat(auto-fill,minmax(165px,1fr)); gap: 9px; }
+  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+  .mc { background: rgba(0,0,0,0.28); border: 1px solid var(--border); border-radius: 9px; padding: 11px 13px; }
+  .ml { font-size: 0.56rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
+  .mv { font-family: 'Syne',sans-serif; font-size: 0.95rem; font-weight: 700; color: #fff; }
+  .ms { font-size: 0.6rem; color: var(--muted); margin-top: 2px; }
+  .comment { background: rgba(26,111,255,0.07); border-left: 3px solid var(--blue); border-radius: 0 10px 10px 0; padding: 13px 15px; margin-top: 13px; font-size: 0.76rem; line-height: 1.75; color: var(--text); }
+  .cl { font-size: 0.56rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 7px; display: block; }
+  .rating { display: flex; align-items: center; gap: 11px; margin-top: 11px; }
+  .rl { font-size: 0.6rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
+  .rt { flex:1; height:5px; background:rgba(255,255,255,0.07); border-radius:3px; overflow:hidden; }
+  .rf { height:100%; border-radius:3px; background:linear-gradient(90deg,var(--blue),var(--accent)); }
+  .rs { font-family:'Syne',sans-serif; font-weight:700; font-size:.82rem; color:var(--accent); white-space:nowrap; }
+  .tbl { width:100%; border-collapse:collapse; font-size:.73rem; }
+  .tbl th { background:rgba(26,111,255,0.14); color:var(--accent); font-size:.58rem; text-transform:uppercase; letter-spacing:1.5px; padding:8px 11px; text-align:left; border-bottom:1px solid var(--border); }
+  .tbl td { padding:8px 11px; border-bottom:1px solid rgba(255,255,255,0.04); color:var(--text); vertical-align:middle; }
+  .tbl tr:nth-child(even) td { background:rgba(26,111,255,0.03); }
+  .tbl tr:hover td { background:rgba(26,111,255,0.08); }
+  .tag { display:inline-block; padding:2px 7px; border-radius:4px; font-size:.58rem; letter-spacing:.5px; }
+  .tg { background:rgba(0,230,118,0.1); color:var(--success); border:1px solid rgba(0,230,118,0.24); }
+  .tr { background:rgba(255,68,68,0.11); color:#ff7777; border:1px solid rgba(255,68,68,0.24); }
+  .ty { background:rgba(255,171,0,0.1); color:var(--warning); border:1px solid rgba(255,171,0,0.24); }
+  .tb { background:rgba(26,111,255,0.11); color:var(--accent); border:1px solid rgba(26,111,255,0.24); }
+  .social-card { display:flex; align-items:center; gap:11px; background:rgba(0,0,0,0.28); border:1px solid var(--border); border-radius:11px; padding:11px 13px; text-decoration:none; color:var(--text); transition:all .2s; }
+  .social-card:hover { border-color:var(--blue); background:rgba(26,111,255,0.09); transform:translateY(-2px); }
+  .si { width:32px; height:32px; border-radius:7px; object-fit:cover; }
+  .sn { font-family:'Syne',sans-serif; font-size:.8rem; font-weight:700; }
+  .ss { font-size:.62rem; color:var(--muted); margin-top:2px; }
+  .team-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(245px,1fr)); gap:11px; }
+  .team-card { background:rgba(0,0,0,0.32); border:1px solid var(--border); border-radius:13px; overflow:hidden; transition:border-color .2s; }
+  .team-card:hover { border-color:var(--blue); }
+  .t-top { display:flex; align-items:center; gap:12px; padding:14px 14px 0; }
+  .t-photo { width:54px; height:54px; border-radius:11px; object-fit:cover; border:2px solid var(--border); flex-shrink:0; background:rgba(26,111,255,0.1); }
+  .t-name { font-family:'Syne',sans-serif; font-size:.88rem; font-weight:700; color:#fff; }
+  .t-role { font-size:.6rem; color:var(--accent); text-transform:uppercase; letter-spacing:1px; margin-top:3px; }
+  .t-actions { display:flex; gap:6px; padding:9px 14px 13px; flex-wrap:wrap; }
+  .btn { display:inline-flex; align-items:center; gap:4px; padding:5px 10px; border-radius:6px; font-family:'DM Mono',monospace; font-size:.6rem; cursor:pointer; border:none; transition:all .2s; text-decoration:none; letter-spacing:.5px; }
+  .bbio { background:rgba(26,111,255,0.11); color:var(--accent); border:1px solid rgba(26,111,255,0.27); }
+  .bbio:hover,.bbio.active { background:rgba(26,111,255,0.27); border-color:var(--blue); }
+  .btw { background:rgba(255,255,255,0.06); color:#fff; border:1px solid rgba(255,255,255,0.1); }
+  .btw:hover { background:rgba(255,255,255,0.11); }
+  .bli { background:rgba(0,119,181,0.11); color:#5aa3d0; border:1px solid rgba(0,119,181,0.24); }
+  .bli:hover { background:rgba(0,119,181,0.2); }
+  .bio-panel { display:none; padding:11px 14px 14px; font-size:.72rem; line-height:1.7; color:var(--muted); border-top:1px solid var(--border); animation:fadeIn .2s ease; }
+  .bio-panel.open { display:block; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:translateY(0)} }
+  .inv-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(188px,1fr)); gap:9px; }
+  .inv-card { background:rgba(0,0,0,0.28); border:1px solid var(--border); border-radius:11px; padding:13px; transition:all .2s; }
+  .inv-card:hover { border-color:var(--blue); background:rgba(26,111,255,0.06); transform:translateY(-2px); }
+  .in { font-family:'Syne',sans-serif; font-size:.8rem; font-weight:700; color:#fff; margin-bottom:5px; }
+  .ib { font-size:.63rem; color:var(--muted); line-height:1.52; }
+  .il { display:inline-block; background:rgba(255,171,0,0.11); color:var(--warning); border:1px solid rgba(255,171,0,0.27); border-radius:4px; padding:1px 7px; font-size:.53rem; letter-spacing:1px; text-transform:uppercase; margin-bottom:6px; }
+  .comp-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(148px,1fr)); gap:9px; }
+  .comp-card { background:rgba(0,0,0,0.28); border:1px solid var(--border); border-radius:11px; padding:13px; text-align:center; text-decoration:none; color:var(--text); transition:all .2s; display:block; }
+  .comp-card:hover { border-color:var(--blue); background:rgba(26,111,255,0.07); transform:translateY(-2px); }
+  .cl2 { width:46px; height:46px; border-radius:50%; object-fit:cover; border:2px solid var(--border); margin:0 auto 7px; display:block; }
+  .cn { font-family:'Syne',sans-serif; font-size:.75rem; font-weight:700; color:#fff; margin-bottom:3px; }
+  .cd { font-size:.6rem; color:var(--muted); line-height:1.4; }
+  .risk-grid { display:grid; grid-template-columns:1fr 1fr; gap:11px; }
+  .risk-col { background:rgba(0,0,0,0.2); border-radius:11px; padding:13px; }
+  .risk-title { font-family:'Syne',sans-serif; font-size:.67rem; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:11px; display:flex; align-items:center; gap:6px; }
+  .risk-title.red { color:var(--danger); }
+  .risk-title.green { color:var(--success); }
+  .ri { display:flex; align-items:flex-start; gap:7px; font-size:.7rem; color:var(--text); margin-bottom:8px; line-height:1.5; }
+  .rd { width:6px; height:6px; border-radius:50%; margin-top:5px; flex-shrink:0; }
+  .rd.red { background:var(--danger); }
+  .rd.green { background:var(--success); }
+  .score-row { display:flex; align-items:center; gap:9px; margin-bottom:9px; }
+  .sc { font-size:.68rem; color:var(--text); width:168px; flex-shrink:0; }
+  .sw { font-size:.56rem; color:var(--muted); width:36px; flex-shrink:0; }
+  .sb { flex:1; height:6px; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; }
+  .sbf { height:100%; border-radius:3px; background:linear-gradient(90deg,var(--blue),var(--accent)); }
+  .sv { font-family:'Syne',sans-serif; font-weight:700; font-size:.76rem; color:var(--accent); width:34px; text-align:right; flex-shrink:0; }
+  .roadmap { position:relative; padding-left:20px; }
+  .roadmap::before { content:''; position:absolute; left:6px; top:8px; bottom:8px; width:2px; background:linear-gradient(180deg,var(--blue),transparent); }
+  .rmi { position:relative; margin-bottom:14px; }
+  .rmi::before { content:''; position:absolute; left:-16px; top:5px; width:10px; height:10px; border-radius:50%; border:2px solid var(--blue); background:#040d20; }
+  .rmi.done::before { background:var(--success); border-color:var(--success); }
+  .rmi.soon::before { background:var(--warning); border-color:var(--warning); }
+  .rmi.upcoming::before { background:var(--blue); border-color:var(--accent); }
+  .rp { font-size:.58rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:3px; }
+  .rm { font-size:.75rem; color:var(--text); line-height:1.5; }
+  .uc-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(188px,1fr)); gap:7px; }
+  .uci { background:rgba(0,0,0,0.2); border:1px solid var(--border); border-radius:9px; padding:10px 12px; font-size:.72rem; color:var(--text); display:flex; align-items:center; gap:7px; }
+  .ucn { font-family:'Syne',sans-serif; font-size:.63rem; font-weight:700; color:var(--accent); width:18px; flex-shrink:0; }
+  .level-grid { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-bottom:11px; }
+  .lc { background:rgba(0,0,0,0.2); border-radius:9px; padding:11px 13px; }
+  .lt { font-size:.58rem; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:7px; }
+  .lt.sup { color:var(--success); } .lt.res { color:var(--danger); }
+  .li2 { font-family:'Syne',sans-serif; font-size:.77rem; font-weight:600; color:#fff; margin-bottom:4px; }
+  .li2 small { font-family:'DM Mono',monospace; font-size:.58rem; font-weight:400; color:var(--muted); margin-left:5px; }
+  .verdict-box { background:linear-gradient(135deg,rgba(10,42,110,0.52),rgba(0,212,255,0.04)); border:1px solid var(--blue); border-radius:15px; padding:22px; text-align:center; position:relative; overflow:hidden; }
+  .vl { font-size:.58rem; text-transform:uppercase; letter-spacing:3px; color:var(--muted); margin-bottom:7px; }
+  .vt { font-family:'Syne',sans-serif; font-size:1.6rem; font-weight:800; color:var(--warning); margin-bottom:9px; }
+  .vd { font-size:.75rem; color:var(--muted); line-height:1.7; max-width:500px; margin:0 auto 16px; }
+  .vg { display:grid; grid-template-columns:repeat(auto-fit,minmax(125px,1fr)); gap:8px; }
+  .vi { background:rgba(0,0,0,0.28); border:1px solid var(--border); border-radius:9px; padding:10px 11px; }
+  .vil { font-size:.53rem; text-transform:uppercase; letter-spacing:1.5px; color:var(--muted); margin-bottom:4px; }
+  .viv { font-family:'Syne',sans-serif; font-size:.8rem; font-weight:700; color:#fff; }
+  .sc-wrap { display:flex; align-items:center; justify-content:center; gap:18px; margin:14px 0; flex-wrap:wrap; }
+  .sc-circle { width:90px; height:90px; border-radius:50%; display:flex; align-items:center; justify-content:center; position:relative; background:conic-gradient(var(--blue) 0deg,var(--accent) 263deg,rgba(255,255,255,0.05) 263deg); }
+  .sc-circle::before { content:''; position:absolute; width:70px; height:70px; border-radius:50%; background:#040d20; }
+  .sc-num { font-family:'Syne',sans-serif; font-size:1.2rem; font-weight:800; color:#fff; position:relative; z-index:1; }
+  .proto-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(155px,1fr)); gap:9px; }
+  .pc { background:rgba(0,0,0,0.28); border:1px solid var(--border); border-radius:9px; padding:11px 13px; }
+  .pl { font-size:.56rem; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:4px; }
+  .pv2 { font-family:'Syne',sans-serif; font-size:.88rem; font-weight:700; color:#fff; }
+  .ps { font-size:.58rem; margin-top:2px; }
+  .sp { display:inline-block; padding:4px 12px; border-radius:18px; font-size:.65rem; margin:3px; }
+  .sb2 { background:rgba(0,230,118,0.09); color:var(--success); border:1px solid rgba(0,230,118,0.22); }
+  .sbe { background:rgba(255,68,68,0.09); color:var(--danger); border:1px solid rgba(255,68,68,0.22); }
+  .sn2 { background:rgba(255,171,0,0.09); color:var(--warning); border:1px solid rgba(255,171,0,0.22); }
+  @media(max-width:560px){.risk-grid{grid-template-columns:1fr}.level-grid{grid-template-columns:1fr}.g2{grid-template-columns:1fr}.hero-title{font-size:2rem}.sc{width:115px}}
+</style>
+</head>
+<body>
+<div id="bg"></div>
+
+<header>
+  <div class="hdr-main">
+    <img class="hdr-logo" src="https://i.ibb.co/qLFh3cRB/images-5.jpg" alt="ARB">
+    <div class="hdr-info">
+      <div class="hdr-name">Arbitrum (ARB)</div>
+      <div class="hdr-sub">Fundamental Analysis · May 2026</div>
+    </div>
+    <div class="hdr-price">
+      <div class="pv">$0.1228</div>
+      <div class="rk">RANK #70</div>
+    </div>
+  </div>
+  <div class="contract-strip">
+    <span style="color:var(--muted);flex-shrink:0">CONTRACT:</span>
+    <span>0x912CE59144191C1204E64559FE8253a0e49E6548</span>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showTab('overview',this)">Overview</button>
+    <button class="nav-tab" onclick="showTab('market',this)">Market Data</button>
+    <button class="nav-tab" onclick="showTab('tokenomics',this)">Tokenomics</button>
+    <button class="nav-tab" onclick="showTab('team',this)">Team</button>
+    <button class="nav-tab" onclick="showTab('investors',this)">Investors</button>
+    <button class="nav-tab" onclick="showTab('ecosystem',this)">Ecosystem</button>
+    <button class="nav-tab" onclick="showTab('technical',this)">Technical</button>
+    <button class="nav-tab" onclick="showTab('verdict',this)">Verdict</button>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="live-badge"><div class="live-dot"></div>Live Fundamental Analysis · May 2026</div>
+  <div class="hero-title">ARBI<span>TRUM</span></div>
+  <div class="hero-sub">Ethereum Layer 2 · Optimistic Rollup</div>
+  <div class="contract-scroll">0x912CE59144191C1204E64559FE8253a0e49E6548</div>
+  <div class="hero-stats">
+    <div class="hs"><div class="v">$0.1228</div><div class="l">Current Price</div><div class="c down">▼ 94.9% from ATH</div></div>
+    <div class="hs"><div class="v">$755M</div><div class="l">Market Cap</div><div class="c" style="color:var(--accent)">Rank #70</div></div>
+    <div class="hs"><div class="v">$1.687B</div><div class="l">Current TVL</div><div class="c up">+1.33% 24h</div></div>
+    <div class="hs"><div class="v">$2.39</div><div class="l">All-Time High</div><div class="c" style="color:var(--muted)">Jan 12, 2024</div></div>
+  </div>
+</div>
+
+<div id="main">
+
+<!-- OVERVIEW -->
+<div id="tab-overview" class="tab-page active">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Project Overview</div>
+    <div class="comment" style="margin-top:0">
+      <span class="cl">What is Arbitrum?</span>
+      Arbitrum is Ethereum's leading Layer 2 scaling solution built by Offchain Labs — a startup founded by Princeton PhD cryptographers. It uses Optimistic Rollup technology to batch Ethereum transactions off-chain, cutting fees by 90%+ while inheriting Ethereum's security. The ARB token powers governance of the Arbitrum DAO which controls a 35.3% community treasury. Arbitrum hosts the deepest DeFi ecosystem of any L2, with $1.687B TVL and $524M in daily perpetuals volume.
+    </div>
+  </div>
+  <div class="section">
+    <div class="sec-title"><span class="num">02</span>Key Stats</div>
+    <div class="g-auto">
+      <div class="mc"><div class="ml">Price</div><div class="mv">$0.1228</div></div>
+      <div class="mc"><div class="ml">Market Cap</div><div class="mv">$755.6M</div></div>
+      <div class="mc"><div class="ml">FDV</div><div class="mv">$1.228B</div></div>
+      <div class="mc"><div class="ml">MCAP/FDV</div><div class="mv warn">0.62</div></div>
+      <div class="mc"><div class="ml">TVL</div><div class="mv up">$1.687B</div></div>
+      <div class="mc"><div class="ml">TVL/MCAP</div><div class="mv up">2.24×</div></div>
+      <div class="mc"><div class="ml">ATH</div><div class="mv">$2.39</div></div>
+      <div class="mc"><div class="ml">ATL</div><div class="mv">$0.087</div></div>
+      <div class="mc"><div class="ml">From ATH</div><div class="mv down">−94.9%</div></div>
+      <div class="mc"><div class="ml">From ATL</div><div class="mv up">+40.8%</div></div>
+      <div class="mc"><div class="ml">Watchlist</div><div class="mv">209,435</div></div>
+      <div class="mc"><div class="ml">Rank</div><div class="mv">#70</div></div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="sec-title"><span class="num">03</span>Risk Matrix</div>
+    <div class="risk-grid">
+      <div class="risk-col">
+        <div class="risk-title red">🔴 Red Flags</div>
+        <div class="ri"><div class="rd red"></div>Team &amp; Advisors hold 26.9% — above 20% danger threshold</div>
+        <div class="ri"><div class="rd red"></div>Centralized sequencer — Offchain Labs controls tx ordering</div>
+        <div class="ri"><div class="rd red"></div>−94.9% from ATH — prolonged downtrend</div>
+        <div class="ri"><div class="rd red"></div>Base surpassing ARB in daily active users</div>
+        <div class="ri"><div class="rd red"></div>Alameda Research historical investor association</div>
+        <div class="ri"><div class="rd red"></div>$260M+ in team/investor tokens still locked</div>
+      </div>
+      <div class="risk-col">
+        <div class="risk-title green">✅ White Flags</div>
+        <div class="ri"><div class="rd green"></div>Fully doxxed team — Princeton PhDs + White House CTO</div>
+        <div class="ri"><div class="rd green"></div>#1 L2 by TVL — $1.687B DeFi + $10.9B bridged</div>
+        <div class="ri"><div class="rd green"></div>Elite investors — Pantera, Lightspeed, Coinbase Ventures</div>
+        <div class="ri"><div class="rd green"></div>$524M daily perps — real usage, not speculation</div>
+        <div class="ri"><div class="rd green"></div>Stylus multi-VM — genuine L2 technical differentiator</div>
+        <div class="ri"><div class="rd green"></div>TVL/MCAP 2.24× — undervaluation signal</div>
+        <div class="ri"><div class="rd green"></div>Active DAO — 35.3% community treasury</div>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="sec-title"><span class="num">04</span>Overall Comments</div>
+    <div class="comment" style="margin-top:0;font-size:.78rem;line-height:1.8">
+      <span class="cl">📋 Summary</span>
+      Arbitrum is the leading Ethereum Layer 2 by TVL and DeFi ecosystem depth. Built by Princeton cryptographers with White House-level credibility and backed by $123.7M from elite VCs. The protocol is genuinely used with 163K daily active addresses, $524M in daily perps, and $3.84B in on-chain stablecoins.<br><br>
+      Main weaknesses: Team &amp; Advisors hold 26.9% with most still locked creating persistent sell pressure. Sequencer remains centralized until BoLD upgrade. Competition from Base and ZK-rollups intensifying. Price 94.9% below ATH with no clear short-term catalyst beyond macro conditions.<br><br>
+      <strong style="color:#fff">Bottom line:</strong> Strong project in a difficult position. Fundamentals justify patient accumulation at deep discounts. Quality hold for 12–18 month horizon with proper risk management.
+    </div>
+    <div style="margin-top:11px;display:flex;flex-wrap:wrap;gap:5px">
+      <span class="tag tr">🔴 Centralized Sequencer</span>
+      <span class="tag tr">🔴 26.9% Team Allocation</span>
+      <span class="tag tr">🔴 −94.9% From ATH</span>
+      <span class="tag tg">✅ #1 L2 by TVL</span>
+      <span class="tag tg">✅ Princeton PhD Team</span>
+      <span class="tag tg">✅ Elite Investors</span>
+      <span class="tag tg">✅ Real Adoption</span>
+    </div>
+    <div class="rating"><span class="rl">Overall Score</span><div class="rt"><div class="rf" style="width:73%"></div></div><span class="rs">73 / 100</span></div>
+  </div>
+</div>
+
+<!-- MARKET DATA -->
+<div id="tab-market" class="tab-page">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Market Overview</div>
+    <div class="g-auto">
+      <div class="mc"><div class="ml">Current Price</div><div class="mv">$0.1228</div><div class="ms down">−94.9% from ATH</div></div>
+      <div class="mc"><div class="ml">24h High</div><div class="mv">$0.1254</div></div>
+      <div class="mc"><div class="ml">24h Low</div><div class="mv">$0.1217</div></div>
+      <div class="mc"><div class="ml">Market Cap</div><div class="mv">$755.6M</div></div>
+      <div class="mc"><div class="ml">FDV</div><div class="mv">$1.228B</div></div>
+      <div class="mc"><div class="ml">MCAP / FDV</div><div class="mv warn">0.62</div><div class="ms">38% supply still locked</div></div>
+      <div class="mc"><div class="ml">Volume 24h</div><div class="mv">$49.6M</div></div>
+      <div class="mc"><div class="ml">Liquidity Ratio</div><div class="mv warn">6.57%</div><div class="ms">Below 10% threshold</div></div>
+      <div class="mc"><div class="ml">Circulating Supply</div><div class="mv">6.15B ARB</div></div>
+      <div class="mc"><div class="ml">Total Supply</div><div class="mv">10.00B ARB</div></div>
+      <div class="mc"><div class="ml">Max Supply</div><div class="mv up">10.00B ARB</div><div class="ms up">Capped ✅</div></div>
+      <div class="mc"><div class="ml">% Circulating</div><div class="mv warn">61.5%</div></div>
+      <div class="mc"><div class="ml">All Time High</div><div class="mv">$2.39</div><div class="ms">Jan 12, 2024</div></div>
+      <div class="mc"><div class="ml">All Time Low</div><div class="mv">$0.087</div><div class="ms">Mar 29, 2026</div></div>
+      <div class="mc"><div class="ml">Watchlist</div><div class="mv">209,435</div></div>
+      <div class="mc"><div class="ml">TVL / MCAP</div><div class="mv up">2.24×</div><div class="ms up">Undervaluation signal</div></div>
+    </div>
+    <div class="comment"><span class="cl">📊 Analysis</span>ARB has a 61.5% circulating supply — a white flag. Max supply of 10B caps inflation. MCAP/FDV of 0.62 means 38% more supply enters market over time — mild red flag. Liquidity ratio of 6.57% is below the 10% threshold — thin liquidity for a $755M project. TVL/MCAP of 2.24× is a classic undervaluation signal.</div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:65%"></div></div><span class="rs">6.5 / 10</span></div>
+  </div>
+  <div class="section">
+    <div class="sec-title"><span class="num">02</span>Protocol / Revenue Metrics</div>
+    <div class="proto-grid">
+      <div class="pc"><div class="pl">TVL (DeFi)</div><div class="pv2">$1.687B</div><div class="ps up">+1.33% 24h</div></div>
+      <div class="pc"><div class="pl">Bridged TVL</div><div class="pv2">$10.927B</div><div class="ps">Total locked value</div></div>
+      <div class="pc"><div class="pl">Chain Fees 24h</div><div class="pv2">$10,054</div><div class="ps down">Ultra-cheap fees</div></div>
+      <div class="pc"><div class="pl">Chain Revenue 24h</div><div class="pv2">$9,956</div><div class="ps">Protocol revenue</div></div>
+      <div class="pc"><div class="pl">App Revenue 24h</div><div class="pv2">$131,898</div><div class="ps up">Ecosystem dApps</div></div>
+      <div class="pc"><div class="pl">App Fees 24h</div><div class="pv2">$355,459</div><div class="ps up">User activity</div></div>
+      <div class="pc"><div class="pl">DEXs Volume 24h</div><div class="pv2">$155.56M</div><div class="ps up">Trading activity</div></div>
+      <div class="pc"><div class="pl">Perps Volume 24h</div><div class="pv2">$524.59M</div><div class="ps up">Largest L2 perps</div></div>
+      <div class="pc"><div class="pl">Active Addresses 24h</div><div class="pv2">163,770</div><div class="ps up">Real users</div></div>
+      <div class="pc"><div class="pl">Stablecoins MCAP</div><div class="pv2">$3.842B</div><div class="ps down">−3.28% 7d</div></div>
+      <div class="pc"><div class="pl">Inflows 24h</div><div class="pv2">$48.95M</div><div class="ps up">Capital flowing in</div></div>
+      <div class="pc"><div class="pl">Total Raised</div><div class="pv2">$123.7M</div><div class="ps">3 funding rounds</div></div>
+    </div>
+    <div class="comment"><span class="cl">📊 Analysis</span>On-chain metrics confirm genuine usage — not just speculation. $524M daily perps, 163K active addresses, $155M DEX volume are real economic activity. TVL/MCAP of 2.24× is a strong undervaluation signal. Chain fees of ~$10K/day are low for a $755M project, reflecting the ultra-cheap fee model that benefits users but limits direct protocol revenue.</div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:75%"></div></div><span class="rs">7.5 / 10</span></div>
+  </div>
+  <div class="section">
+    <div class="sec-title"><span class="num">03</span>Community Sentiment</div>
+    <div style="margin-bottom:11px">
+      <span class="sp sb2">🟢 Bullish: Strong L2 adoption + real usage</span>
+      <span class="sp sbe">🔴 Bearish: Unlock pressure + competition</span>
+      <span class="sp sn2">🟡 Overall: Mixed-Cautiously Bearish</span>
+    </div>
+    <div class="g-auto">
+      <div class="mc"><div class="ml">X Twitter</div><div class="mv up">1.3M+ Followers</div></div>
+      <div class="mc"><div class="ml">Discord</div><div class="mv">90,000+ Members</div></div>
+      <div class="mc"><div class="ml">Watchlist</div><div class="mv">209,435</div></div>
+      <div class="mc"><div class="ml">DAO Activity</div><div class="mv up">Very High</div></div>
+    </div>
+    <div class="rating" style="margin-top:11px"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:72%"></div></div><span class="rs">7.0 / 10</span></div>
+  </div>
+  <div class="section">
+    <div class="sec-title"><span class="num">04</span>Social Media</div>
+    <div class="g2">
+      <a class="social-card" href="https://x.com/arbitrum" target="_blank"><img class="si" src="https://i.ibb.co/SwBtvS1Z/images.png" alt="X"><div><div class="sn">X (Twitter)</div><div class="ss">@arbitrum · 1.3M+ Followers</div></div></a>
+      <a class="social-card" href="https://discord.gg/arbitrum" target="_blank"><img class="si" src="https://i.ibb.co/qLFh3cRB/images-5.jpg" alt="Discord"><div><div class="sn">Discord</div><div class="ss">90,000+ Members</div></div></a>
+      <a class="social-card" href="https://t.me/arbitrum" target="_blank"><img class="si" src="https://i.ibb.co/rR07xjGc/images.jpg" alt="Telegram"><div><div class="sn">Telegram</div><div class="ss">Official Community</div></div></a>
+      <a class="social-card" href="https://reddit.com/r/arbitrum" target="_blank"><img class="si" src="https://i.ibb.co/qLFh3cRB/images-5.jpg" alt="Reddit"><div><div class="sn">Reddit</div><div class="ss">r/arbitrum · Active</div></div></a>
+    </div>
+    <div class="rating" style="margin-top:11px"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:85%"></div></div><span class="rs">8.5 / 10</span></div>
+  </div>
+</div>
+
+<!-- TOKENOMICS -->
+<div id="tab-tokenomics" class="tab-page">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Token Allocation</div>
+    <table class="tbl">
+      <tr><th>Category</th><th>Total %</th><th>Locked</th><th>Unlocked</th><th>Flag</th></tr>
+      <tr><td>DAO Treasury</td><td>35.3%</td><td>—</td><td>35.3%</td><td><span class="tag tg">✅ White</span></td></tr>
+      <tr><td>Team &amp; Advisors</td><td>26.9%</td><td>20.8%</td><td>6.17%</td><td><span class="tag tr">🔴 Red</span></td></tr>
+      <tr><td>Investors</td><td>17.5%</td><td>13.5%</td><td>4.02%</td><td><span class="tag ty">⚠️ Caution</span></td></tr>
+      <tr><td>Airdrop</td><td>11.6%</td><td>—</td><td>11.6%</td><td><span class="tag tg">✅ White</span></td></tr>
+      <tr><td>Arbitrum Foundation</td><td>7.5%</td><td>—</td><td>7.5%</td><td><span class="tag tg">✅ White</span></td></tr>
+      <tr><td>DAOs in Ecosystem</td><td>1.13%</td><td>1.13%</td><td>—</td><td><span class="tag tb">🔵 Neutral</span></td></tr>
+    </table>
+    <div class="comment"><span class="cl">📊 Analysis</span>Team &amp; Advisors at 26.9% is above the 20% danger threshold — a red flag. Investor allocation at 17.5% is acceptable. DAO Treasury at 35.3% is community-first — white flag. Total supply is still 53% locked or untracked with significant dilution pressure ahead.</div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:60%"></div></div><span class="rs">6.0 / 10</span></div>
+  </div>
+  <div class="section">
+    <div class="sec-title"><span class="num">02</span>Distribution Progress</div>
+    <div class="g-auto">
+      <div class="mc"><div class="ml">Total Unlocked</div><div class="mv up">47%</div><div class="ms">ARB 4.70B · ~$576.8M</div></div>
+      <div class="mc"><div class="ml">Next Unlock</div><div class="mv warn">0.93%</div><div class="ms">ARB 92.63M · ~$11.36M</div></div>
+      <div class="mc"><div class="ml">Still Locked</div><div class="mv down">9.26%</div><div class="ms">ARB 926.31M · ~$113.62M</div></div>
+      <div class="mc"><div class="ml">Untracked</div><div class="mv">42.8%</div><div class="ms">ARB 4.28B · ~$524.73M</div></div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="sec-title"><span class="num">03</span>Tokenomics Pressure</div>
+    <div class="g-auto">
+      <div class="mc"><div class="ml">Team Unlock Overhang</div><div class="mv down">20.8% locked</div><div class="ms">~$157M potential sell</div></div>
+      <div class="mc"><div class="ml">Investor Overhang</div><div class="mv warn">13.5% locked</div><div class="ms">~$102M potential sell</div></div>
+      <div class="mc"><div class="ml">Total Sell Pressure</div><div class="mv down">HIGH</div><div class="ms">$260M+ pending</div></div>
+      <div class="mc"><div class="ml">Staking vs Inflation</div><div class="mv warn">Not offsetting</div></div>
+    </div>
+    <div class="comment"><span class="cl">📊 Analysis</span>Tokenomics pressure is ARB's biggest structural challenge. ~$260M+ in potential sell pressure remains from Team and Investor vesting. Until the majority of these unlocks are absorbed, upside will be structurally limited. Clear red flag for medium-term price action.</div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:40%"></div></div><span class="rs">4.0 / 10</span></div>
+  </div>
+  <div class="section">
+    <div class="sec-title"><span class="num">04</span>Roadmap</div>
+    <div class="roadmap">
+      <div class="rmi done"><div class="rp">May 2021</div><div class="rm">Arbitrum One mainnet — first major optimistic rollup on Ethereum <span class="tag tg">✅ Done</span></div></div>
+      <div class="rmi done"><div class="rp">Aug 2022</div><div class="rm">Arbitrum Nova + Nitro upgrade — 7–10× throughput boost <span class="tag tg">✅ Done</span></div></div>
+      <div class="rmi done"><div class="rp">Mar 2023</div><div class="rm">ARB token TGE &amp; airdrop. Arbitrum DAO launched <span class="tag tg">✅ Done</span></div></div>
+      <div class="rmi done"><div class="rp">Jan 2024</div><div class="rm">ARB hits ATH $2.39. Orbit chains framework launches <span class="tag tg">✅ Done</span></div></div>
+      <div class="rmi done"><div class="rp">Late 2024</div><div class="rm">Stylus mainnet — Rust &amp; C++ smart contracts live <span class="tag tg">✅ Done</span></div></div>
+      <div class="rmi done"><div class="rp">Mar 2026</div><div class="rm">ARB hits ATL $0.087. TVL holds strong at $1.5B+ <span class="tag tg">✅ Done</span></div></div>
+      <div class="rmi soon"><div class="rp">Mid 2026</div><div class="rm">BoLD upgrade — decentralizes fraud proof validation <span class="tag ty">⏳ Soon</span></div></div>
+      <div class="rmi upcoming"><div class="rp">Late 2026</div><div class="rm">Full sequencer decentralization — removes centralization risk <span class="tag tb">🔵 Upcoming</span></div></div>
+      <div class="rmi upcoming"><div class="rp">2026–2027</div><div class="rm">50+ active Orbit L3 chains + enterprise integrations <span class="tag tb">🔵 Long-term</span></div></div>
+    </div>
+    <div class="comment"><span class="cl">📊 Analysis</span>Arbitrum has consistently delivered its roadmap. BoLD upgrade will address the biggest criticism — centralized security council. Sequencer decentralization is the final piece for true trustlessness. If both deliver, they significantly de-risk ARB long term.</div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:80%"></div></div><span class="rs">8.0 / 10</span></div>
+  </div>
+</div>
+
+<!-- TEAM -->
+<div id="tab-team" class="tab-page">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Core Team</div>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="t-top"><img class="t-photo" src="https://pbs.twimg.com/profile_images/1588932838984540160/eKGQETvS_400x400.jpg" alt="Steven" onerror="this.src='https://i.ibb.co/qLFh3cRB/images-5.jpg'"><div><div class="t-name">Steven Goldfeder</div><div class="t-role">Co-Founder &amp; CEO</div></div></div>
+        <div class="t-actions"><button class="btn bbio" onclick="toggleBio(this)">▼ Bio</button><a class="btn btw" href="https://x.com/sgoldfed" target="_blank">𝕏 Twitter</a><a class="btn bli" href="https://linkedin.com/in/stevengoldfeder" target="_blank">in LinkedIn</a></div>
+        <div class="bio-panel">PhD in Computer Science from Princeton, focused on cryptography and blockchain security. Co-authored foundational research on cryptocurrency wallets, L2 scaling, and cross-chain bridges. Former Ethereum Foundation researcher. Co-wrote multiple peer-reviewed cryptography papers. Main public face driving Arbitrum's vision.</div>
+      </div>
+      <div class="team-card">
+        <div class="t-top"><img class="t-photo" src="https://pbs.twimg.com/profile_images/1090063254657581057/ojEGNj1P_400x400.jpg" alt="Harry" onerror="this.src='https://i.ibb.co/qLFh3cRB/images-5.jpg'"><div><div class="t-name">Harry Kalodner</div><div class="t-role">Co-Founder &amp; CTO</div></div></div>
+        <div class="t-actions"><button class="btn bbio" onclick="toggleBio(this)">▼ Bio</button><a class="btn btw" href="https://x.com/hkalodner" target="_blank">𝕏 Twitter</a><a class="btn bli" href="https://linkedin.com/in/harrykalodner" target="_blank">in LinkedIn</a></div>
+        <div class="bio-panel">Princeton PhD in Computer Science, specializing in cryptographic systems. Co-authored the original Arbitrum whitepaper and leads protocol architecture — optimistic rollup design, fraud proofs, and the AVM. Leads Stylus development enabling Rust and C++ smart contracts. Known for deep technical focus and low public profile.</div>
+      </div>
+      <div class="team-card">
+        <div class="t-top"><img class="t-photo" src="https://pbs.twimg.com/profile_images/1488624820741771267/J2jGGUVJ_400x400.jpg" alt="Ed" onerror="this.src='https://i.ibb.co/qLFh3cRB/images-5.jpg'"><div><div class="t-name">Ed Felten</div><div class="t-role">Co-Founder &amp; Chief Scientist</div></div></div>
+        <div class="t-actions"><button class="btn bbio" onclick="toggleBio(this)">▼ Bio</button><a class="btn btw" href="https://x.com/EdFelten" target="_blank">𝕏 Twitter</a><a class="btn bli" href="https://linkedin.com/in/ed-felten" target="_blank">in LinkedIn</a></div>
+        <div class="bio-panel">Professor of Computer Science and Public Affairs at Princeton University. Served as Deputy U.S. Chief Technology Officer under the Obama White House (2015–2017). Leading expert in computer security, privacy, and technology policy. His government experience gives Arbitrum rare legitimacy in regulatory and institutional circles.</div>
+      </div>
+      <div class="team-card">
+        <div class="t-top"><img class="t-photo" src="https://pbs.twimg.com/profile_images/1488277016802869248/oQE3HVGF_400x400.jpg" alt="AJ" onerror="this.src='https://i.ibb.co/qLFh3cRB/images-5.jpg'"><div><div class="t-name">A.J. Warner</div><div class="t-role">Chief Strategy Officer</div></div></div>
+        <div class="t-actions"><button class="btn bbio" onclick="toggleBio(this)">▼ Bio</button><a class="btn btw" href="https://x.com/AJWarner_" target="_blank">𝕏 Twitter</a><a class="btn bli" href="https://linkedin.com/in/aj-warner" target="_blank">in LinkedIn</a></div>
+        <div class="bio-panel">Background in traditional finance and crypto venture across multiple blockchain infrastructure projects. Responsible for business development, ecosystem partnerships, and go-to-market strategy. Key role in onboarding institutional partners, negotiating DeFi integrations, and expanding the Arbitrum Orbit ecosystem.</div>
+      </div>
+      <div class="team-card">
+        <div class="t-top"><img class="t-photo" src="https://i.ibb.co/qLFh3cRB/images-5.jpg" alt="Gary" onerror="this.src='https://i.ibb.co/qLFh3cRB/images-5.jpg'"><div><div class="t-name">Gary Wachtel</div><div class="t-role">General Counsel</div></div></div>
+        <div class="t-actions"><button class="btn bbio" onclick="toggleBio(this)">▼ Bio</button><a class="btn bli" href="https://linkedin.com/in/garywachtel" target="_blank">in LinkedIn</a></div>
+        <div class="bio-panel">General Counsel at Offchain Labs overseeing all legal matters — regulatory compliance, intellectual property, and corporate governance. Extensive legal expertise from traditional finance and technology. Critical role navigating SEC regulatory attention on L2 tokens and DAO governance structures. Strong U.S. legal credibility.</div>
+      </div>
+    </div>
+    <div class="comment"><span class="cl">📊 Analysis</span>The Arbitrum team is one of the most credentialed in all of crypto. All three co-founders hold Princeton PhDs — a massive white flag. Ed Felten served as White House Deputy CTO adding unmatched institutional legitimacy. Team identities are fully public and verifiable. Regular posting, strong technical blog, and active governance participation.</div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:90%"></div></div><span class="rs">9.0 / 10</span></div>
+  </div>
+</div>
+
+<!-- INVESTORS -->
+<div id="tab-investors" class="tab-page">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Funding Overview</div>
+    <div class="g-auto">
+      <div class="mc"><div class="ml">Total Raised</div><div class="mv up">$123.7M</div></div>
+      <div class="mc"><div class="ml">Seed Round</div><div class="mv">$3.7M</div><div class="ms">Led by Pantera Capital</div></div>
+      <div class="mc"><div class="ml">Series A</div><div class="mv">$20M</div></div>
+      <div class="mc"><div class="ml">Series B</div><div class="mv">$100M</div><div class="ms">Led by Lightspeed · $1.2B val.</div></div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="sec-title"><span class="num">02</span>Investor Profiles</div>
+    <div class="inv-grid">
+      <div class="inv-card"><div class="il">LEAD — SEED</div><div class="in">Pantera Capital</div><div class="ib">One of the oldest crypto-focused VCs. Led Arbitrum's $3.7M seed. Known for early bets on Ethereum, Polkadot, and top L1/L2 protocols. Their early conviction validates the protocol's foundation.</div></div>
+      <div class="inv-card"><div class="il">LEAD — SERIES B</div><div class="in">Lightspeed Venture Partners</div><div class="ib">Top-tier Silicon Valley VC with $25B+ AUM. Led the $100M Series B valuing Offchain Labs at $1.2B. Brings Wall Street credibility and opens doors to enterprise adoption.</div></div>
+      <div class="inv-card"><div class="in">Coinbase Ventures</div><div class="ib">Venture arm of Coinbase, the largest U.S. crypto exchange. Investment signals regulatory alignment and potential for future exchange integrations — strong strategic signal.</div></div>
+      <div class="inv-card"><div class="in">Polychain Capital</div><div class="ib">Leading crypto-native hedge fund with billions in AUM. Known for deep technical due diligence. Series B participation validates Arbitrum's architecture and long-term thesis.</div></div>
+      <div class="inv-card"><div class="in">Ribbit Capital</div><div class="ib">Fintech-focused VC that backed Robinhood, Coinbase, and Brex. Involvement signals Arbitrum's crossover appeal between traditional fintech and DeFi infrastructure.</div></div>
+      <div class="inv-card"><div class="in">Redpoint Ventures</div><div class="ib">Top-tier Silicon Valley VC with investments in Stripe, Snowflake, and Netflix. Their backing reflects mainstream tech investor interest in Ethereum L2 scaling.</div></div>
+      <div class="inv-card"><div class="in">Compound VC</div><div class="ib">VC with deep DeFi roots. Participated in the seed round. Early conviction in Arbitrum shows strong DeFi community support from the very beginning.</div></div>
+      <div class="inv-card"><div class="in" style="color:var(--warning)">Alameda Research ⚠️</div><div class="ib">Former trading firm by Sam Bankman-Fried — collapsed Nov 2022 (FTX crisis). Historical investment creates minor reputational association. No direct impact on Arbitrum operations but worth noting.</div></div>
+    </div>
+    <div class="comment"><span class="cl">📊 Analysis</span>Elite investor lineup — Pantera, Lightspeed, Coinbase Ventures, Polychain, and Ribbit are all tier-1. Total raised of $123.7M gives a long operational runway. The only concern is the Alameda Research historical association — minimal operational impact but a minor optics flag. Overall one of the strongest possible investor lineups in crypto.</div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:90%"></div></div><span class="rs">9.0 / 10</span></div>
+  </div>
+</div>
+
+<!-- ECOSYSTEM -->
+<div id="tab-ecosystem" class="tab-page">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Use Cases</div>
+    <div class="uc-grid">
+      <div class="uci"><span class="ucn">01</span>Ethereum L2 Scaling — fast, cheap ETH transactions</div>
+      <div class="uci"><span class="ucn">02</span>DeFi Hub — lending, borrowing, DEX (GMX, Uniswap, Aave)</div>
+      <div class="uci"><span class="ucn">03</span>Perpetuals Trading — largest perps volume among all L2s</div>
+      <div class="uci"><span class="ucn">04</span>NFT &amp; Gaming — low-cost minting and game transactions</div>
+      <div class="uci"><span class="ucn">05</span>Real World Assets — tokenized bonds and treasuries on-chain</div>
+      <div class="uci"><span class="ucn">06</span>Orbit Chains — launch custom L3 chains on Arbitrum</div>
+      <div class="uci"><span class="ucn">07</span>Stylus Multi-VM — Rust &amp; C++ smart contracts + Solidity</div>
+      <div class="uci"><span class="ucn">08</span>DAO Governance — ARB token for on-chain voting</div>
+      <div class="uci"><span class="ucn">09</span>Cross-chain Bridges — native bridge to Ethereum + 3rd party</div>
+      <div class="uci"><span class="ucn">10</span>Stablecoin Hub — $3.84B stablecoin market cap on chain</div>
+    </div>
+    <div class="comment"><span class="cl">📊 Analysis</span>Arbitrum's use cases are broad and battle-tested. GMX drives hundreds of millions in daily perps. Orbit chains create a recursive ecosystem. Stylus opens Arbitrum to non-Solidity developers. The $3.84B stablecoin market cap shows deep real-world financial activity — not just speculation.</div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:85%"></div></div><span class="rs">8.5 / 10</span></div>
+  </div>
+  <div class="section">
+    <div class="sec-title"><span class="num">02</span>Competitors</div>
+    <div class="comp-grid">
+      <a class="comp-card" href="https://x.com/optimismFND" target="_blank"><img class="cl2" src="https://cryptologos.cc/logos/optimism-ethereum-op-logo.png" alt="OP" onerror="this.src='https://i.ibb.co/qLFh3cRB/images-5.jpg'"><div class="cn">Optimism (OP)</div><div class="cd">Same optimistic rollup tech. Powers OP Superchain and Base.</div></a>
+      <a class="comp-card" href="https://x.com/base" target="_blank"><img class="cl2" src="https://i.ibb.co/qLFh3cRB/images-5.jpg" alt="Base"><div class="cn">Base</div><div class="cd">Coinbase L2 on OP Stack. Fastest growing L2 by user count.</div></a>
+      <a class="comp-card" href="https://x.com/0xPolygon" target="_blank"><img class="cl2" src="https://cryptologos.cc/logos/polygon-matic-logo.png" alt="POL" onerror="this.src='https://i.ibb.co/qLFh3cRB/images-5.jpg'"><div class="cn">Polygon (POL)</div><div class="cd">Multi-chain scaling with ZK-rollup pivot. Enterprise ties.</div></a>
+      <a class="comp-card" href="https://x.com/zksync" target="_blank"><img class="cl2" src="https://i.ibb.co/qLFh3cRB/images-5.jpg" alt="ZK"><div class="cn">zkSync (ZK)</div><div class="cd">ZK-rollup competitor claiming stronger security guarantees.</div></a>
+      <a class="comp-card" href="https://x.com/StarkWareLtd" target="_blank"><img class="cl2" src="https://i.ibb.co/qLFh3cRB/images-5.jpg" alt="STRK"><div class="cn">StarkNet (STRK)</div><div class="cd">ZK-STARK rollup targeting high-throughput DeFi.</div></a>
+    </div>
+    <div class="comment"><span class="cl">📊 Analysis</span>Arbitrum faces fierce L2 competition. Base has surpassed it in daily active users. ZK-rollup chains pose a technological threat with stronger security guarantees. However Arbitrum maintains highest TVL, deepest DeFi ecosystem, and Stylus is a genuine differentiator. Evolving, not losing.</div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:70%"></div></div><span class="rs">7.0 / 10</span></div>
+  </div>
+</div>
+
+<!-- TECHNICAL -->
+<div id="tab-technical" class="tab-page">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Technical Analysis</div>
+    <div class="level-grid">
+      <div class="lc"><div class="lt sup">🟢 Support Levels</div><div class="li2">$0.120 – $0.122 <small>Strong pivot (current)</small></div><div class="li2">$0.118 – $0.119 <small>Mid support</small></div><div class="li2">$0.115 <small>Key level</small></div><div class="li2">$0.087 – $0.090 <small>ATL zone (last resort)</small></div></div>
+      <div class="lc"><div class="lt res">🔴 Resistance Levels</div><div class="li2">$0.125 – $0.127 <small>Near-term ceiling</small></div><div class="li2">$0.128 – $0.130 <small>Key breakout level</small></div><div class="li2">$0.140 – $0.150 <small>Mid resistance</small></div><div class="li2">$0.180 – $0.200 <small>Major resistance</small></div></div>
+    </div>
+    <div class="g-auto">
+      <div class="mc"><div class="ml">Trend</div><div class="mv down">Downtrend</div></div>
+      <div class="mc"><div class="ml">RSI</div><div class="mv warn">Neutral / Mixed</div></div>
+      <div class="mc"><div class="ml">50-Day SMA</div><div class="mv down">Below (Bearish)</div></div>
+      <div class="mc"><div class="ml">200-Day SMA</div><div class="mv down">Below (Bearish)</div></div>
+      <div class="mc"><div class="ml">2026 Conservative</div><div class="mv warn">$0.20 – $0.40</div></div>
+      <div class="mc"><div class="ml">2026 Optimistic</div><div class="mv up">$0.50 – $1.00+</div></div>
+    </div>
+    <div class="comment"><span class="cl">📊 Analysis</span>ARB is in a prolonged downtrend from $2.39 ATH but consolidating near $0.12. Below both 50 and 200-day SMAs — bearish. The ATL of $0.087 (March 2026) forming a higher low could signal base-building. A confirmed break above $0.130 with volume would be the first bullish signal. Until then, sideways to slightly down.</div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:45%"></div></div><span class="rs">4.5 / 10</span></div>
+  </div>
+  <div class="section">
+    <div class="sec-title"><span class="num">02</span>Catalysts &amp; Entry / Exit Strategy</div>
+    <table class="tbl" style="margin-bottom:12px">
+      <tr><th>Type</th><th>Catalyst</th><th>Impact</th></tr>
+      <tr><td><span class="tag tg">Bullish</span></td><td>BoLD upgrade — full fraud proof decentralization</td><td>High</td></tr>
+      <tr><td><span class="tag tg">Bullish</span></td><td>ETH price recovery — ARB correlates 85%+ with ETH</td><td>Very High</td></tr>
+      <tr><td><span class="tag tg">Bullish</span></td><td>Break + hold above $0.130 with volume</td><td>Medium</td></tr>
+      <tr><td><span class="tag tg">Bullish</span></td><td>Sequencer decentralization announcement</td><td>High</td></tr>
+      <tr><td><span class="tag tr">Bearish</span></td><td>Large team/investor unlock hitting market</td><td>High</td></tr>
+      <tr><td><span class="tag tr">Bearish</span></td><td>Break below $0.120 support — targets $0.09</td><td>High</td></tr>
+      <tr><td><span class="tag tr">Bearish</span></td><td>BTC/ETH macro downturn</td><td>Very High</td></tr>
+    </table>
+    <div class="g-auto">
+      <div class="mc"><div class="ml">🟢 Buy Zone</div><div class="mv up">$0.087 – $0.115</div></div>
+      <div class="mc"><div class="ml">🎯 Take Profit 1</div><div class="mv warn">$0.130 – $0.150</div></div>
+      <div class="mc"><div class="ml">🎯 Take Profit 2</div><div class="mv warn">$0.200 – $0.250</div></div>
+      <div class="mc"><div class="ml">🛑 Stop Loss</div><div class="mv down">Below $0.083</div></div>
+      <div class="mc"><div class="ml">Time Horizon</div><div class="mv">6 – 18 months</div></div>
+      <div class="mc"><div class="ml">Risk Level</div><div class="mv down">Medium – High</div></div>
+    </div>
+    <div class="comment" style="font-size:.68rem">⚠️ Not financial advice. Educational research only. Crypto is high risk. Always DYOR and only invest what you can afford to lose.</div>
+  </div>
+  <div class="section">
+    <div class="sec-title"><span class="num">03</span>Fundamental Scoring</div>
+    <div class="score-row"><div class="sc">Team &amp; Founders</div><div class="sw">×20%</div><div class="sb"><div class="sbf" style="width:90%"></div></div><div class="sv">9.0</div></div>
+    <div class="score-row"><div class="sc">Tokenomics</div><div class="sw">×20%</div><div class="sb"><div class="sbf" style="width:50%"></div></div><div class="sv">5.0</div></div>
+    <div class="score-row"><div class="sc">Technology</div><div class="sw">×15%</div><div class="sb"><div class="sbf" style="width:88%"></div></div><div class="sv">8.5</div></div>
+    <div class="score-row"><div class="sc">Protocol Metrics</div><div class="sw">×15%</div><div class="sb"><div class="sbf" style="width:75%"></div></div><div class="sv">7.5</div></div>
+    <div class="score-row"><div class="sc">Investors / Backing</div><div class="sw">×10%</div><div class="sb"><div class="sbf" style="width:90%"></div></div><div class="sv">9.0</div></div>
+    <div class="score-row"><div class="sc">Competitors</div><div class="sw">×10%</div><div class="sb"><div class="sbf" style="width:70%"></div></div><div class="sv">7.0</div></div>
+    <div class="score-row"><div class="sc">Community</div><div class="sw">×5%</div><div class="sb"><div class="sbf" style="width:85%"></div></div><div class="sv">8.5</div></div>
+    <div class="score-row"><div class="sc">Technical (Price)</div><div class="sw">×5%</div><div class="sb"><div class="sbf" style="width:45%"></div></div><div class="sv">4.5</div></div>
+    <div class="sc-wrap" style="margin-top:18px">
+      <div class="sc-circle"><div class="sc-num">7.3</div></div>
+      <div><div style="font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;color:#fff;margin-bottom:3px">Weighted Score: 73 / 100</div><div style="font-size:.68rem;color:var(--muted)">Strong Fundamentals · Weak Price Action</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- VERDICT -->
+<div id="tab-verdict" class="tab-page">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Final Verdict</div>
+    <div class="verdict-box">
+      <div class="vl">Overall Verdict</div>
+      <div class="vt">👀 WATCH &amp; ACCUMULATE</div>
+      <div class="vd">Arbitrum is one of the most fundamentally strong projects in the L2 space. Elite team, top-tier investors, real on-chain adoption, and genuine technical innovation. Token is under structural sell pressure from vesting unlocks and trades in a prolonged downtrend. Watch for $0.12 support confirmation and accumulate in the $0.087–$0.115 zone with defined risk. Quality hold for the next ETH bull cycle — not a short-term flip.</div>
+      <div class="vg">
+        <div class="vi"><div class="vil">Verdict</div><div class="viv">WATCH / BUY DIP</div></div>
+        <div class="vi"><div class="vil">Time Horizon</div><div class="viv">6–18 Months</div></div>
+        <div class="vi"><div class="vil">Risk Level</div><div class="viv" style="color:var(--warning)">MEDIUM–HIGH</div></div>
+        <div class="vi"><div class="vil">Position Size</div><div class="viv">2–5% Portfolio</div></div>
+        <div class="vi"><div class="vil">Fund. Score</div><div class="viv" style="color:var(--success)">73 / 100</div></div>
+        <div class="vi"><div class="vil">Key Risk</div><div class="viv" style="color:var(--danger)">Unlock Pressure</div></div>
+      </div>
+    </div>
+    <div style="margin-top:13px;font-size:.6rem;color:var(--muted);text-align:center;letter-spacing:.5px;line-height:1.6">⚠️ This report is for educational and research purposes only. Not financial advice. Always DYOR and manage your risk carefully.</div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function showTab(name, btn) {
+  document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function toggleBio(btn) {
+  const card = btn.closest('.team-card');
+  const panel = card.querySelector('.bio-panel');
+  const isOpen = panel.classList.contains('open');
+  panel.classList.toggle('open', !isOpen);
+  btn.textContent = isOpen ? '▼ Bio' : '▲ Bio';
+  btn.classList.toggle('active', !isOpen);
+}
+</script>
+</body>
+</html>
