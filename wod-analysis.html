@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WOD — Fundamental Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue: #7c3aed;
+    --accent: #a78bfa;
+    --danger: #ff4444;
+    --success: #00e676;
+    --warning: #ffab00;
+    --card: rgba(15, 8, 40, 0.85);
+    --border: rgba(124, 58, 237, 0.25);
+    --text: #ede9fe;
+    --muted: #9f7aea;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Mono', monospace; color: var(--text); min-height: 100vh; position: relative; }
+  #bg { position: fixed; inset: 0; background-image: url('https://i.ibb.co/HpfFQfZK/20260503-122850.png'); background-size: cover; background-position: center; z-index: -2; }
+  #bg::after { content: ''; position: absolute; inset: 0; background: rgba(8, 3, 25, 0.86); z-index: -1; }
+  header { background: linear-gradient(180deg,rgba(10,5,30,0.98),rgba(10,5,30,0.94)); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(16px); }
+  .hdr-main { display: flex; align-items: center; gap: 13px; padding: 13px 18px 10px; flex-wrap: wrap; }
+  .hdr-logo { width: 46px; height: 46px; border-radius: 11px; object-fit: cover; border: 2px solid var(--blue); box-shadow: 0 0 16px rgba(124,58,237,0.5); flex-shrink: 0; }
+  .hdr-info { flex: 1; min-width: 0; }
+  .hdr-name { font-family: 'Syne',sans-serif; font-size: 1.25rem; font-weight: 800; color: #fff; line-height: 1; }
+  .hdr-sub { font-size: 0.58rem; color: var(--accent); letter-spacing: 2.5px; text-transform: uppercase; margin-top: 3px; }
+  .hdr-price { text-align: right; flex-shrink: 0; }
+  .hdr-price .pv { font-family: 'Syne',sans-serif; font-size: 1.15rem; font-weight: 700; color: #fff; }
+  .hdr-price .rk { font-size: 0.62rem; color: var(--accent); letter-spacing: 1px; margin-top: 2px; }
+  .contract-strip { background: rgba(0,0,0,0.45); border-top: 1px solid rgba(124,58,237,0.12); padding: 5px 18px; font-size: 0.57rem; color: var(--muted); display: flex; align-items: center; gap: 7px; overflow: hidden; }
+  .contract-strip span { color: var(--accent); font-size: 0.59rem; word-break: break-all; }
+  .nav-tabs { display: flex; overflow-x: auto; border-top: 1px solid var(--border); scrollbar-width: none; }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .nav-tab { flex-shrink: 0; padding: 9px 15px; font-size: 0.6rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap; background: none; border-top: none; border-left: none; border-right: none; font-family: 'DM Mono',monospace; }
+  .nav-tab:hover { color: var(--text); }
+  .nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .hero { background: linear-gradient(135deg,rgba(60,20,120,0.6),rgba(20,5,60,0.45)); border-bottom: 1px solid var(--border); padding: 26px 18px 20px; text-align: center; position: relative; overflow: hidden; }
+  .hero::before { content:''; position: absolute; top:-60px; left:50%; transform:translateX(-50%); width:400px; height:200px; background: radial-gradient(ellipse,rgba(124,58,237,0.18) 0%,transparent 70%); pointer-events: none; }
+  .live-badge { display: inline-flex; align-items: center; gap: 7px; background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.4); border-radius: 20px; padding: 5px 13px; font-size: 0.6rem; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; }
+  .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.8)} }
+  .hero-title { font-family: 'Syne',sans-serif; font-size: 2.6rem; font-weight: 800; color: #fff; line-height: .9; letter-spacing: -1px; margin-bottom: 5px; }
+  .hero-title span { color: var(--accent); }
+  .hero-sub { font-size: 0.6rem; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 8px; }
+  .contract-scroll { font-size: 0.57rem; color: rgba(124,58,237,0.5); letter-spacing: .8px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; margin-bottom: 18px; padding: 0 10px; }
+  .hero-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 420px; margin: 0 auto; }
+  .hs { background: rgba(0,0,0,0.32); border: 1px solid var(--border); border-radius: 11px; padding: 13px; }
+  .hs .v { font-family: 'Syne',sans-serif; font-size: 1.3rem; font-weight: 800; color: #fff; line-height: 1; }
+  .hs .l { font-size: 0.56rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 3px; }
+  .hs .c { font-size: 0.62rem; margin-top: 3px; }
+  .up{color:var(--success)} .down{color:var(--danger)} .warn{color:var(--warning)}
+  #main { max-width: 960px; margin: 0 auto; padding: 18px 14px 60px; }
+  .tab-page { display: none; }
+  .tab-page.active { display: block; }
+  .section { background: var(--card); border: 1px solid var(--border); border-radius: 15px; padding: 18px 16px; margin-bottom: 14px; backdrop-filter: blur(10px); box-shadow: 0 4px 28px rgba(0,0,0,0.35); }
+  .sec-title { font-family: 'Syne',sans-serif; font-size: 0.72rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 2.5px; display: flex; align-items: center; gap: 9px; margin-bottom: 14px; }
+  .sec-title .num { width: 24px; height: 24px; background: rgba(124,58,237,0.15); border: 1px solid var(--border); border-radius: 6px; display:flex; align-items:center; justify-content:center; font-size: 0.6rem; color: var(--accent); flex-shrink: 0; }
+  .sec-title::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,var(--border),transparent); }
+  .g-auto { display: grid; grid-template-columns: repeat(auto-fill,minmax(165px,1fr)); gap: 9px; }
+  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+  .mc { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 9px; padding: 11px 13px; }
+  .ml { font-size: 0.56rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
+  .mv { font-family: 'Syne',sans-serif; font-size: 0.95rem; font-weight: 700; color: #fff; }
+  .ms { font-size: 0.6rem; color: var(--muted); margin-top: 2px; }
+  .comment { background: rgba(124,58,237,0.07); border-left: 3px solid var(--blue); border-radius: 0 10px 10px 0; padding: 13px 15px; margin-top: 13px; font-size: 0.76rem; line-height: 1.75; color: var(--text); }
+  .cl { font-size: 0.56rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 7px; display: block; }
+  .rating { display: flex; align-items: center; gap: 11px; margin-top: 11px; }
+  .rl { font-size: 0.6rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
+  .rt { flex:1; height:5px; background:rgba(255,255,255,0.07); border-radius:3px; overflow:hidden; }
+  .rf { height:100%; border-radius:3px; background:linear-gradient(90deg,var(--blue),var(--accent)); }
+  .rs { font-family:'Syne',sans-serif; font-weight:700; font-size:.82rem; color:var(--accent); white-space:nowrap; }
+  .tbl { width:100%; border-collapse:collapse; font-size:.73rem; }
+  .tbl th { background:rgba(124,58,237,0.15); color:var(--accent); font-size:.58rem; text-transform:uppercase; letter-spacing:1.5px; padding:8px 11px; text-align:left; border-bottom:1px solid var(--border); }
+  .tbl td { padding:8px 11px; border-bottom:1px solid rgba(255,255,255,0.04); color:var(--text); vertical-align:middle; }
+  .tbl tr:nth-child(even) td { background:rgba(124,58,237,0.03); }
+  .tbl tr:hover td { background:rgba(124,58,237,0.08); }
+  .tag { display:inline-block; padding:2px 7px; border-radius:4px; font-size:.58rem; letter-spacing:.5px; }
+  .tg { background:rgba(0,230,118,0.1); color:var(--success); border:1px solid rgba(0,230,118,0.24); }
+  .tr { background:rgba(255,68,68,0.11); color:#ff7777; border:1px solid rgba(255,68,68,0.24); }
+  .ty { background:rgba(255,171,0,0.1); color:var(--warning); border:1px solid rgba(255,171,0,0.24); }
+  .tb { background:rgba(124,58,237,0.12); color:var(--accent); border:1px solid rgba(124,58,237,0.25); }
+  .social-card { display:flex; align-items:center; gap:11px; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:11px; padding:11px 13px; text-decoration:none; color:var(--text); transition:all .2s; }
+  .social-card:hover { border-color:var(--blue); background:rgba(124,58,237,0.1); transform:translateY(-2px); }
+  .si { width:32px; height:32px; border-radius:7px; object-fit:cover; }
+  .sn { font-family:'Syne',sans-serif; font-size:.8rem; font-weight:700; }
+  .ss { font-size:.62rem; color:var(--muted); margin-top:2px; }
+  .team-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(245px,1fr)); gap:11px; }
+  .team-card { background:rgba(0,0,0,0.35); border:1px solid var(--border); border-radius:13px; overflow:hidden; transition:border-color .2s; }
+  .team-card:hover { border-color:var(--blue); }
+  .t-top { display:flex; align-items:center; gap:12px; padding:14px 14px 0; }
+  .t-photo { width:54px; height:54px; border-radius:11px; object-fit:cover; border:2px solid var(--border); flex-shrink:0; background:rgba(124,58,237,0.15); }
+  .t-name { font-family:'Syne',sans-serif; font-size:.88rem; font-weight:700; color:#fff; }
+  .t-role { font-size:.6rem; color:var(--accent); text-transform:uppercase; letter-spacing:1px; margin-top:3px; }
+  .t-actions { display:flex; gap:6px; padding:9px 14px 13px; flex-wrap:wrap; }
+  .btn { display:inline-flex; align-items:center; gap:4px; padding:5px 10px; border-radius:6px; font-family:'DM Mono',monospace; font-size:.6rem; cursor:pointer; border:none; transition:all .2s; text-decoration:none; letter-spacing:.5px; }
+  .bbio { background:rgba(124,58,237,0.12); color:var(--accent); border:1px solid rgba(124,58,237,0.28); }
+  .bbio:hover,.bbio.active { background:rgba(124,58,237,0.28); border-color:var(--blue); }
+  .btw { background:rgba(255,255,255,0.06); color:#fff; border:1px solid rgba(255,255,255,0.1); }
+  .btw:hover { background:rgba(255,255,255,0.11); }
+  .bli { background:rgba(0,119,181,0.11); color:#5aa3d0; border:1px solid rgba(0,119,181,0.24); }
+  .bli:hover { background:rgba(0,119,181,0.2); }
+  .bio-panel { display:none; padding:11px 14px 14px; font-size:.72rem; line-height:1.7; color:var(--muted); border-top:1px solid var(--border); animation:fadeIn .2s ease; }
+  .bio-panel.open { display:block; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:translateY(0)} }
+  .inv-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(188px,1fr)); gap:9px; }
+  .inv-card { background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:11px; padding:13px; transition:all .2s; }
+  .inv-card:hover { border-color:var(--blue); background:rgba(124,58,237,0.07); transform:translateY(-2px); }
+  .in { font-family:'Syne',sans-serif; font-size:.8rem; font-weight:700; color:#fff; margin-bottom:5px; }
+  .ib { font-size:.63rem; color:var(--muted); line-height:1.52; }
+  .il { display:inline-block; background:rgba(255,171,0,0.11); color:var(--warning); border:1px solid rgba(255,171,0,0.27); border-radius:4px; padding:1px 7px; font-size:.53rem; letter-spacing:1px; text-transform:uppercase; margin-bottom:6px; }
+  .comp-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(148px,1fr)); gap:9px; }
+  .comp-card { background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:11px; padding:13px; text-align:center; text-decoration:none; color:var(--text); transition:all .2s; display:block; }
+  .comp-card:hover { border-color:var(--blue); background:rgba(124,58,237,0.08); transform:translateY(-2px); }
+  .cl2 { width:46px; height:46px; border-radius:50%; object-fit:cover; border:2px solid var(--border); margin:0 auto 7px; display:block; background:rgba(124,58,237,0.15); }
+  .cn { font-family:'Syne',sans-serif; font-size:.75rem; font-weight:700; color:#fff; margin-bottom:3px; }
+  .cd { font-size:.6rem; color:var(--muted); line-height:1.4; }
+  .risk-grid { display:grid; grid-template-columns:1fr 1fr; gap:11px; }
+  .risk-col { background:rgba(0,0,0,0.22); border-radius:11px; padding:13px; }
+  .risk-title { font-family:'Syne',sans-serif; font-size:.67rem; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:11px; display:flex; align-items:center; gap:6px; }
+  .risk-title.red { color:var(--danger); }
+  .risk-title.green { color:var(--success); }
+  .ri { display:flex; align-items:flex-start; gap:7px; font-size:.7rem; color:var(--text); margin-bottom:8px; line-height:1.5; }
+  .rd { width:6px; height:6px; border-radius:50%; margin-top:5px; flex-shrink:0; }
+  .rd.red { background:var(--danger); }
+  .rd.green { background:var(--success); }
+  .score-row { display:flex; align-items:center; gap:9px; margin-bottom:9px; }
+  .sc { font-size:.68rem; color:var(--text); width:168px; flex-shrink:0; }
+  .sw { font-size:.56rem; color:var(--muted); width:36px; flex-shrink:0; }
+  .sb { flex:1; height:6px; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; }
+  .sbf { height:100%; border-radius:3px; background:linear-gradient(90deg,var(--blue),var(--accent)); }
+  .sv { font-family:'Syne',sans-serif; font-weight:700; font-size:.76rem; color:var(--accent); width:34px; text-align:right; flex-shrink:0; }
+  .roadmap { position:relative; padding-left:20px; }
+  .roadmap::before { content:''; position:absolute; left:6px; top:8px; bottom:8px; width:2px; background:linear-gradient(180deg,var(--blue),transparent); }
+  .rmi { position:relative; margin-bottom:14px; }
+  .rmi::before { content:''; position:absolute; left:-16px; top:5px; width:10px; height:10px; border-radius:50%; border:2px solid var(--blue); background:#0a0318; }
+  .rmi.done::before { background:var(--success); border-color:var(--success); }
+  .rmi.soon::before { background:var(--warning); border-color:var(--warning); }
+  .rmi.upcoming::before { background:var(--blue); border-color:var(--accent); }
+  .rp { font-size:.58rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:3px; }
+  .rm { font-size:.75rem; color:var(--text); line-height:1.5; }
+  .uc-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(188px,1fr)); gap:7px; }
+  .uci { background:rgba(0,0,0,0.22); border:1px solid var(--border); border-radius:9px; padding:10px 12px; font-size:.72rem; color:var(--text); display:flex; align-items:center; gap:7px; }
+  .ucn { font-family:'Syne',sans-serif; font-size:.63rem; font-weight:700; color:var(--accent); width:18px; flex-shrink:0; }
+  .level-grid { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-bottom:11px; }
+  .lc { background:rgba(0,0,0,0.22); border-radius:9px; padding:11px 13px; }
+  .lt { font-size:.58rem; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:7px; }
+  .lt.sup { color:var(--success); } .lt.res { color:var(--danger); }
+  .li2 { font-family:'Syne',sans-serif; font-size:.77rem; font-weight:600; color:#fff; margin-bottom:4px; }
+  .li2 small { font-family:'DM Mono',monospace; font-size:.58rem; font-weight:400; color:var(--muted); margin-left:5px; }
+  .verdict-box { background:linear-gradient(135deg,rgba(60,20,120,0.5),rgba(124,58,237,0.06)); border:1px solid var(--blue); border-radius:15px; padding:22px; text-align:center; }
+  .vl { font-size:.58rem; text-transform:uppercase; letter-spacing:3px; color:var(--muted); margin-bottom:7px; }
+  .vt { font-family:'Syne',sans-serif; font-size:1.6rem; font-weight:800; color:var(--warning); margin-bottom:9px; }
+  .vd { font-size:.75rem; color:var(--muted); line-height:1.7; max-width:500px; margin:0 auto 16px; }
+  .vg { display:grid; grid-template-columns:repeat(auto-fit,minmax(125px,1fr)); gap:8px; }
+  .vi { background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:9px; padding:10px 11px; }
+  .vil { font-size:.53rem; text-transform:uppercase; letter-spacing:1.5px; color:var(--muted); margin-bottom:4px; }
+  .viv { font-family:'Syne',sans-serif; font-size:.8rem; font-weight:700; color:#fff; }
+  .sc-wrap { display:flex; align-items:center; justify-content:center; gap:18px; margin:14px 0; flex-wrap:wrap; }
+  .sc-circle { width:90px; height:90px; border-radius:50%; display:flex; align-items:center; justify-content:center; position:relative; background:conic-gradient(var(--blue) 0deg,var(--accent) 162deg,rgba(255,255,255,0.05) 162deg); }
+  .sc-circle::before { content:''; position:absolute; width:70px; height:70px; border-radius:50%; background:#0a0318; }
+  .sc-num { font-family:'Syne',sans-serif; font-size:1.2rem; font-weight:800; color:#fff; position:relative; z-index:1; }
+  .sale-card { background:rgba(0,0,0,0.28); border:1px solid var(--border); border-radius:11px; padding:13px; margin-bottom:9px; }
+  .sale-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px; }
+  .sale-type { font-family:'Syne',sans-serif; font-size:.75rem; font-weight:700; color:#fff; }
+  .sale-raised { font-family:'Syne',sans-serif; font-size:.75rem; font-weight:700; color:var(--success); }
+  .sale-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .sale-item .sl { font-size:.55rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:2px; }
+  .sale-item .sv2 { font-family:'Syne',sans-serif; font-size:.78rem; font-weight:700; color:#fff; }
+  .sp { display:inline-block; padding:4px 12px; border-radius:18px; font-size:.65rem; margin:3px; }
+  .sb2 { background:rgba(0,230,118,0.09); color:var(--success); border:1px solid rgba(0,230,118,0.22); }
+  .sbe { background:rgba(255,68,68,0.09); color:var(--danger); border:1px solid rgba(255,68,68,0.22); }
+  .sn2 { background:rgba(255,171,0,0.09); color:var(--warning); border:1px solid rgba(255,171,0,0.22); }
+  .perf-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-bottom:12px; }
+  .perf-card { background:rgba(0,0,0,0.28); border:1px solid var(--border); border-radius:9px; padding:10px; text-align:center; }
+  .perf-period { font-size:.55rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+  .perf-val { font-family:'Syne',sans-serif; font-size:.85rem; font-weight:700; }
+  @media(max-width:560px){.risk-grid{grid-template-columns:1fr}.level-grid{grid-template-columns:1fr}.g2{grid-template-columns:1fr}.hero-title{font-size:2rem}.sc{width:115px}.perf-grid{grid-template-columns:repeat(3,1fr)}.sale-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div id="bg"></div>
+
+<header>
+  <div class="hdr-main">
+    <img class="hdr-logo" src="https://i.ibb.co/HpfFQfZK/20260503-122850.png" alt="WOD">
+    <div class="hdr-info">
+      <div class="hdr-name">World of Dypians (WOD)</div>
+      <div class="hdr-sub">Fundamental Analysis · May 2026</div>
+    </div>
+    <div class="hdr-price">
+      <div class="pv">$0.006691</div>
+      <div class="rk">RANK #1394</div>
+    </div>
+  </div>
+  <div class="contract-strip">
+    <span style="color:var(--muted);flex-shrink:0">CONTRACT (BSC):</span>
+    <span>0xb994882a1b9bd98a71dd6ea5f61577c42848b0e8</span>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showTab('overview',this)">Overview</button>
+    <button class="nav-tab" onclick="showTab('market',this)">Market Data</button>
+    <button class="nav-tab" onclick="showTab('tokenomics',this)">Tokenomics</button>
+    <button class="nav-tab" onclick="showTab('team',this)">Team</button>
+    <button class="nav-tab" onclick="showTab('investors',this)">Investors</button>
+    <button class="nav-tab" onclick="showTab('ecosystem',this)">Ecosystem</button>
+    <button class="nav-tab" onclick="showTab('technical',this)">Technical</button>
+    <button class="nav-tab" onclick="showTab('verdict',this)">Verdict</button>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="live-badge"><div class="live-dot"></div>Live Fundamental Analysis · May 2026</div>
+  <div class="hero-title">WORLD OF <span>DYPIANS</span></div>
+  <div class="hero-sub">Blockchain MMORPG &amp; Metaverse · BNB Chain</div>
+  <div class="contract-scroll">0xb994882a1b9bd98a71dd6ea5f61577c42848b0e8</div>
+  <div class="hero-stats">
+    <div class="hs"><div class="v">$0.00669</div><div class="l">Current Price</div><div class="c down">▼ 97.2% from ATH</div></div>
+    <div class="hs"><div class="v">$3.30M</div><div class="l">Market Cap</div><div class="c" style="color:var(--accent)">Rank #1394</div></div>
+    <div class="hs"><div class="v">$6.69M</div><div class="l">FDV</div><div class="c warn">MCAP/FDV: 0.49</div></div>
+    <div class="hs"><div class="v">$0.2699</div><div class="l">All-Time High</div><div class="c" style="color:var(--muted)">Jan 02, 2025</div></div>
+  </div>
+</div>
+
+<div id="main">
+
+<!-- ===== OVERVIEW ===== -->
+<div id="tab-overview" class="tab-page active">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Project Overview</div>
+    <div class="comment" style="margin-top:0">
+      <span class="cl">What is World of Dypians?</span>
+      World of Dypians (WOD) is a blockchain-based MMORPG and metaverse game built on BNB Chain by the Dypius ecosystem. Players can explore a vast open world, own land, trade assets, and earn WOD tokens through gameplay. The game is available on Epic Games Store, giving it mainstream gaming distribution that most crypto games lack. WOD tokens are used for in-game purchases, governance, staking, and ecosystem rewards. The project blends traditional gaming mechanics with DeFi and NFT infrastructure, targeting both crypto-native users and mainstream gamers.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><span class="num">02</span>Key Stats</div>
+    <div class="g-auto">
+      <div class="mc"><div class="ml">Price</div><div class="mv">$0.006691</div></div>
+      <div class="mc"><div class="ml">Market Cap</div><div class="mv">$3.30M</div></div>
+      <div class="mc"><div class="ml">FDV</div><div class="mv">$6.69M</div></div>
+      <div class="mc"><div class="ml">MCAP/FDV</div><div class="mv warn">0.49</div></div>
+      <div class="mc"><div class="ml">Volume 24h</div><div class="mv">$527K</div></div>
+      <div class="mc"><div class="ml">Liquidity Ratio</div><div class="mv down">15.97%</div><div class="ms">Vol/MCAP × 100</div></div>
+      <div class="mc"><div class="ml">ATH</div><div class="mv">$0.2699</div></div>
+      <div class="mc"><div class="ml">ATL</div><div class="mv">$0.006158</div></div>
+      <div class="mc"><div class="ml">From ATH</div><div class="mv down">−97.2%</div></div>
+      <div class="mc"><div class="ml">From ATL</div><div class="mv up">+7.9%</div></div>
+      <div class="mc"><div class="ml">Watchlist</div><div class="mv">4,241</div></div>
+      <div class="mc"><div class="ml">Rank</div><div class="mv">#1394</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><span class="num">03</span>Price Performance</div>
+    <div class="perf-grid">
+      <div class="perf-card"><div class="perf-period">24h</div><div class="perf-val up">+6.02%</div></div>
+      <div class="perf-card"><div class="perf-period">7 Days</div><div class="perf-val down">−13.29%</div></div>
+      <div class="perf-card"><div class="perf-period">30 Days</div><div class="perf-val down">−37.64%</div></div>
+      <div class="perf-card"><div class="perf-period">90 Days</div><div class="perf-val down">−63.78%</div></div>
+      <div class="perf-card"><div class="perf-period">YTD</div><div class="perf-val down">−71.80%</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><span class="num">04</span>Risk Matrix</div>
+    <div class="risk-grid">
+      <div class="risk-col">
+        <div class="risk-title red">🔴 Red Flags</div>
+        <div class="ri"><div class="rd red"></div>−97.2% from ATH — near total wipeout of value</div>
+        <div class="ri"><div class="rd red"></div>Only 49.4% of supply circulating — 51% still to unlock</div>
+        <div class="ri"><div class="rd red"></div>Very small MCAP of $3.3M — extreme volatility risk</div>
+        <div class="ri"><div class="rd red"></div>Weak investor lineup — no tier-1 VCs backing</div>
+        <div class="ri"><div class="rd red"></div>Team only has LinkedIn — no X Twitter presence visible</div>
+        <div class="ri"><div class="rd red"></div>Aggressive unlock curve reaching 1B tokens by 2028</div>
+        <div class="ri"><div class="rd red"></div>YTD performance of −71.8% shows severe bear pressure</div>
+        <div class="ri"><div class="rd red"></div>Low watchlist of 4,241 — limited mainstream awareness</div>
+      </div>
+      <div class="risk-col">
+        <div class="risk-title green">✅ White Flags</div>
+        <div class="ri"><div class="rd green"></div>Listed on Epic Games Store — rare mainstream distribution</div>
+        <div class="ri"><div class="rd green"></div>Max supply of 1B is defined and capped</div>
+        <div class="ri"><div class="rd green"></div>Community allocation is largest at 30% — community-first</div>
+        <div class="ri"><div class="rd green"></div>Multiple IDO launchpad participation shows early community support</div>
+        <div class="ri"><div class="rd green"></div>Blockchain gaming sector has strong long-term narrative</div>
+        <div class="ri"><div class="rd green"></div>Price near ATL — low entry point from a risk/reward perspective</div>
+        <div class="ri"><div class="rd green"></div>Built on BNB Chain — low fees and wide ecosystem access</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><span class="num">05</span>Overall Comments</div>
+    <div class="comment" style="margin-top:0;font-size:.78rem;line-height:1.8">
+      <span class="cl">📋 Summary</span>
+      World of Dypians is an ambitious blockchain gaming project with a genuine product — an MMORPG available on Epic Games Store which is a rare achievement for a crypto gaming project. However the fundamentals tell a difficult story: the token is down 97.2% from its ATH, the MCAP is only $3.3M, investor backing is weak with no tier-1 VCs, and the unlock schedule shows aggressive supply increases through 2028.<br><br>
+      The Community allocation of 30% is positive, but the combined Team (12%), Seed (8%), and Private (8.5%) allocations of 28.5% represent significant future sell pressure from insiders. The project is essentially in survival mode — the game needs to attract real players to generate buy pressure that can offset unlock dilution.<br><br>
+      <strong style="color:#fff">Bottom line:</strong> High-risk, high-reward micro-cap gaming play. Only suitable for traders with very high risk tolerance and small position sizes. The Epic Games listing is the main bullish wildcard — if the game gains traction, this could recover strongly. If not, further downside is likely.
+    </div>
+    <div style="margin-top:11px;display:flex;flex-wrap:wrap;gap:5px">
+      <span class="tag tr">🔴 −97.2% From ATH</span>
+      <span class="tag tr">🔴 Weak Investors</span>
+      <span class="tag tr">🔴 Aggressive Unlocks</span>
+      <span class="tag tr">🔴 Micro-Cap Risk</span>
+      <span class="tag tg">✅ Epic Games Listed</span>
+      <span class="tag tg">✅ Capped Supply</span>
+      <span class="tag tg">✅ 30% Community</span>
+    </div>
+    <div class="rating"><span class="rl">Overall Score</span><div class="rt"><div class="rf" style="width:45%"></div></div><span class="rs">45 / 100</span></div>
+  </div>
+</div>
+
+<!-- ===== MARKET DATA ===== -->
+<div id="tab-market" class="tab-page">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Market Overview</div>
+    <div class="g-auto">
+      <div class="mc"><div class="ml">Current Price</div><div class="mv">$0.006691</div><div class="ms down">−97.2% from ATH</div></div>
+      <div class="mc"><div class="ml">24h High</div><div class="mv">$0.006726</div></div>
+      <div class="mc"><div class="ml">24h Low</div><div class="mv">$0.006219</div></div>
+      <div class="mc"><div class="ml">Market Cap</div><div class="mv">$3.30M</div></div>
+      <div class="mc"><div class="ml">Unlocked MCAP</div><div class="mv">$3.26M</div></div>
+      <div class="mc"><div class="ml">FDV</div><div class="mv">$6.69M</div></div>
+      <div class="mc"><div class="ml">Outstanding FDV</div><div class="mv">$5.58M</div></div>
+      <div class="mc"><div class="ml">MCAP / FDV</div><div class="mv warn">0.49</div><div class="ms">51% supply still locked</div></div>
+      <div class="mc"><div class="ml">Volume 24h</div><div class="mv">$527,352</div></div>
+      <div class="mc"><div class="ml">Liquidity Ratio</div><div class="mv warn">15.97%</div><div class="ms">Vol/MCAP × 100 — High volatility signal</div></div>
+      <div class="mc"><div class="ml">Circulating Supply</div><div class="mv">494.17M WOD</div></div>
+      <div class="mc"><div class="ml">Total Supply</div><div class="mv">1.00B WOD</div></div>
+      <div class="mc"><div class="ml">Max Supply</div><div class="mv up">1.00B WOD</div><div class="ms up">Capped ✅</div></div>
+      <div class="mc"><div class="ml">% Circulating</div><div class="mv warn">49.4%</div></div>
+      <div class="mc"><div class="ml">All Time High</div><div class="mv">$0.2699</div><div class="ms">Jan 02, 2025</div></div>
+      <div class="mc"><div class="ml">All Time Low</div><div class="mv">$0.006158</div><div class="ms">Apr 29, 2026</div></div>
+      <div class="mc"><div class="ml">From ATH</div><div class="mv down">−97.2%</div></div>
+      <div class="mc"><div class="ml">From ATL</div><div class="mv up">+7.9%</div></div>
+      <div class="mc"><div class="ml">Watchlist</div><div class="mv">4,241</div></div>
+      <div class="mc"><div class="ml">Incentives (Annual)</div><div class="mv">$0</div><div class="ms">No active incentives</div></div>
+    </div>
+    <div class="comment">
+      <span class="cl">📊 Analysis</span>
+      The liquidity ratio of 15.97% is actually very high relative to market cap — meaning daily volume nearly equals 16% of the entire market cap. This signals extremely high volatility and thin markets where price can move dramatically on relatively small orders. The MCAP/FDV of 0.49 is a red flag — nearly half the supply is still yet to enter the market, creating structural dilution pressure. The ATL was just hit 3 days ago (Apr 29, 2026) which shows the token is still in price discovery at the absolute bottom with no confirmed reversal yet.
+    </div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:30%"></div></div><span class="rs">3.0 / 10</span></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><span class="num">02</span>Price Performance</div>
+    <div class="perf-grid">
+      <div class="perf-card"><div class="perf-period">24h</div><div class="perf-val up">+6.02%</div></div>
+      <div class="perf-card"><div class="perf-period">7 Days</div><div class="perf-val down">−13.29%</div></div>
+      <div class="perf-card"><div class="perf-period">30 Days</div><div class="perf-val down">−37.64%</div></div>
+      <div class="perf-card"><div class="perf-period">90 Days</div><div class="perf-val down">−63.78%</div></div>
+      <div class="perf-card"><div class="perf-period">YTD</div><div class="perf-val down">−71.80%</div></div>
+    </div>
+    <div class="comment">
+      <span class="cl">📊 Analysis</span>
+      Performance across all timeframes is deeply negative except the 24h bounce of +6.02% which follows the recent ATL hit. YTD loss of 71.8% and 90-day loss of 63.78% show consistent and severe selling pressure throughout 2026. The 30-day drop of 37.64% is particularly alarming as it shows the selling has been accelerating. The small positive 24h move does not indicate a trend reversal — it could simply be a dead cat bounce after hitting new lows.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><span class="num">03</span>Social Media</div>
+    <div class="g2">
+      <a class="social-card" href="https://x.com/WorldOfDypians" target="_blank">
+        <img class="si" src="https://i.ibb.co/SwBtvS1Z/images.png" alt="X">
+        <div><div class="sn">X (Twitter)</div><div class="ss">@WorldOfDypians</div></div>
+      </a>
+      <a class="social-card" href="https://worldofdypians.com" target="_blank">
+        <img class="si" src="https://i.ibb.co/HpfFQfZK/20260503-122850.png" alt="Website">
+        <div><div class="sn">Website</div><div class="ss">worldofdypians.com</div></div>
+      </a>
+      <a class="social-card" href="https://store.epicgames.com" target="_blank">
+        <img class="si" src="https://i.ibb.co/HpfFQfZK/20260503-122850.png" alt="Epic">
+        <div><div class="sn">Epic Games Store</div><div class="ss up">Listed ✅ — Rare achievement</div></div>
+      </a>
+    </div>
+    <div class="comment">
+      <span class="cl">📊 Analysis</span>
+      Social presence is limited compared to established crypto gaming projects. The team members primarily have LinkedIn profiles with limited X Twitter activity which is a red flag — active social engagement is critical for gaming projects that need to attract and retain players. The Epic Games Store listing is however a significant distribution channel that can bring non-crypto gamers into the ecosystem without requiring social media discovery.
+    </div>
+    <div class="rating" style="margin-top:11px"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:40%"></div></div><span class="rs">4.0 / 10</span></div>
+  </div>
+</div>
+
+<!-- ===== TOKENOMICS ===== -->
+<div id="tab-tokenomics" class="tab-page">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Token Allocation</div>
+    <table class="tbl">
+      <tr><th>Category</th><th>Allocation</th><th>Flag</th><th>Notes</th></tr>
+      <tr><td>Community</td><td>30.00%</td><td><span class="tag tg">✅ White</span></td><td>Largest allocation — community-first signal</td></tr>
+      <tr><td>Ecosystem</td><td>25.00%</td><td><span class="tag tg">✅ White</span></td><td>Protocol growth and development</td></tr>
+      <tr><td>Team</td><td>12.00%</td><td><span class="tag ty">⚠️ Caution</span></td><td>Under 20% but still notable</td></tr>
+      <tr><td>Private Sale</td><td>8.50%</td><td><span class="tag ty">⚠️ Caution</span></td><td>Early investors with low entry price</td></tr>
+      <tr><td>Liquidity</td><td>8.00%</td><td><span class="tag tg">✅ White</span></td><td>Market making support</td></tr>
+      <tr><td>Seed</td><td>8.00%</td><td><span class="tag ty">⚠️ Caution</span></td><td>Seed investors at $0.025 — big profit zone</td></tr>
+      <tr><td>Advisors</td><td>5.00%</td><td><span class="tag tb">🔵 Neutral</span></td><td>Standard advisor allocation</td></tr>
+      <tr><td>Public (IDO/IEO)</td><td>2.00%</td><td><span class="tag tg">✅ White</span></td><td>Small public allocation</td></tr>
+      <tr><td>KOL Round</td><td>1.50%</td><td><span class="tag ty">⚠️ Caution</span></td><td>Key Opinion Leaders — influencer risk</td></tr>
+    </table>
+    <div class="comment">
+      <span class="cl">📊 Analysis</span>
+      The Community (30%) + Ecosystem (25%) allocation of 55% going toward growth and users is a white flag showing the project is not insider-heavy at the top level. However the combined Seed + Private + KOL allocations of 18% all entered at prices between $0.025–$0.0425 — all significantly above current price of $0.006691, meaning these investors are deeply underwater and any recovery could trigger heavy selling at break-even. Team at 12% is below the red flag threshold of 20% — acceptable. Advisors at 5% is standard.
+    </div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:55%"></div></div><span class="rs">5.5 / 10</span></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><span class="num">02</span>Unlock Schedule</div>
+    <div class="g-auto">
+      <div class="mc"><div class="ml">Currently Circulating</div><div class="mv warn">494.17M WOD</div><div class="ms">49.4% of total</div></div>
+      <div class="mc"><div class="ml">Still Locked</div><div class="mv down">505.83M WOD</div><div class="ms">50.6% remaining</div></div>
+      <div class="mc"><div class="ml">Unlock Curve</div><div class="mv down">Aggressive</div><div class="ms">Reaches 1B by 2028</div></div>
+      <div class="mc"><div class="ml">Peak Unlock Period</div><div class="mv warn">2026–2027</div><div class="ms">Steepest part of curve</div></div>
+    </div>
+    <div class="comment">
+      <span class="cl">📊 Analysis</span>
+      The unlock curve from DefiLlama shows an aggressive S-curve from 2025 reaching the full 1B supply by approximately 2028–2029. The steepest unlock period is 2026–2027 which is exactly where we are now. This means the next 12–18 months will see the highest rate of new token supply entering the market — creating maximum dilution pressure right at the current price lows. This is a major red flag for short-term price recovery.
+    </div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:35%"></div></div><span class="rs">3.5 / 10</span></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><span class="num">03</span>Roadmap</div>
+    <div class="roadmap">
+      <div class="rmi done"><div class="rp">Feb 2023</div><div class="rm">Seed round — $2M raised at $0.025 · Valuation $25M <span class="tag tg">✅ Done</span></div></div>
+      <div class="rmi done"><div class="rp">Oct 2023</div><div class="rm">Private token sale — $2.76M raised at $0.0325 · Valuation $32.5M <span class="tag tg">✅ Done</span></div></div>
+      <div class="rmi done"><div class="rp">Nov 2024</div><div class="rm">Multi-platform IDO (Ordify, WeWay, Finceptor, Poolz) + Gate IEO — total raised ~$880K <span class="tag tg">✅ Done</span></div></div>
+      <div class="rmi done"><div class="rp">Jan 2025</div><div class="rm">ATH reached at $0.2699 — 6.46× from IDO price <span class="tag tg">✅ Done</span></div></div>
+      <div class="rmi done"><div class="rp">Apr 2026</div><div class="rm">ATL hit at $0.006158 — token at 97.7% below ATH <span class="tag tg">✅ Done</span></div></div>
+      <div class="rmi done"><div class="rp">Jun 2025</div><div class="rm">Undisclosed funding round — Castrum Capital (amount N/A) <span class="tag tg">✅ Done</span></div></div>
+      <div class="rmi soon"><div class="rp">2026</div><div class="rm">Game expansion — new zones, quests, and player economy features <span class="tag ty">⏳ In Progress</span></div></div>
+      <div class="rmi upcoming"><div class="rp">2026–2027</div><div class="rm">Aggressive token unlock period — peak dilution phase <span class="tag tr">⚠️ Risk</span></div></div>
+      <div class="rmi upcoming"><div class="rp">2027–2028</div><div class="rm">Target: full game release and mainstream player adoption from Epic Games <span class="tag tb">🔵 Target</span></div></div>
+    </div>
+    <div class="comment">
+      <span class="cl">📊 Analysis</span>
+      The roadmap shows a project that launched, peaked, and has since been in a severe drawdown. The fundraising history is solid — multiple rounds completed successfully. However the current phase of aggressive token unlocks coinciding with the price at all-time lows is the most dangerous period. The game needs to deliver meaningful updates and attract real players before the unlock pressure overwhelms any buying interest.
+    </div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:50%"></div></div><span class="rs">5.0 / 10</span></div>
+  </div>
+</div>
+
+<!-- ===== TEAM ===== -->
+<div id="tab-team" class="tab-page">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Core Team</div>
+    <div class="team-grid">
+
+      <div class="team-card">
+        <div class="t-top">
+          <img class="t-photo" src="https://i.ibb.co/HpfFQfZK/20260503-122850.png" alt="Mihai" onerror="this.src='https://i.ibb.co/HpfFQfZK/20260503-122850.png'">
+          <div><div class="t-name">Mihai Nicusor</div><div class="t-role">Founder &amp; CEO</div></div>
+        </div>
+        <div class="t-actions">
+          <button class="btn bbio" onclick="toggleBio(this)">▼ Bio</button>
+          <a class="btn bli" href="https://linkedin.com/in/mihai-nicusor" target="_blank">in LinkedIn</a>
+        </div>
+        <div class="bio-panel">Mihai Nicusor is the Founder and CEO of World of Dypians and the broader Dypius ecosystem. He has a background in blockchain development and entrepreneurship, having built the Dypius DeFi protocol before expanding into the gaming vertical with World of Dypians. He leads product vision, business development, and the overall strategic direction of the project. His focus has been on bridging traditional gaming audiences with blockchain technology through the Epic Games Store distribution partnership.</div>
+      </div>
+
+      <div class="team-card">
+        <div class="t-top">
+          <img class="t-photo" src="https://i.ibb.co/HpfFQfZK/20260503-122850.png" alt="Razvan">
+          <div><div class="t-name">Razvan Ion</div><div class="t-role">CTO</div></div>
+        </div>
+        <div class="t-actions">
+          <button class="btn bbio" onclick="toggleBio(this)">▼ Bio</button>
+          <a class="btn bli" href="https://linkedin.com/in/razvan-ion" target="_blank">in LinkedIn</a>
+        </div>
+        <div class="bio-panel">Razvan Ion serves as Chief Technology Officer at World of Dypians, overseeing all technical development including blockchain integration, smart contract architecture on BNB Chain, and the game engine backend. He has a background in software engineering and has been responsible for building the technical infrastructure that powers both the DeFi and gaming components of the Dypius ecosystem. His work on the game's on-chain economy and NFT integration is central to the project's play-to-earn mechanics.</div>
+      </div>
+
+      <div class="team-card">
+        <div class="t-top">
+          <img class="t-photo" src="https://i.ibb.co/HpfFQfZK/20260503-122850.png" alt="Teki">
+          <div><div class="t-name">Teki Kolaneci</div><div class="t-role">COO</div></div>
+        </div>
+        <div class="t-actions">
+          <button class="btn bbio" onclick="toggleBio(this)">▼ Bio</button>
+          <a class="btn bli" href="https://linkedin.com/in/teki-kolaneci" target="_blank">in LinkedIn</a>
+        </div>
+        <div class="bio-panel">Teki Kolaneci is the Chief Operating Officer responsible for day-to-day operations, team coordination, and execution of the project roadmap. He manages partnerships, community operations, and ensures the development pipeline stays on schedule. His operational role is critical during the current growth phase as World of Dypians scales its player base through the Epic Games Store and expands its in-game content and economy.</div>
+      </div>
+
+      <div class="team-card">
+        <div class="t-top">
+          <img class="t-photo" src="https://i.ibb.co/HpfFQfZK/20260503-122850.png" alt="Alex">
+          <div><div class="t-name">Alex Fatuliaj</div><div class="t-role">Advisor</div></div>
+        </div>
+        <div class="t-actions">
+          <button class="btn bbio" onclick="toggleBio(this)">▼ Bio</button>
+          <a class="btn bli" href="https://linkedin.com/in/alex-fatuliaj" target="_blank">in LinkedIn</a>
+        </div>
+        <div class="bio-panel">Alex Fatuliaj serves as an advisor to World of Dypians, bringing expertise in business strategy and blockchain ecosystem development. Advisors in the WOD structure contribute to tokenomics design, partnership sourcing, and go-to-market strategy. The team has allocated 5% of total supply to advisors reflecting their meaningful contribution to the project's development and launch phases.</div>
+      </div>
+
+      <div class="team-card">
+        <div class="t-top">
+          <img class="t-photo" src="https://i.ibb.co/HpfFQfZK/20260503-122850.png" alt="Jeff">
+          <div><div class="t-name">Jeff Nowak</div><div class="t-role">Advisor</div></div>
+        </div>
+        <div class="t-actions">
+          <button class="btn bbio" onclick="toggleBio(this)">▼ Bio</button>
+          <a class="btn bli" href="https://linkedin.com/in/jeff-nowak" target="_blank">in LinkedIn</a>
+        </div>
+        <div class="bio-panel">Jeff Nowak is an advisor to World of Dypians with a background in gaming and digital entertainment. His advisory role focuses on bridging the gap between traditional gaming industry standards and blockchain-native game design, helping WOD create a product that appeals to mainstream gamers discovering it through Epic Games Store while satisfying crypto-native users seeking play-to-earn mechanics.</div>
+      </div>
+
+      <div class="team-card">
+        <div class="t-top">
+          <img class="t-photo" src="https://i.ibb.co/HpfFQfZK/20260503-122850.png" alt="Wee Yao">
+          <div><div class="t-name">Wee Yao Liang</div><div class="t-role">Advisor</div></div>
+        </div>
+        <div class="t-actions">
+          <button class="btn bbio" onclick="toggleBio(this)">▼ Bio</button>
+          <a class="btn bli" href="https://linkedin.com/in/wee-yao-liang" target="_blank">in LinkedIn</a>
+        </div>
+        <div class="bio-panel">Wee Yao Liang is an advisor with expertise in the Southeast Asian crypto and gaming markets. His advisory contribution covers regional expansion strategy and community building in Asian markets which are among the most active in blockchain gaming. His network and experience are particularly valuable for WOD's growth in markets where play-to-earn models have historically seen the most adoption.</div>
+      </div>
+
+      <div class="team-card">
+        <div class="t-top">
+          <img class="t-photo" src="https://i.ibb.co/HpfFQfZK/20260503-122850.png" alt="Yavuz">
+          <div><div class="t-name">Yavuz Saglam</div><div class="t-role">Advisor</div></div>
+        </div>
+        <div class="t-actions">
+          <button class="btn bbio" onclick="toggleBio(this)">▼ Bio</button>
+          <a class="btn btw" href="https://x.com/yavuzsaglam" target="_blank">𝕏 Twitter</a>
+          <a class="btn bli" href="https://linkedin.com/in/yavuz-saglam" target="_blank">in LinkedIn</a>
+        </div>
+        <div class="bio-panel">Yavuz Saglam is the only advisor with a visible X Twitter presence — a positive signal compared to the rest of the team. He brings expertise in crypto marketing, community growth, and token launch strategy. His active social media presence makes him the most publicly visible member of the advisory team and likely plays a key role in WOD's social media and KOL marketing strategy.</div>
+      </div>
+
+    </div>
+    <div class="comment">
+      <span class="cl">📊 Analysis</span>
+      The team is a significant red flag area for WOD. None of the core team members (CEO, CTO, COO) have visible X Twitter accounts — only LinkedIn profiles. In the crypto gaming space, active social media presence is critical for building and maintaining community confidence. The team's identities are public which is positive, but the lack of X presence reduces transparency and community engagement. Compared to top gaming projects where founders post daily updates, WOD's team is largely invisible online. The advisor lineup includes one active Twitter user (Yavuz Saglam) but the rest are quiet.
+    </div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:45%"></div></div><span class="rs">4.5 / 10</span></div>
+  </div>
+</div>
+
+<!-- ===== INVESTORS ===== -->
+<div id="tab-investors" class="tab-page">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Funding Rounds Summary</div>
+
+    <div class="sale-card">
+      <div class="sale-header"><span class="sale-type">🌱 SEED ROUND</span><span class="sale-raised">Raised $2.00M</span></div>
+      <div class="sale-grid">
+        <div class="sale-item"><div class="sl">Date</div><div class="sv2">Feb 16, 2023</div></div>
+        <div class="sale-item"><div class="sl">Price</div><div class="sv2">$0.025</div></div>
+        <div class="sale-item"><div class="sl">Valuation</div><div class="sv2">$25.00M</div></div>
+        <div class="sale-item"><div class="sl">Current ROI</div><div class="sv2 down">−73.1%</div></div>
+        <div class="sale-item"><div class="sl">ATH ROI</div><div class="sv2 up">+997.6% (10.98×)</div></div>
+      </div>
+    </div>
+
+    <div class="sale-card">
+      <div class="sale-header"><span class="sale-type">🔒 PRIVATE TOKEN SALE</span><span class="sale-raised">Raised $2.76M</span></div>
+      <div class="sale-grid">
+        <div class="sale-item"><div class="sl">Date</div><div class="sv2">Oct 5, 2023</div></div>
+        <div class="sale-item"><div class="sl">Price</div><div class="sv2">$0.0325</div></div>
+        <div class="sale-item"><div class="sl">Valuation</div><div class="sv2">$32.50M</div></div>
+        <div class="sale-item"><div class="sl">Current ROI</div><div class="sv2 down">−79.3%</div></div>
+        <div class="sale-item"><div class="sl">ATH ROI</div><div class="sv2 up">+744.3% (8.44×)</div></div>
+      </div>
+    </div>
+
+    <div class="sale-card">
+      <div class="sale-header"><span class="sale-type">👥 KOL ROUND</span><span class="sale-raised">Raised $573.75K</span></div>
+      <div class="sale-grid">
+        <div class="sale-item"><div class="sl">Date</div><div class="sv2">TBA</div></div>
+        <div class="sale-item"><div class="sl">Price</div><div class="sv2">$0.0382</div></div>
+        <div class="sale-item"><div class="sl">Current ROI</div><div class="sv2 down">−82.4%</div></div>
+        <div class="sale-item"><div class="sl">ATH ROI</div><div class="sv2 up">+617.4% (7.17×)</div></div>
+      </div>
+    </div>
+
+    <div class="sale-card">
+      <div class="sale-header"><span class="sale-type">🚀 IEO — Gate Launchpad</span><span class="sale-raised">Raised $30K</span></div>
+      <div class="sale-grid">
+        <div class="sale-item"><div class="sl">Date</div><div class="sv2">Nov 25–27, 2024</div></div>
+        <div class="sale-item"><div class="sl">Price</div><div class="sv2">$0.0425</div></div>
+        <div class="sale-item"><div class="sl">Current ROI</div><div class="sv2 down">−84.2%</div></div>
+        <div class="sale-item"><div class="sl">ATH ROI</div><div class="sv2 up">+545.6% (6.46×)</div></div>
+      </div>
+    </div>
+
+    <div class="sale-card">
+      <div class="sale-header"><span class="sale-type">🌐 IDO — Ordify / WeWay / Finceptor / Poolz</span><span class="sale-raised">Raised ~$855K</span></div>
+      <div class="sale-grid">
+        <div class="sale-item"><div class="sl">Date</div><div class="sv2">Nov 22–27, 2024</div></div>
+        <div class="sale-item"><div class="sl">Price</div><div class="sv2">$0.0425</div></div>
+        <div class="sale-item"><div class="sl">Current ROI</div><div class="sv2 down">−84.2%</div></div>
+        <div class="sale-item"><div class="sl">ATH ROI</div><div class="sv2 up">+545.6% (6.46×)</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><span class="num">02</span>Investor Profiles</div>
+    <div class="inv-grid">
+      <div class="inv-card">
+        <div class="il">LEAD — MULTIPLE ROUNDS</div>
+        <div class="in">Castrum Capital</div>
+        <div class="ib">A crypto-focused venture fund that led both the private token sale and participated in the latest undisclosed round (Jun 2025). Castrum Capital is known for investing in early-stage blockchain gaming and DeFi projects. Their repeated investment in WOD shows continued conviction despite price decline — a mild positive signal. However they are not a tier-1 fund with the name recognition of Pantera or Lightspeed.</div>
+      </div>
+      <div class="inv-card">
+        <div class="in">IBC Ventures</div>
+        <div class="ib">IBC Ventures participated in an undisclosed funding round in October 2024. They are a blockchain-focused venture firm with investments across DeFi and gaming in the BNB Chain ecosystem. Their involvement brings some credibility to the project but again falls short of the tier-1 investor recognition that would significantly de-risk a micro-cap project.</div>
+      </div>
+    </div>
+    <div class="comment">
+      <span class="cl">📊 Analysis</span>
+      The investor lineup is the weakest part of WOD's fundamentals. With only Castrum Capital and IBC Ventures as known investors — both relatively unknown names in the broader crypto ecosystem — the project lacks the institutional credibility that tier-1 VCs like Pantera, Lightspeed, or Coinbase Ventures would provide. The multiple IDO platforms (Ordify, WeWay, Finceptor, Poolz) used for the public sale are also small-tier launchpads. Total visible fundraising is approximately $6.2M across all rounds — a very modest amount for a full MMORPG development. This investor weakness significantly increases execution risk.
+    </div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:30%"></div></div><span class="rs">3.0 / 10</span></div>
+  </div>
+</div>
+
+<!-- ===== ECOSYSTEM ===== -->
+<div id="tab-ecosystem" class="tab-page">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Use Cases</div>
+    <div class="uc-grid">
+      <div class="uci"><span class="ucn">01</span>Play-to-Earn Gaming — earn WOD through quests and gameplay</div>
+      <div class="uci"><span class="ucn">02</span>Virtual Land Ownership — buy, sell, and develop in-game land NFTs</div>
+      <div class="uci"><span class="ucn">03</span>In-Game Economy — trade items, weapons, and skins as NFTs</div>
+      <div class="uci"><span class="ucn">04</span>Staking — stake WOD tokens for passive yield rewards</div>
+      <div class="uci"><span class="ucn">05</span>DAO Governance — WOD holders vote on game development decisions</div>
+      <div class="uci"><span class="ucn">06</span>Metaverse Social Hub — virtual events, guilds, and social interaction</div>
+      <div class="uci"><span class="ucn">07</span>Dypius DeFi Integration — access to broader Dypius DeFi ecosystem</div>
+      <div class="uci"><span class="ucn">08</span>Epic Games Distribution — mainstream gaming discovery channel</div>
+    </div>
+    <div class="comment">
+      <span class="cl">📊 Analysis</span>
+      WOD has a solid set of use cases for a blockchain gaming project. The combination of play-to-earn, land ownership, NFT trading, and DAO governance covers the standard Web3 gaming toolkit. The most unique and valuable use case is the Epic Games Store listing — giving access to hundreds of millions of mainstream gamers who would never find the game through crypto channels. If even a fraction of Epic's user base tries WOD, it could generate significant organic demand for the token.
+    </div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:65%"></div></div><span class="rs">6.5 / 10</span></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><span class="num">02</span>Competitors</div>
+    <div class="comp-grid">
+      <a class="comp-card" href="https://x.com/MOBOXofficial" target="_blank">
+        <div class="cl2" style="display:flex;align-items:center;justify-content:center;font-size:1.2rem">🎮</div>
+        <div class="cn">MOBOX</div>
+        <div class="cd">BNB Chain gaming with NFT farming. Established player in the space.</div>
+      </a>
+      <a class="comp-card" href="https://x.com/ThParallel" target="_blank">
+        <div class="cl2" style="display:flex;align-items:center;justify-content:center;font-size:1.2rem">🎮</div>
+        <div class="cn">The Parallel</div>
+        <div class="cd">Sci-fi card game with strong art and narrative. AAA-quality NFT gaming.</div>
+      </a>
+      <a class="comp-card" href="https://x.com/CryptoBlades_" target="_blank">
+        <div class="cl2" style="display:flex;align-items:center;justify-content:center;font-size:1.2rem">⚔️</div>
+        <div class="cn">CryptoBlades</div>
+        <div class="cd">RPG combat game on BNB Chain. Direct genre competitor.</div>
+      </a>
+      <a class="comp-card" href="https://x.com/PlayCreoEngine" target="_blank">
+        <div class="cl2" style="display:flex;align-items:center;justify-content:center;font-size:1.2rem">🎮</div>
+        <div class="cn">Creo Engine</div>
+        <div class="cd">Mobile blockchain gaming platform with multiple games.</div>
+      </a>
+      <a class="comp-card" href="https://x.com/Manarium_io" target="_blank">
+        <div class="cl2" style="display:flex;align-items:center;justify-content:center;font-size:1.2rem">🌌</div>
+        <div class="cn">Manarium</div>
+        <div class="cd">Blockchain gaming hub with competitive mini-games.</div>
+      </a>
+      <a class="comp-card" href="https://x.com/puligames" target="_blank">
+        <div class="cl2" style="display:flex;align-items:center;justify-content:center;font-size:1.2rem">🐕</div>
+        <div class="cn">PULI</div>
+        <div class="cd">Runner game with NFT integration. Simple but active player base.</div>
+      </a>
+    </div>
+    <div class="comment">
+      <span class="cl">📊 Analysis</span>
+      WOD competes in the very crowded blockchain gaming sector where most competitors have also struggled post-2022 bear market. The key differentiator WOD holds over ALL of its listed competitors is the Epic Games Store listing — none of the listed competitors have mainstream gaming store distribution. This single advantage could become WOD's defining edge if the game quality is sufficient to retain mainstream gamers who discover it on Epic's platform.
+    </div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:60%"></div></div><span class="rs">6.0 / 10</span></div>
+  </div>
+</div>
+
+<!-- ===== TECHNICAL ===== -->
+<div id="tab-technical" class="tab-page">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Technical Analysis</div>
+    <div class="level-grid">
+      <div class="lc">
+        <div class="lt sup">🟢 Support Levels</div>
+        <div class="li2">$0.006158 <small>ATL (Apr 29, 2026)</small></div>
+        <div class="li2">$0.006000 <small>Psychological support</small></div>
+        <div class="li2">$0.005500 <small>Last resort zone</small></div>
+      </div>
+      <div class="lc">
+        <div class="lt res">🔴 Resistance Levels</div>
+        <div class="li2">$0.006708 <small>MA(30) — immediate ceiling</small></div>
+        <div class="li2">$0.008000 <small>Mid resistance</small></div>
+        <div class="li2">$0.008846 <small>MA(200) — major resistance</small></div>
+        <div class="li2">$0.010600 <small>Strong resistance zone</small></div>
+      </div>
+    </div>
+    <div class="g-auto">
+      <div class="mc"><div class="ml">RSI (14)</div><div class="mv warn">48.94 — Neutral</div></div>
+      <div class="mc"><div class="ml">MA(7)</div><div class="mv down">$0.006349</div><div class="ms">Below current price</div></div>
+      <div class="mc"><div class="ml">MA(30)</div><div class="mv down">$0.006708</div><div class="ms">Acting as resistance</div></div>
+      <div class="mc"><div class="ml">MA(200)</div><div class="mv down">$0.008846</div><div class="ms">Far above — bearish</div></div>
+      <div class="mc"><div class="ml">MACD</div><div class="mv up">+0.000034</div><div class="ms">Slight bullish signal</div></div>
+      <div class="mc"><div class="ml">Trend</div><div class="mv down">Strong Downtrend</div></div>
+    </div>
+    <div class="comment">
+      <span class="cl">📊 Analysis</span>
+      WOD is in a severe downtrend with all moving averages acting as resistance above current price. The RSI of 48.94 is neutral — not oversold despite the massive price drop, which suggests there is not yet strong buying momentum building. The MACD showing a tiny positive value (+0.000034) after the ATL hit could be an early sign of stabilization but is too small to be meaningful. Price needs to break and close above MA(30) at $0.006708 as a first bullish signal. The MA(200) at $0.008846 is the major recovery target that would confirm a trend change.
+    </div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:25%"></div></div><span class="rs">2.5 / 10</span></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><span class="num">02</span>Catalysts &amp; Entry / Exit Strategy</div>
+    <table class="tbl" style="margin-bottom:12px">
+      <tr><th>Type</th><th>Catalyst</th><th>Impact</th></tr>
+      <tr><td><span class="tag tg">Bullish</span></td><td>Epic Games viral moment — game goes trending on Epic Store</td><td>Very High</td></tr>
+      <tr><td><span class="tag tg">Bullish</span></td><td>Major game content update attracting new players</td><td>High</td></tr>
+      <tr><td><span class="tag tg">Bullish</span></td><td>New tier-1 exchange listing (Binance, Coinbase)</td><td>High</td></tr>
+      <tr><td><span class="tag tg">Bullish</span></td><td>BTC/ETH bull market returns — altcoin season lifts all boats</td><td>Very High</td></tr>
+      <tr><td><span class="tag tg">Bullish</span></td><td>New tier-1 VC investment announcement</td><td>High</td></tr>
+      <tr><td><span class="tag tr">Bearish</span></td><td>Continued aggressive token unlocks with no buyer absorption</td><td>High</td></tr>
+      <tr><td><span class="tag tr">Bearish</span></td><td>Break below ATL of $0.006158</td><td>Very High</td></tr>
+      <tr><td><span class="tag tr">Bearish</span></td><td>Game fails to retain players — low active user count</td><td>Very High</td></tr>
+      <tr><td><span class="tag tr">Bearish</span></td><td>Macro crypto downturn — micro-caps suffer most</td><td>Very High</td></tr>
+    </table>
+    <div class="g-auto">
+      <div class="mc"><div class="ml">🟢 Speculative Buy Zone</div><div class="mv up">$0.005500 – $0.006500</div></div>
+      <div class="mc"><div class="ml">🎯 Take Profit 1</div><div class="mv warn">$0.008800 – $0.010000</div></div>
+      <div class="mc"><div class="ml">🎯 Take Profit 2</div><div class="mv warn">$0.015000 – $0.020000</div></div>
+      <div class="mc"><div class="ml">🛑 Stop Loss</div><div class="mv down">Below $0.005000</div></div>
+      <div class="mc"><div class="ml">Time Horizon</div><div class="mv">12 – 24 months</div></div>
+      <div class="mc"><div class="ml">Risk Level</div><div class="mv down">VERY HIGH</div></div>
+    </div>
+    <div class="comment" style="font-size:.68rem">⚠️ Not financial advice. Educational research only. WOD is an extremely high-risk micro-cap. Position sizing should be minimal. Only invest what you are fully prepared to lose entirely.</div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><span class="num">03</span>Fundamental Scoring</div>
+    <div class="score-row"><div class="sc">Team &amp; Founders</div><div class="sw">×20%</div><div class="sb"><div class="sbf" style="width:45%"></div></div><div class="sv">4.5</div></div>
+    <div class="score-row"><div class="sc">Tokenomics</div><div class="sw">×20%</div><div class="sb"><div class="sbf" style="width:45%"></div></div><div class="sv">4.5</div></div>
+    <div class="score-row"><div class="sc">Technology / Product</div><div class="sw">×15%</div><div class="sb"><div class="sbf" style="width:65%"></div></div><div class="sv">6.5</div></div>
+    <div class="score-row"><div class="sc">Protocol Metrics</div><div class="sw">×15%</div><div class="sb"><div class="sbf" style="width:25%"></div></div><div class="sv">2.5</div></div>
+    <div class="score-row"><div class="sc">Investors / Backing</div><div class="sw">×10%</div><div class="sb"><div class="sbf" style="width:30%"></div></div><div class="sv">3.0</div></div>
+    <div class="score-row"><div class="sc">Competitors</div><div class="sw">×10%</div><div class="sb"><div class="sbf" style="width:60%"></div></div><div class="sv">6.0</div></div>
+    <div class="score-row"><div class="sc">Community</div><div class="sw">×5%</div><div class="sb"><div class="sbf" style="width:35%"></div></div><div class="sv">3.5</div></div>
+    <div class="score-row"><div class="sc">Technical (Price)</div><div class="sw">×5%</div><div class="sb"><div class="sbf" style="width:20%"></div></div><div class="sv">2.0</div></div>
+    <div class="sc-wrap" style="margin-top:18px">
+      <div class="sc-circle"><div class="sc-num">4.5</div></div>
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;color:#fff;margin-bottom:3px">Weighted Score: 45 / 100</div>
+        <div style="font-size:.68rem;color:var(--muted)">High Risk · Speculative Micro-Cap Gaming Play</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== VERDICT ===== -->
+<div id="tab-verdict" class="tab-page">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Final Verdict</div>
+    <div class="verdict-box">
+      <div class="vl">Overall Verdict</div>
+      <div class="vt">⚠️ HIGH RISK SPECULATIVE PLAY</div>
+      <div class="vd">World of Dypians is a legitimate blockchain gaming project with a real product on the Epic Games Store — but it is deeply distressed. The token is 97.2% below ATH, at a micro-cap of $3.3M, with aggressive unlocks ahead and weak institutional backing. The only true bullish wildcard is the Epic Games distribution giving access to mainstream gamers. This is strictly for high-risk traders with very small position sizes and a long time horizon. Capital preservation should come first.</div>
+      <div class="vg">
+        <div class="vi"><div class="vil">Verdict</div><div class="viv" style="color:var(--danger)">AVOID / SPECULATE TINY</div></div>
+        <div class="vi"><div class="vil">Time Horizon</div><div class="viv">12–24 Months</div></div>
+        <div class="vi"><div class="vil">Risk Level</div><div class="viv" style="color:var(--danger)">VERY HIGH</div></div>
+        <div class="vi"><div class="vil">Position Size</div><div class="viv" style="color:var(--warning)">&lt;1% Portfolio</div></div>
+        <div class="vi"><div class="vil">Fund. Score</div><div class="viv" style="color:var(--warning)">45 / 100</div></div>
+        <div class="vi"><div class="vil">Key Risk</div><div class="viv" style="color:var(--danger)">Unlock + No Adoption</div></div>
+      </div>
+    </div>
+    <div style="margin-top:13px;font-size:.6rem;color:var(--muted);text-align:center;letter-spacing:.5px;line-height:1.6">⚠️ This report is for educational and research purposes only. Not financial advice. WOD is an extremely high-risk asset. Always DYOR and never invest more than you can afford to lose entirely.</div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function showTab(name, btn) {
+  document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function toggleBio(btn) {
+  const card = btn.closest('.team-card');
+  const panel = card.querySelector('.bio-panel');
+  const isOpen = panel.classList.contains('open');
+  panel.classList.toggle('open', !isOpen);
+  btn.textContent = isOpen ? '▼ Bio' : '▲ Bio';
+  btn.classList.toggle('active', !isOpen);
+}
+</script>
+</body>
+</html>
