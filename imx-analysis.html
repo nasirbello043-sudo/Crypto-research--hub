@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IMX — Fundamental Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--blue:#0ea5e9;--accent:#38bdf8;--danger:#ff4444;--success:#00e676;--warning:#ffab00;--card:rgba(5,18,35,0.88);--border:rgba(14,165,233,0.22);--text:#e0f2fe;--muted:#7cb9e8}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Mono',monospace;color:var(--text);min-height:100vh}
+#bg{position:fixed;inset:0;background-image:url('https://i.ibb.co/4qMc50r/images-1.png');background-size:cover;background-position:center;z-index:-2}
+#bg::after{content:'';position:absolute;inset:0;background:rgba(3,10,25,0.88);z-index:-1}
+header{background:linear-gradient(180deg,rgba(3,10,30,0.98),rgba(3,10,30,0.95));border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(16px)}
+.hdr-main{display:flex;align-items:center;gap:13px;padding:13px 18px 10px;flex-wrap:wrap}
+.hdr-logo{width:46px;height:46px;border-radius:11px;object-fit:cover;border:2px solid var(--blue);box-shadow:0 0 16px rgba(14,165,233,0.5);flex-shrink:0}
+.hdr-info{flex:1;min-width:0}
+.hdr-name{font-family:'Syne',sans-serif;font-size:1.25rem;font-weight:800;color:#fff;line-height:1}
+.hdr-sub{font-size:0.58rem;color:var(--accent);letter-spacing:2.5px;text-transform:uppercase;margin-top:3px}
+.hdr-price{text-align:right;flex-shrink:0}
+.hdr-price .pv{font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:700;color:#fff}
+.hdr-price .rk{font-size:0.62rem;color:var(--accent);letter-spacing:1px;margin-top:2px}
+.contract-strip{background:rgba(0,0,0,0.45);border-top:1px solid rgba(14,165,233,0.12);padding:5px 18px;font-size:0.57rem;color:var(--muted);display:flex;align-items:center;gap:7px;overflow:hidden}
+.contract-strip span{color:var(--accent);font-size:0.59rem;word-break:break-all}
+.nav-tabs{display:flex;overflow-x:auto;border-top:1px solid var(--border);scrollbar-width:none}
+.nav-tabs::-webkit-scrollbar{display:none}
+.nav-tab{flex-shrink:0;padding:9px 15px;font-size:0.6rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;font-family:'DM Mono',monospace}
+.nav-tab:hover{color:var(--text)}
+.nav-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.hero{background:linear-gradient(135deg,rgba(14,165,233,0.12),rgba(3,10,30,0.5));border-bottom:1px solid var(--border);padding:26px 18px 20px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:400px;height:200px;background:radial-gradient(ellipse,rgba(14,165,233,0.15) 0%,transparent 70%);pointer-events:none}
+.live-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(14,165,233,0.12);border:1px solid rgba(14,165,233,0.35);border-radius:20px;padding:5px 13px;font-size:0.6rem;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+.hero-title{font-family:'Syne',sans-serif;font-size:2.6rem;font-weight:800;color:#fff;line-height:.9;letter-spacing:-1px;margin-bottom:5px}
+.hero-title span{color:var(--accent)}
+.hero-sub{font-size:0.6rem;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px}
+.contract-scroll{font-size:0.57rem;color:rgba(14,165,233,0.45);letter-spacing:.8px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;margin-bottom:18px;padding:0 10px}
+.hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:420px;margin:0 auto}
+.hs{background:rgba(0,0,0,0.32);border:1px solid var(--border);border-radius:11px;padding:13px}
+.hs .v{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;color:#fff;line-height:1}
+.hs .l{font-size:0.56rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-top:3px}
+.hs .c{font-size:0.62rem;margin-top:3px}
+.up{color:var(--success)}.down{color:var(--danger)}.warn{color:var(--warning)}
+#main{max-width:960px;margin:0 auto;padding:18px 14px 60px}
+.tab-page{display:none}
+.tab-page.active{display:block}
+.section{background:var(--card);border:1px solid var(--border);border-radius:15px;padding:18px 16px;margin-bottom:14px;backdrop-filter:blur(10px);box-shadow:0 4px 28px rgba(0,0,0,0.35)}
+.sec-title{font-family:'Syne',sans-serif;font-size:0.72rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:2.5px;display:flex;align-items:center;gap:9px;margin-bottom:14px}
+.sec-title .num{width:24px;height:24px;background:rgba(14,165,233,0.14);border:1px solid var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:var(--accent);flex-shrink:0}
+.sec-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
+.g-auto{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:9px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.mc{background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:9px;padding:11px 13px}
+.ml{font-size:0.56rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px}
+.mv{font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:700;color:#fff}
+.ms{font-size:0.6rem;color:var(--muted);margin-top:2px}
+.comment{background:rgba(14,165,233,0.07);border-left:3px solid var(--blue);border-radius:0 10px 10px 0;padding:13px 15px;margin-top:13px;font-size:0.76rem;line-height:1.75;color:var(--text)}
+.cl{font-size:0.56rem;text-transform:uppercase;letter-spacing:2px;color:var(--accent);margin-bottom:7px;display:block}
+.rating{display:flex;align-items:center;gap:11px;margin-top:11px}
+.rl{font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;white-space:nowrap}
+.rt{flex:1;height:5px;background:rgba(255,255,255,0.07);border-radius:3px;overflow:hidden}
+.rf{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--blue),var(--accent))}
+.rs{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;color:var(--accent);white-space:nowrap}
+.tbl{width:100%;border-collapse:collapse;font-size:.73rem}
+.tbl th{background:rgba(14,165,233,0.14);color:var(--accent);font-size:.58rem;text-transform:uppercase;letter-spacing:1.5px;padding:8px 11px;text-align:left;border-bottom:1px solid var(--border)}
+.tbl td{padding:8px 11px;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--text);vertical-align:middle}
+.tbl tr:nth-child(even) td{background:rgba(14,165,233,0.03)}
+.tbl tr:hover td{background:rgba(14,165,233,0.08)}
+.tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:.58rem;letter-spacing:.5px}
+.tg{background:rgba(0,230,118,0.1);color:var(--success);border:1px solid rgba(0,230,118,0.24)}
+.tr{background:rgba(255,68,68,0.11);color:#ff7777;border:1px solid rgba(255,68,68,0.24)}
+.ty{background:rgba(255,171,0,0.1);color:var(--warning);border:1px solid rgba(255,171,0,0.24)}
+.tb{background:rgba(14,165,233,0.11);color:var(--accent);border:1px solid rgba(14,165,233,0.24)}
+.social-card{display:flex;align-items:center;gap:11px;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:11px;padding:11px 13px;text-decoration:none;color:var(--text);transition:all .2s}
+.social-card:hover{border-color:var(--blue);background:rgba(14,165,233,0.09);transform:translateY(-2px)}
+.si{width:32px;height:32px;border-radius:7px;object-fit:cover}
+.sn{font-family:'Syne',sans-serif;font-size:.8rem;font-weight:700}
+.ss{font-size:.62rem;color:var(--muted);margin-top:2px}
+.team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(245px,1fr));gap:11px}
+.team-card{background:rgba(0,0,0,0.35);border:1px solid var(--border);border-radius:13px;overflow:hidden;transition:border-color .2s}
+.team-card:hover{border-color:var(--blue)}
+.t-top{display:flex;align-items:center;gap:12px;padding:14px 14px 0}
+.t-photo{width:54px;height:54px;border-radius:11px;object-fit:cover;border:2px solid var(--border);flex-shrink:0;background:rgba(14,165,233,0.1)}
+.t-name{font-family:'Syne',sans-serif;font-size:.88rem;font-weight:700;color:#fff}
+.t-role{font-size:.6rem;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-top:3px}
+.t-actions{display:flex;gap:6px;padding:9px 14px 13px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:6px;font-family:'DM Mono',monospace;font-size:.6rem;cursor:pointer;border:none;transition:all .2s;text-decoration:none;letter-spacing:.5px}
+.bbio{background:rgba(14,165,233,0.11);color:var(--accent);border:1px solid rgba(14,165,233,0.28)}
+.bbio:hover,.bbio.active{background:rgba(14,165,233,0.27);border-color:var(--blue)}
+.btw{background:rgba(255,255,255,0.06);color:#fff;border:1px solid rgba(255,255,255,0.1)}
+.btw:hover{background:rgba(255,255,255,0.11)}
+.bli{background:rgba(0,119,181,0.11);color:#5aa3d0;border:1px solid rgba(0,119,181,0.24)}
+.bli:hover{background:rgba(0,119,181,0.2)}
+.bio-panel{display:none;padding:11px 14px 14px;font-size:.72rem;line-height:1.7;color:var(--muted);border-top:1px solid var(--border);animation:fadeIn .2s ease}
+.bio-panel.open{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.inv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(188px,1fr));gap:9px}
+.inv-card{background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:11px;padding:13px;transition:all .2s}
+.inv-card:hover{border-color:var(--blue);background:rgba(14,165,233,0.06);transform:translateY(-2px)}
+.in{font-family:'Syne',sans-serif;font-size:.8rem;font-weight:700;color:#fff;margin-bottom:5px}
+.ib{font-size:.63rem;color:var(--muted);line-height:1.52}
+.il{display:inline-block;background:rgba(255,171,0,0.11);color:var(--warning);border:1px solid rgba(255,171,0,0.27);border-radius:4px;padding:1px 7px;font-size:.53rem;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.comp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:9px}
+.comp-card{background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:11px;padding:13px;text-align:center;text-decoration:none;color:var(--text);transition:all .2s;display:block}
+.comp-card:hover{border-color:var(--blue);background:rgba(14,165,233,0.07);transform:translateY(-2px)}
+.cn{font-family:'Syne',sans-serif;font-size:.75rem;font-weight:700;color:#fff;margin-bottom:3px}
+.cd{font-size:.6rem;color:var(--muted);line-height:1.4}
+.risk-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.risk-col{background:rgba(0,0,0,0.22);border-radius:11px;padding:13px}
+.risk-title{font-family:'Syne',sans-serif;font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:11px;display:flex;align-items:center;gap:6px}
+.risk-title.red{color:var(--danger)}
+.risk-title.green{color:var(--success)}
+.ri{display:flex;align-items:flex-start;gap:7px;font-size:.7rem;color:var(--text);margin-bottom:8px;line-height:1.5}
+.rd{width:6px;height:6px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.rd.red{background:var(--danger)}
+.rd.green{background:var(--success)}
+.score-row{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.sc{font-size:.68rem;color:var(--text);width:168px;flex-shrink:0}
+.sw{font-size:.56rem;color:var(--muted);width:36px;flex-shrink:0}
+.sb{flex:1;height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden}
+.sbf{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--blue),var(--accent))}
+.sv{font-family:'Syne',sans-serif;font-weight:700;font-size:.76rem;color:var(--accent);width:34px;text-align:right;flex-shrink:0}
+.roadmap{position:relative;padding-left:20px}
+.roadmap::before{content:'';position:absolute;left:6px;top:8px;bottom:8px;width:2px;background:linear-gradient(180deg,var(--blue),transparent)}
+.rmi{position:relative;margin-bottom:14px}
+.rmi::before{content:'';position:absolute;left:-16px;top:5px;width:10px;height:10px;border-radius:50%;border:2px solid var(--blue);background:#030a19}
+.rmi.done::before{background:var(--success);border-color:var(--success)}
+.rmi.soon::before{background:var(--warning);border-color:var(--warning)}
+.rmi.upcoming::before{background:var(--blue);border-color:var(--accent)}
+.rp{font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
+.rm{font-size:.75rem;color:var(--text);line-height:1.5}
+.uc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(188px,1fr));gap:7px}
+.uci{background:rgba(0,0,0,0.22);border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-size:.72rem;color:var(--text);display:flex;align-items:center;gap:7px}
+.ucn{font-family:'Syne',sans-serif;font-size:.63rem;font-weight:700;color:var(--accent);width:18px;flex-shrink:0}
+.level-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:11px}
+.lc{background:rgba(0,0,0,0.22);border-radius:9px;padding:11px 13px}
+.lt{font-size:.58rem;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:7px}
+.lt.sup{color:var(--success)}.lt.res{color:var(--danger)}
+.li2{font-family:'Syne',sans-serif;font-size:.77rem;font-weight:600;color:#fff;margin-bottom:4px}
+.li2 small{font-family:'DM Mono',monospace;font-size:.58rem;font-weight:400;color:var(--muted);margin-left:5px}
+.verdict-box{background:linear-gradient(135deg,rgba(14,165,233,0.12),rgba(3,10,30,0.6));border:1px solid var(--blue);border-radius:15px;padding:22px;text-align:center}
+.vl{font-size:.58rem;text-transform:uppercase;letter-spacing:3px;color:var(--muted);margin-bottom:7px}
+.vt{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:var(--warning);margin-bottom:9px}
+.vd{font-size:.75rem;color:var(--muted);line-height:1.7;max-width:500px;margin:0 auto 16px}
+.vg{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:8px}
+.vi{background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:9px;padding:10px 11px}
+.vil{font-size:.53rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:4px}
+.viv{font-family:'Syne',sans-serif;font-size:.8rem;font-weight:700;color:#fff}
+.sc-wrap{display:flex;align-items:center;justify-content:center;gap:18px;margin:14px 0;flex-wrap:wrap}
+.sc-circle{width:90px;height:90px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;background:conic-gradient(var(--blue) 0deg,var(--accent) 284deg,rgba(255,255,255,0.05) 284deg)}
+.sc-circle::before{content:'';position:absolute;width:70px;height:70px;border-radius:50%;background:#030a19}
+.sc-num{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;color:#fff;position:relative;z-index:1}
+.sale-card{background:rgba(0,0,0,0.28);border:1px solid var(--border);border-radius:11px;padding:13px;margin-bottom:9px}
+.sale-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px}
+.sale-type{font-family:'Syne',sans-serif;font-size:.75rem;font-weight:700;color:#fff}
+.sale-raised{font-family:'Syne',sans-serif;font-size:.75rem;font-weight:700;color:var(--success)}
+.sale-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sale-item .sl{font-size:.55rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
+.sale-item .sv2{font-family:'Syne',sans-serif;font-size:.78rem;font-weight:700;color:#fff}
+.perf-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px}
+.perf-card{background:rgba(0,0,0,0.28);border:1px solid var(--border);border-radius:9px;padding:10px;text-align:center}
+.perf-period{font-size:.55rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.perf-val{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700}
+.proto-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:9px}
+.pc{background:rgba(0,0,0,0.28);border:1px solid var(--border);border-radius:9px;padding:11px 13px}
+.pl{font-size:.56rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px}
+.pv2{font-family:'Syne',sans-serif;font-size:.88rem;font-weight:700;color:#fff}
+.ps{font-size:.58rem;margin-top:2px}
+.sp{display:inline-block;padding:4px 12px;border-radius:18px;font-size:.65rem;margin:3px}
+.sb2{background:rgba(0,230,118,0.09);color:var(--success);border:1px solid rgba(0,230,118,0.22)}
+.sbe{background:rgba(255,68,68,0.09);color:var(--danger);border:1px solid rgba(255,68,68,0.22)}
+.sn2{background:rgba(255,171,0,0.09);color:var(--warning);border:1px solid rgba(255,171,0,0.22)}
+@media(max-width:560px){.risk-grid{grid-template-columns:1fr}.level-grid{grid-template-columns:1fr}.g2{grid-template-columns:1fr}.hero-title{font-size:2rem}.sc{width:115px}.perf-grid{grid-template-columns:repeat(3,1fr)}.sale-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div id="bg"></div>
+<header>
+  <div class="hdr-main">
+    <img class="hdr-logo" src="https://i.ibb.co/4qMc50r/images-1.png" alt="IMX">
+    <div class="hdr-info">
+      <div class="hdr-name">Immutable (IMX)</div>
+      <div class="hdr-sub">Fundamental Analysis · May 2026</div>
+    </div>
+    <div class="hdr-price">
+      <div class="pv">$0.1744</div>
+      <div class="rk">RANK #108</div>
+    </div>
+  </div>
+  <div class="contract-strip">
+    <span style="color:var(--muted);flex-shrink:0">CONTRACT (ETH):</span>
+    <span>0xf57e7e7c23978c3caec3c3548e3d615c346e79ff</span>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showTab('overview',this)">Overview</button>
+    <button class="nav-tab" onclick="showTab('market',this)">Market Data</button>
+    <button class="nav-tab" onclick="showTab('tokenomics',this)">Tokenomics</button>
+    <button class="nav-tab" onclick="showTab('team',this)">Team</button>
+    <button class="nav-tab" onclick="showTab('investors',this)">Investors</button>
+    <button class="nav-tab" onclick="showTab('ecosystem',this)">Ecosystem</button>
+    <button class="nav-tab" onclick="showTab('technical',this)">Technical</button>
+    <button class="nav-tab" onclick="showTab('verdict',this)">Verdict</button>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="live-badge"><div class="live-dot"></div>Live Fundamental Analysis · May 2026</div>
+  <div class="hero-title">IMMU<span>TABLE</span></div>
+  <div class="hero-sub">Ethereum Layer 2 · NFT &amp; Gaming Infrastructure · ZK-Rollup</div>
+  <div class="contract-scroll">0xf57e7e7c23978c3caec3c3548e3d615c346e79ff</div>
+  <div class="hero-stats">
+    <div class="hs"><div class="v">$0.1744</div><div class="l">Current Price</div><div class="c up">▲ 2.36% 24h</div></div>
+    <div class="hs"><div class="v">$348.43M</div><div class="l">Market Cap</div><div class="c" style="color:var(--accent)">Rank #108</div></div>
+    <div class="hs"><div class="v">$322.38M</div><div class="l">Total Raised</div><div class="c up">Valuation $2.50B</div></div>
+    <div class="hs"><div class="v">$9.52</div><div class="l">All-Time High</div><div class="c" style="color:var(--muted)">Nov 26, 2021</div></div>
+  </div>
+</div>
+
+<div id="main">
+
+<!-- OVERVIEW -->
+<div id="tab-overview" class="tab-page active">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Project Overview</div>
+    <div class="comment" style="margin-top:0">
+      <span class="cl">What is Immutable (IMX)?</span>
+      Immutable is the first Layer 2 scaling solution built exclusively for NFTs and blockchain gaming on Ethereum. It uses ZK-Rollup technology to deliver 9,000+ transactions per second with zero gas fees for NFT minting and trading, while fully inheriting Ethereum's security. The platform launched Immutable zkEVM — a fully EVM-compatible ZK-rollup chain purpose-built for gaming studios. Games like Gods Unchained, Guild of Guardians, and Illuvium are built on the platform. The IMX token is used for fees, staking, and governance — 20% of all protocol fees must be paid in IMX, creating consistent buy pressure as the ecosystem grows.
+    </div>
+  </div>
+  <div class="section">
+    <div class="sec-title"><span class="num">02</span>Key Stats</div>
+    <div class="g-auto">
+      <div class="mc"><div class="ml">Price</div><div class="mv">$0.1744</div></div>
+      <div class="mc"><div class="ml">Market Cap</div><div class="mv">$348.43M</div></div>
+      <div class="mc"><div class="ml">FDV</div><div class="mv up">$348.43M</div><div class="ms up">MCAP = FDV ✅</div></div>
+      <div class="mc"><div class="ml">MCAP/FDV</div><div class="mv up">1.00</div><div class="ms up">No dilution risk</div></div>
+      <div class="mc"><div class="ml">Volume 24h</div><div class="mv">$25.57M</div></div>
+      <div class="mc"><div class="ml">Liquidity Ratio</div><div class="mv warn">7.34%</div><div class="ms">Vol/MCAP × 100</div></div>
+      <div class="mc"><div class="ml">Circ. Supply</div><div class="mv up">2.00B IMX</div></div>
+      <div class="mc"><div class="ml">% Circulating</div><div class="mv up">100%</div><div class="ms up">Fully distributed ✅</div></div>
+      <div class="mc"><div class="ml">ATH</div><div class="mv">$9.52</div><div class="ms">Nov 26, 2021</div></div>
+      <div class="mc"><div class="ml">From ATH</div><div class="mv down">−98.2%</div></div>
+      <div class="mc"><div class="ml">ATL</div><div class="mv">$0.1305</div><div class="ms">Apr 05, 2026</div></div>
+      <div class="mc"><div class="ml">From ATL</div><div class="mv up">+34.0%</div></div>
+      <div class="mc"><div class="ml">TVL</div><div class="mv">$569,724</div></div>
+      <div class="mc"><div class="ml">FDV/TVL</div><div class="mv down">614.01×</div></div>
+      <div class="mc"><div class="ml">Fees 24h</div><div class="mv up">$7.13K</div></div>
+      <div class="mc"><div class="ml">Watchlist</div><div class="mv">149,213</div></div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="sec-title"><span class="num">03</span>Risk Matrix</div>
+    <div class="risk-grid">
+      <div class="risk-col">
+        <div class="risk-title red">🔴 Red Flags</div>
+        <div class="ri"><div class="rd red"></div>−98.2% from ATH of $9.52 — severe long-term drawdown</div>
+        <div class="ri"><div class="rd red"></div>TVL only $569K — very low protocol usage vs $348M MCAP</div>
+        <div class="ri"><div class="rd red"></div>FDV/TVL ratio of 614× — massively overvalued vs on-chain activity</div>
+        <div class="ri"><div class="rd red"></div>Fees only $7.13K/day — low revenue for its market cap size</div>
+        <div class="ri"><div class="rd red"></div>NFT market remains deeply bearish — core revenue driver depressed</div>
+        <div class="ri"><div class="rd red"></div>YTD still −31.5% despite recent ATL recovery bounce</div>
+        <div class="ri"><div class="rd red"></div>Alameda Research historical investor association</div>
+      </div>
+      <div class="risk-col">
+        <div class="risk-title green">✅ White Flags</div>
+        <div class="ri"><div class="rd green"></div>100% circulating supply — zero unlock pressure remaining</div>
+        <div class="ri"><div class="rd green"></div>MCAP = FDV — no hidden dilution, fully priced in</div>
+        <div class="ri"><div class="rd green"></div>Temasek-led $200M raise — Singapore sovereign wealth fund</div>
+        <div class="ri"><div class="rd green"></div>Coinbase Ventures, Animoca, Galaxy Digital, Tencent backing</div>
+        <div class="ri"><div class="rd green"></div>Forbes 30 Under 30 founding brothers — fully public team</div>
+        <div class="ri"><div class="rd green"></div>ZK-rollup technology — superior security vs optimistic rollups</div>
+        <div class="ri"><div class="rd green"></div>+34% recovery from ATL shows accumulation building</div>
+        <div class="ri"><div class="rd green"></div>Price above all MAs — bullish technical alignment</div>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="sec-title"><span class="num">04</span>Overall Comments</div>
+    <div class="comment" style="margin-top:0;font-size:.78rem;line-height:1.8">
+      <span class="cl">📋 Summary</span>
+      Immutable is one of the best-funded and technically advanced NFT gaming blockchain projects in crypto. Founded by Forbes 30 Under 30 brothers with $322M raised from Singapore's sovereign wealth fund Temasek, Coinbase Ventures, Animoca Brands, Tencent, and Galaxy Digital — the investor quality is exceptional and rivals the very best in the industry.<br><br>
+      The biggest structural concern is the massive gap between market cap ($348M) and actual protocol usage ($569K TVL, $7K/day fees). The NFT market downturn has hit Immutable's core revenue stream hard and the −98.2% from ATH reflects this reality. However the 100% circulating supply is a key differentiator — there is zero future unlock pressure. Every IMX token is already on the market meaning no insider overhang exists.<br><br>
+      <strong style="color:#fff">Bottom line:</strong> Strong fundamentals, weak current adoption metrics. This is a bet on the NFT gaming market recovery. The technical setup is bullish — price above all moving averages for the first time in months. A quality accumulation candidate near ATL for patient traders with 12–36 month horizon.
+    </div>
+    <div style="margin-top:11px;display:flex;flex-wrap:wrap;gap:5px">
+      <span class="tag tr">🔴 −98.2% From ATH</span>
+      <span class="tag tr">🔴 Low TVL vs MCAP</span>
+      <span class="tag tr">🔴 NFT Bear Market</span>
+      <span class="tag tg">✅ 100% Circulating</span>
+      <span class="tag tg">✅ Temasek / Tencent</span>
+      <span class="tag tg">✅ ZK-Rollup Tech</span>
+      <span class="tag tg">✅ Forbes 30U30 Team</span>
+      <span class="tag tg">✅ $322M Raised</span>
+    </div>
+    <div class="rating"><span class="rl">Overall Score</span><div class="rt"><div class="rf" style="width:64%"></div></div><span class="rs">64 / 100</span></div>
+  </div>
+</div>
+
+<!-- MARKET DATA -->
+<div id="tab-market" class="tab-page">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Market Overview</div>
+    <div class="g-auto">
+      <div class="mc"><div class="ml">Current Price</div><div class="mv">$0.1744</div><div class="ms up">▲ 2.36% 24h</div></div>
+      <div class="mc"><div class="ml">24h High</div><div class="mv">$0.1766</div></div>
+      <div class="mc"><div class="ml">24h Low</div><div class="mv">$0.1694</div></div>
+      <div class="mc"><div class="ml">Market Cap</div><div class="mv">$348.43M</div></div>
+      <div class="mc"><div class="ml">Unlocked MCAP</div><div class="mv up">$348.43M</div><div class="ms up">100% liquid</div></div>
+      <div class="mc"><div class="ml">FDV</div><div class="mv up">$348.43M</div><div class="ms up">= MCAP ✅</div></div>
+      <div class="mc"><div class="ml">MCAP / FDV</div><div class="mv up">1.00</div><div class="ms up">Zero dilution risk</div></div>
+      <div class="mc"><div class="ml">Volume 24h</div><div class="mv">$25.57M</div></div>
+      <div class="mc"><div class="ml">Liquidity Ratio</div><div class="mv warn">7.34%</div><div class="ms">Vol/MCAP × 100</div></div>
+      <div class="mc"><div class="ml">Circulating Supply</div><div class="mv up">2.00B IMX</div></div>
+      <div class="mc"><div class="ml">Total Supply</div><div class="mv">2.00B IMX</div></div>
+      <div class="mc"><div class="ml">Max Supply</div><div class="mv up">2.00B IMX</div><div class="ms up">Capped ✅</div></div>
+      <div class="mc"><div class="ml">% Circulating</div><div class="mv up">100%</div></div>
+      <div class="mc"><div class="ml">All Time High</div><div class="mv">$9.52</div><div class="ms">Nov 26, 2021</div></div>
+      <div class="mc"><div class="ml">All Time Low</div><div class="mv">$0.1305</div><div class="ms">Apr 05, 2026</div></div>
+      <div class="mc"><div class="ml">From ATH</div><div class="mv down">−98.2%</div></div>
+      <div class="mc"><div class="ml">From ATL</div><div class="mv up">+34.0%</div></div>
+      <div class="mc"><div class="ml">Watchlist</div><div class="mv">149,213</div></div>
+      <div class="mc"><div class="ml">Open Interest</div><div class="mv">$36.53M</div></div>
+    </div>
+    <div class="comment">
+      <span class="cl">📊 Analysis</span>
+      The most significant positive here is MCAP = FDV = 1.00 meaning 100% of all 2B IMX tokens are already circulating. There is zero future dilution — no insiders waiting to dump locked tokens. This is a massive white flag that separates IMX from most crypto projects. The liquidity ratio of 7.34% is moderate and acceptable. The FDV/TVL ratio of 614× is a red flag showing the protocol is significantly overvalued relative to actual on-chain activity — meaning the price is pricing in future growth not yet realized.
+    </div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:65%"></div></div><span class="rs">6.5 / 10</span></div>
+  </div>
+  <div class="section">
+    <div class="sec-title"><span class="num">02</span>Price Performance</div>
+    <div class="perf-grid">
+      <div class="perf-card"><div class="perf-period">24h</div><div class="perf-val up">+2.36%</div></div>
+      <div class="perf-card"><div class="perf-period">7 Days</div><div class="perf-val up">+6.58%</div></div>
+      <div class="perf-card"><div class="perf-period">30 Days</div><div class="perf-val up">+26.28%</div></div>
+      <div class="perf-card"><div class="perf-period">90 Days</div><div class="perf-val up">+10.00%</div></div>
+      <div class="perf-card"><div class="perf-period">YTD</div><div class="perf-val down">−31.50%</div></div>
+    </div>
+    <div class="comment">
+      <span class="cl">📊 Analysis</span>
+      Short-term performance is a white flag — positive across 24h, 7d, 30d, and 90d showing genuine momentum building from the ATL of $0.1305 hit on April 5, 2026. The +26.28% in 30 days is strong and suggests buyers are stepping in at these levels. The YTD of −31.5% reflects earlier bear pressure but the trend is visibly reversing. This is the best short-term performance data IMX has shown in over a year.
+    </div>
+  </div>
+  <div class="section">
+    <div class="sec-title"><span class="num">03</span>Protocol / Revenue Metrics</div>
+    <div class="proto-grid">
+      <div class="pc"><div class="pl">TVL</div><div class="pv2">$569,724</div><div class="ps down">Low vs $348M MCAP</div></div>
+      <div class="pc"><div class="pl">Fees 24h</div><div class="pv2">$7.13K</div><div class="ps up">+3.9%</div></div>
+      <div class="pc"><div class="pl">Revenue 24h</div><div class="pv2">$7.13K</div><div class="ps up">+3.9%</div></div>
+      <div class="pc"><div class="pl">FDV / TVL</div><div class="pv2 down">614.01×</div><div class="ps down">Growth priced in</div></div>
+      <div class="pc"><div class="pl">DEX Volume 24h</div><div class="pv2">$107,490</div><div class="ps">On-chain</div></div>
+      <div class="pc"><div class="pl">Open Interest</div><div class="pv2">$36.53M</div><div class="ps">Perps OI</div></div>
+      <div class="pc"><div class="pl">CMC Volume 24h</div><div class="pv2">$25.57M</div><div class="ps">All exchanges</div></div>
+      <div class="pc"><div class="pl">DefiLlama Vol 24h</div><div class="pv2">$84.13M</div><div class="ps">Broader measure</div></div>
+    </div>
+    <div class="comment">
+      <span class="cl">📊 Analysis</span>
+      Protocol metrics reveal the core challenge — $569K TVL for a $348M MCAP gives a FDV/TVL of 614× meaning the market is pricing in massive future growth. Daily fees of $7.13K are growing (+3.9%) which is encouraging but modest. This is strictly a narrative and momentum play — not a value play based on current on-chain fundamentals. The bet is on NFT gaming adoption recovering and protocol fees multiplying as new games launch on Immutable zkEVM.
+    </div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:45%"></div></div><span class="rs">4.5 / 10</span></div>
+  </div>
+  <div class="section">
+    <div class="sec-title"><span class="num">04</span>Social Media</div>
+    <div class="g2">
+      <a class="social-card" href="https://x.com/Immutable" target="_blank"><img class="si" src="https://i.ibb.co/SwBtvS1Z/images.png" alt="X"><div><div class="sn">X (Twitter)</div><div class="ss">@Immutable · 500K+ Followers</div></div></a>
+      <a class="social-card" href="https://discord.gg/immutable" target="_blank"><img class="si" src="https://i.ibb.co/4qMc50r/images-1.png" alt="Discord"><div><div class="sn">Discord</div><div class="ss">Large Active Community</div></div></a>
+      <a class="social-card" href="https://immutable.com" target="_blank"><img class="si" src="https://i.ibb.co/4qMc50r/images-1.png" alt="Web"><div><div class="sn">Website</div><div class="ss">immutable.com</div></div></a>
+      <a class="social-card" href="https://t.me/immutable" target="_blank"><img class="si" src="https://i.ibb.co/rR07xjGc/images.jpg" alt="TG"><div><div class="sn">Telegram</div><div class="ss">Official Community</div></div></a>
+    </div>
+    <div class="comment">
+      <span class="cl">📊 Analysis</span>
+      Immutable has a strong social presence with 500K+ Twitter followers. Both James and Robbie Ferguson post regularly with project updates and ecosystem news — a white flag showing transparent, active leadership. The 149,213 CoinGecko watchlist shows broad awareness. Community is healthy and engaged despite the bear market in NFT prices.
+    </div>
+    <div class="rating" style="margin-top:11px"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:80%"></div></div><span class="rs">8.0 / 10</span></div>
+  </div>
+</div>
+
+<!-- TOKENOMICS -->
+<div id="tab-tokenomics" class="tab-page">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Token Allocation</div>
+    <table class="tbl">
+      <tr><th>Category</th><th>%</th><th>Amount</th><th>Vesting</th><th>Flag</th></tr>
+      <tr><td>Ecosystem Development</td><td>51.74%</td><td>1.03B IMX</td><td>Rewards, grants, liquidity</td><td><span class="tag tg">✅ White</span></td></tr>
+      <tr><td>Project Development</td><td>25.00%</td><td>500M IMX</td><td>Fully unlocked</td><td><span class="tag ty">⚠️ Caution</span></td></tr>
+      <tr><td>Private Sale</td><td>14.26%</td><td>285.2M IMX</td><td>1yr cliff, 2yr monthly — completed</td><td><span class="tag tg">✅ White</span></td></tr>
+      <tr><td>Public Sale 1</td><td>2.94%</td><td>58.8M IMX</td><td>6-month unlock — completed</td><td><span class="tag tg">✅ White</span></td></tr>
+      <tr><td>Public Sale 2</td><td>2.48%</td><td>49.6M IMX</td><td>3-month unlock — completed</td><td><span class="tag tg">✅ White</span></td></tr>
+      <tr><td>Foundation Reserve</td><td>4.00%</td><td>80M IMX</td><td>1yr cliff, 4yr monthly — completed</td><td><span class="tag tb">🔵 Neutral</span></td></tr>
+    </table>
+    <div class="comment">
+      <span class="cl">📊 Analysis</span>
+      The single most important fact about IMX tokenomics: ALL vesting schedules have completed. 100% of supply is circulating — meaning zero future sell pressure from any category. This is an exceptional white flag. Ecosystem Development at 51.74% going toward user rewards and developer grants is community-first. Project Development at 25% is above the 20% caution threshold but since it's fully unlocked it carries no future risk. Private Sale investors at 14.26% have had years to exit — their 2-year vesting completed long ago.
+    </div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:82%"></div></div><span class="rs">8.2 / 10</span></div>
+  </div>
+  <div class="section">
+    <div class="sec-title"><span class="num">02</span>Distribution Progress</div>
+    <div class="g-auto">
+      <div class="mc"><div class="ml">Total Circulating</div><div class="mv up">2.00B IMX</div><div class="ms up">100% — all distributed</div></div>
+      <div class="mc"><div class="ml">Still Locked</div><div class="mv up">0 IMX</div><div class="ms up">Zero unlock pressure ✅</div></div>
+      <div class="mc"><div class="ml">Sell Pressure</div><div class="mv up">NONE</div><div class="ms up">All vesting complete ✅</div></div>
+      <div class="mc"><div class="ml">Next Unlock</div><div class="mv up">None</div><div class="ms up">Fully distributed ✅</div></div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="sec-title"><span class="num">03</span>Roadmap</div>
+    <div class="roadmap">
+      <div class="rmi done"><div class="rp">2018</div><div class="rm">Immutable founded. Seed round raised — early research into NFT L2 scaling <span class="tag tg">✅ Done</span></div></div>
+      <div class="rmi done"><div class="rp">Sep 2019</div><div class="rm">$15M Series A raised — Coinbase, Naspers, Galaxy Digital among investors <span class="tag tg">✅ Done</span></div></div>
+      <div class="rmi done"><div class="rp">Apr 2021</div><div class="rm">Immutable X mainnet — first ZK-rollup NFT platform on Ethereum goes live <span class="tag tg">✅ Done</span></div></div>
+      <div class="rmi done"><div class="rp">Nov 2021</div><div class="rm">ATH $9.52 reached. IMX token TGE — IEO on HTX and ICO on Coinlist <span class="tag tg">✅ Done</span></div></div>
+      <div class="rmi done"><div class="rp">Mar 2022</div><div class="rm">$200M raise led by Temasek — $2.50B valuation. Largest gaming blockchain raise <span class="tag tg">✅ Done</span></div></div>
+      <div class="rmi done"><div class="rp">2023</div><div class="rm">Immutable zkEVM announced — EVM-compatible ZK chain for gaming studios <span class="tag tg">✅ Done</span></div></div>
+      <div class="rmi done"><div class="rp">Dec 2023</div><div class="rm">Framework Ventures strategic round — continued institutional conviction <span class="tag tg">✅ Done</span></div></div>
+      <div class="rmi done"><div class="rp">2024</div><div class="rm">Immutable zkEVM mainnet live — multiple AAA gaming partnerships confirmed <span class="tag tg">✅ Done</span></div></div>
+      <div class="rmi done"><div class="rp">Apr 2026</div><div class="rm">ATL of $0.1305 — strong accumulation zone established, +34% recovery begins <span class="tag tg">✅ Done</span></div></div>
+      <div class="rmi soon"><div class="rp">2026</div><div class="rm">Major AAA game launches on Immutable zkEVM targeting mainstream gamers <span class="tag ty">⏳ In Progress</span></div></div>
+      <div class="rmi upcoming"><div class="rp">2026–2027</div><div class="rm">NFT marketplace expansion — targeting top gaming companies globally <span class="tag tb">🔵 Upcoming</span></div></div>
+      <div class="rmi upcoming"><div class="rp">2027+</div><div class="rm">Target: become the default blockchain for mainstream gaming NFTs globally <span class="tag tb">🔵 Long-term</span></div></div>
+    </div>
+    <div class="comment">
+      <span class="cl">📊 Analysis</span>
+      Immutable has delivered consistently on its roadmap over 7+ years — from mainnet launch to the historic $200M Temasek raise to Immutable zkEVM. The project has built real, battle-tested infrastructure. The current phase requires converting that infrastructure into mass adoption. The technology is ready — the gaming NFT market needs to cooperate. The long-term vision of becoming the default NFT gaming blockchain remains intact and credible.
+    </div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:82%"></div></div><span class="rs">8.2 / 10</span></div>
+  </div>
+</div>
+
+<!-- TEAM -->
+<div id="tab-team" class="tab-page">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Core Team</div>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="t-top"><img class="t-photo" src="https://i.ibb.co/1S7Js7x/images-7.jpg" alt="James" onerror="this.src='https://i.ibb.co/4qMc50r/images-1.png'"><div><div class="t-name">James Ferguson</div><div class="t-role">Co-Founder &amp; CEO</div></div></div>
+        <div class="t-actions"><button class="btn bbio" onclick="toggleBio(this)">▼ Bio</button><a class="btn btw" href="https://x.com/JamesFerguson_X" target="_blank">𝕏 Twitter</a><a class="btn bli" href="https://linkedin.com/in/jamesferguson" target="_blank">in LinkedIn</a></div>
+        <div class="bio-panel">Forbes 30 Under 30 entrepreneur and CEO of Immutable. Before founding Immutable, he led a software development team at a billion-dollar eCommerce company, building expertise in scalable infrastructure. He co-founded Immutable with his brother Robbie after identifying Ethereum's core limitations for NFT applications. Under his leadership Immutable has raised $322M, achieved a $2.5B valuation, attracted AAA gaming partners, and built Immutable zkEVM — the first EVM-compatible ZK-rollup purpose-built for gaming. Extremely active on X Twitter, posting regularly about blockchain gaming, ecosystem updates, and product developments.</div>
+      </div>
+      <div class="team-card">
+        <div class="t-top"><img class="t-photo" src="https://i.ibb.co/PZ733ZgH/images-8.jpg" alt="Alex" onerror="this.src='https://i.ibb.co/4qMc50r/images-1.png'"><div><div class="t-name">Alex Connolly</div><div class="t-role">Co-Founder &amp; CTO</div></div></div>
+        <div class="t-actions"><button class="btn bbio" onclick="toggleBio(this)">▼ Bio</button><a class="btn btw" href="https://x.com/AlexConnolly_" target="_blank">𝕏 Twitter</a><a class="btn bli" href="https://linkedin.com/in/alexconnolly" target="_blank">in LinkedIn</a></div>
+        <div class="bio-panel">Co-Founder and CTO of Immutable responsible for all technical architecture and engineering direction. He is the principal architect behind Immutable X's ZK-rollup design and the more recent Immutable zkEVM which brought full EVM compatibility to the platform. With deep expertise in distributed systems and cryptography, Alex leads a team of 100+ engineers from blockchain, FAANG, and fintech backgrounds. His early bet on ZK-rollups over optimistic rollups is now validated as the superior security model — assets traded on the L2 with validity proof stored on Ethereum mainnet making 51% attacks unfeasible.</div>
+      </div>
+      <div class="team-card">
+        <div class="t-top"><img class="t-photo" src="https://i.ibb.co/dw61ks4x/images-9.jpg" alt="Robbie" onerror="this.src='https://i.ibb.co/4qMc50r/images-1.png'"><div><div class="t-name">Robbie Ferguson</div><div class="t-role">Co-Founder &amp; President</div></div></div>
+        <div class="t-actions"><button class="btn bbio" onclick="toggleBio(this)">▼ Bio</button><a class="btn btw" href="https://x.com/RobbieFerguson_" target="_blank">𝕏 Twitter</a><a class="btn bli" href="https://linkedin.com/in/robbieferguson" target="_blank">in LinkedIn</a></div>
+        <div class="bio-panel">Forbes 30 Under 30 entrepreneur and Thiel Fellow — one of the most prestigious entrepreneurship fellowships globally, funded by Peter Thiel. As President of Immutable he oversees partnerships, ecosystem development, and business strategy. He secured deals with major gaming companies and built the Immutable Games Studio which creates first-party titles like Gods Unchained. His Thiel Fellowship and Forbes recognition give Immutable credibility in both traditional tech and crypto circles. He is one of the most vocal blockchain gaming advocates globally and posts regularly on X Twitter.</div>
+      </div>
+      <div class="team-card">
+        <div class="t-top"><img class="t-photo" src="https://i.ibb.co/vfQdWZn/1749543098410.jpg" alt="David" onerror="this.src='https://i.ibb.co/4qMc50r/images-1.png'"><div><div class="t-name">David Bicknell</div><div class="t-role">CFO</div></div></div>
+        <div class="t-actions"><button class="btn bbio" onclick="toggleBio(this)">▼ Bio</button><a class="btn btw" href="https://x.com/DavidBicknell_" target="_blank">𝕏 Twitter</a><a class="btn bli" href="https://linkedin.com/in/davidbicknell" target="_blank">in LinkedIn</a></div>
+        <div class="bio-panel">Chief Financial Officer at Immutable overseeing financial strategy, treasury management, and investor relations. His background spans traditional finance and technology, bringing institutional-grade financial governance to the company. With $322M raised across multiple rounds and a $2.5B peak valuation, David manages Immutable's substantial treasury to ensure the company has the runway to execute its long-term gaming infrastructure vision regardless of market conditions. Critical role given the current NFT bear market — ensuring operational sustainability through the cycle.</div>
+      </div>
+      <div class="team-card">
+        <div class="t-top"><img class="t-photo" src="https://i.ibb.co/v4qf4Knm/images-10.jpg" alt="Gillian" onerror="this.src='https://i.ibb.co/4qMc50r/images-1.png'"><div><div class="t-name">Gillian Findlay</div><div class="t-role">COO</div></div></div>
+        <div class="t-actions"><button class="btn bbio" onclick="toggleBio(this)">▼ Bio</button><a class="btn btw" href="https://x.com/GillianFindlay_" target="_blank">𝕏 Twitter</a><a class="btn bli" href="https://linkedin.com/in/gillianfindlay" target="_blank">in LinkedIn</a></div>
+        <div class="bio-panel">Chief Operating Officer at Immutable responsible for day-to-day operations across a global team of 100+ employees. Her operational leadership ensures engineering, business development, marketing, and partnerships teams execute cohesively. She brings operational expertise from high-growth technology companies and plays a central role in scaling the organization to support its growing portfolio of gaming partnerships on Immutable zkEVM. As COO she also oversees the transition from Immutable X to the zkEVM architecture ensuring continuity for existing game developers and partners.</div>
+      </div>
+      <div class="team-card">
+        <div class="t-top"><img class="t-photo" src="https://i.ibb.co/V0DWRhvF/20260506-172826.jpg" alt="Justin" onerror="this.src='https://i.ibb.co/4qMc50r/images-1.png'"><div><div class="t-name">G. Justin Hulog</div><div class="t-role">Chief Marketing Officer</div></div></div>
+        <div class="t-actions"><button class="btn bbio" onclick="toggleBio(this)">▼ Bio</button><a class="btn btw" href="https://x.com/justinhulog" target="_blank">𝕏 Twitter</a><a class="btn bli" href="https://linkedin.com/in/gjustinhulog" target="_blank">in LinkedIn</a></div>
+        <div class="bio-panel">Chief Marketing Officer at Immutable leading global brand strategy, developer marketing, and player acquisition. He has extensive experience in the gaming industry having worked with major gaming publishers before transitioning to blockchain gaming. His focus at Immutable is bridging traditional gaming audiences and Web3 — ensuring marketing speaks to both crypto-native users and mainstream gamers discovering blockchain through game titles built on the platform. His gaming industry network is particularly valuable for onboarding AAA studios to Immutable zkEVM.</div>
+      </div>
+    </div>
+    <div class="comment">
+      <span class="cl">📊 Analysis</span>
+      The Immutable team is one of the strongest in blockchain gaming. Two Forbes 30 Under 30 co-founders, a Thiel Fellow, and 100+ employees from FAANG, finance, and blockchain. All three co-founders are fully public, verifiable, and extremely active on X Twitter — a major white flag. The C-suite covers CEO, CTO, President, CFO, COO, and CMO — showing mature, complete organizational structure. The Ferguson brothers' combined network directly enabled the Temasek, Coinbase Ventures, Animoca, and Tencent relationships.
+    </div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:90%"></div></div><span class="rs">9.0 / 10</span></div>
+  </div>
+</div>
+
+<!-- INVESTORS -->
+<div id="tab-investors" class="tab-page">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Funding Overview</div>
+    <div class="g-auto">
+      <div class="mc"><div class="ml">Total Raised</div><div class="mv up">$322.38M</div></div>
+      <div class="mc"><div class="ml">Last Valuation</div><div class="mv up">$2.50B</div></div>
+      <div class="mc"><div class="ml">Public Sale</div><div class="mv">$44.98M (14%)</div></div>
+      <div class="mc"><div class="ml">Funding Rounds</div><div class="mv">$277.40M (86%)</div></div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="sec-title"><span class="num">02</span>Token Sale History</div>
+    <div class="sale-card">
+      <div class="sale-header"><span class="sale-type">🌱 SEED ROUND</span><span class="sale-raised">Raised $2.50M</span></div>
+      <div class="sale-grid">
+        <div class="sale-item"><div class="sl">Price</div><div class="sv2">$0.0185</div></div>
+        <div class="sale-item"><div class="sl">Current ROI</div><div class="sv2 up">+843.1% (9.43×)</div></div>
+        <div class="sale-item"><div class="sl">ATH ROI</div><div class="sv2 up">+51,370% (514.7×)</div></div>
+      </div>
+    </div>
+    <div class="sale-card">
+      <div class="sale-header"><span class="sale-type">🔒 PRIVATE SALE</span><span class="sale-raised">Raised $28.52M</span></div>
+      <div class="sale-grid">
+        <div class="sale-item"><div class="sl">Price</div><div class="sv2">$0.10</div></div>
+        <div class="sale-item"><div class="sl">Current ROI</div><div class="sv2 up">+74.5% (1.74×)</div></div>
+        <div class="sale-item"><div class="sl">ATH ROI</div><div class="sv2 up">+9,422% (95.22×)</div></div>
+      </div>
+    </div>
+    <div class="sale-card">
+      <div class="sale-header"><span class="sale-type">🌐 ICO — Coinlist Option 1</span><span class="sale-raised">Raised $4.00M</span></div>
+      <div class="sale-grid">
+        <div class="sale-item"><div class="sl">Date</div><div class="sv2">Sep 8, 2021</div></div>
+        <div class="sale-item"><div class="sl">Price</div><div class="sv2">$0.10</div></div>
+        <div class="sale-item"><div class="sl">Current ROI</div><div class="sv2 up">+74.5% (1.74×)</div></div>
+      </div>
+    </div>
+    <div class="sale-card">
+      <div class="sale-header"><span class="sale-type">🌐 ICO — Coinlist Option 2</span><span class="sale-raised">Raised $9.00M</span></div>
+      <div class="sale-grid">
+        <div class="sale-item"><div class="sl">Date</div><div class="sv2">Sep 8, 2021</div></div>
+        <div class="sale-item"><div class="sl">Price</div><div class="sv2">$0.15</div></div>
+        <div class="sale-item"><div class="sl">Current ROI</div><div class="sv2 up">+16.3% (1.16×)</div></div>
+      </div>
+    </div>
+    <div class="sale-card">
+      <div class="sale-header"><span class="sale-type">🚀 IEO — HTX Primelist</span><span class="sale-raised">Raised $960K</span></div>
+      <div class="sale-grid">
+        <div class="sale-item"><div class="sl">Date</div><div class="sv2">Nov 5, 2021</div></div>
+        <div class="sale-item"><div class="sl">Price</div><div class="sv2">$0.16</div></div>
+        <div class="sale-item"><div class="sl">Current ROI</div><div class="sv2 up">+9.0% (1.09×)</div></div>
+      </div>
+    </div>
+    <div class="sale-card">
+      <div class="sale-header"><span class="sale-type">💰 UNDISCLOSED — TEMASEK LED</span><span class="sale-raised">Raised $200.00M</span></div>
+      <div class="sale-grid">
+        <div class="sale-item"><div class="sl">Date</div><div class="sv2">Mar 7, 2022</div></div>
+        <div class="sale-item"><div class="sl">Valuation</div><div class="sv2">$2.50B</div></div>
+        <div class="sale-item"><div class="sl">Lead</div><div class="sv2" style="color:var(--warning)">Temasek</div></div>
+      </div>
+    </div>
+    <div class="sale-card">
+      <div class="sale-header"><span class="sale-type">🎯 STRATEGIC ROUND</span><span class="sale-raised">Raised N/A</span></div>
+      <div class="sale-grid">
+        <div class="sale-item"><div class="sl">Date</div><div class="sv2">Dec 21, 2023</div></div>
+        <div class="sale-item"><div class="sl">Lead</div><div class="sv2">Framework Ventures</div></div>
+        <div class="sale-item"><div class="sl">Note</div><div class="sv2">Continued conviction</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="sec-title"><span class="num">03</span>Investor Profiles</div>
+    <div class="inv-grid">
+      <div class="inv-card"><div class="il">TIER 1</div><div class="in">Coinbase Ventures</div><div class="ib">Venture arm of the largest U.S. crypto exchange. Their investment signals regulatory credibility and alignment with the Ethereum ecosystem. Coinbase listing of IMX provides significant liquidity and retail access for millions of users.</div></div>
+      <div class="inv-card"><div class="il">TIER 2 — LEAD $200M</div><div class="in">Temasek</div><div class="ib">Singapore's sovereign wealth fund managing $400B+ in assets. Led the landmark $200M round valuing Immutable at $2.5B. This is one of the most significant institutional validations in all of blockchain gaming history — a government-backed fund backing a crypto gaming project.</div></div>
+      <div class="inv-card"><div class="il">TIER 2</div><div class="in">Delphi Ventures</div><div class="ib">One of crypto's most respected research-first venture funds. Known for deep fundamental analysis before committing capital. Their backing signals strong conviction in IMX's technical and market thesis for NFT gaming infrastructure.</div></div>
+      <div class="inv-card"><div class="il">TIER 2</div><div class="in">Framework Ventures</div><div class="ib">Leading Web3 focused VC that led the Dec 2023 Strategic round — showing continued conviction even after the NFT market downturn. Framework's long-term protocol infrastructure thesis aligns perfectly with Immutable's positioning.</div></div>
+      <div class="inv-card"><div class="il">TIER 2</div><div class="in">ParaFi Capital</div><div class="ib">Leading crypto-focused hedge fund with deep DeFi and Web3 expertise. Their participation in the $200M Temasek round alongside sovereign wealth capital adds credibility from both institutional and crypto-native perspectives.</div></div>
+      <div class="inv-card"><div class="il">TIER 3</div><div class="in">Animoca Brands</div><div class="ib">The leading blockchain gaming company. Both financial and strategic investor — Animoca's massive portfolio of gaming IPs could integrate with Immutable's infrastructure. Their involvement directly validates Immutable's gaming infrastructure thesis.</div></div>
+      <div class="inv-card"><div class="il">TIER 3 — LEAD</div><div class="in">Galaxy Interactive</div><div class="ib">Gaming-focused fund from Galaxy Digital, one of crypto's largest financial institutions. Led an early round with conviction in the gaming thesis — their gaming-specific expertise validates the product-market fit before others saw it.</div></div>
+      <div class="inv-card"><div class="il">CORPORATE</div><div class="in">Tencent</div><div class="ib">The world's largest gaming company by revenue. Tencent's investment is strategically enormous — suggesting potential for future integration of Immutable's technology with Tencent's massive gaming IP portfolio across hundreds of millions of players.</div></div>
+      <div class="inv-card"><div class="in" style="color:var(--warning)">Alameda Research ⚠️</div><div class="ib">Former trading firm by Sam Bankman-Fried — collapsed Nov 2022 (FTX crisis). Historical investor listed under "Other" category. No direct operational impact on Immutable but carries minor reputational association worth noting.</div></div>
+    </div>
+    <div class="comment">
+      <span class="cl">📊 Analysis</span>
+      The investor lineup is world-class — arguably one of the best in all of blockchain gaming. Temasek ($400B sovereign wealth fund) leading the $200M round, Coinbase Ventures, Animoca Brands, Tencent (world's largest gaming company), Galaxy Digital, Delphi Ventures, and Framework Ventures. Total of $322.38M raised gives Immutable an enormous operational runway to weather the NFT bear market. The only note is Alameda Research's historical association — zero operational impact but listed for transparency.
+    </div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:95%"></div></div><span class="rs">9.5 / 10</span></div>
+  </div>
+</div>
+
+<!-- ECOSYSTEM -->
+<div id="tab-ecosystem" class="tab-page">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Use Cases</div>
+    <div class="uc-grid">
+      <div class="uci"><span class="ucn">01</span>NFT Minting — zero gas fees for creators and game developers</div>
+      <div class="uci"><span class="ucn">02</span>NFT Trading — instant settlement at 9,000+ TPS</div>
+      <div class="uci"><span class="ucn">03</span>Blockchain Gaming — purpose-built Immutable zkEVM chain</div>
+      <div class="uci"><span class="ucn">04</span>Fee Payment — 20% of protocol fees must be paid in IMX</div>
+      <div class="uci"><span class="ucn">05</span>Staking — earn proportional share of all network fees</div>
+      <div class="uci"><span class="ucn">06</span>Governance — on-chain voting on protocol proposals</div>
+      <div class="uci"><span class="ucn">07</span>Developer SDK — REST API for simple NFT integration</div>
+      <div class="uci"><span class="ucn">08</span>NFT Marketplace — native + 3rd party marketplace support</div>
+      <div class="uci"><span class="ucn">09</span>ERC-20 &amp; ERC-721 — issue any token type at massive scale</div>
+      <div class="uci"><span class="ucn">10</span>Cross-chain Bridge — bridge assets between Ethereum and IMX</div>
+    </div>
+    <div class="comment">
+      <span class="cl">📊 Analysis</span>
+      IMX has comprehensive, well-designed use cases. The zero gas fee model solves the biggest pain point for NFT creators and gamers. The 9,000+ TPS capacity puts it far ahead of Ethereum mainnet for high-frequency gaming interactions. The mandatory 20% fee payment in IMX creates sustainable buy pressure as the ecosystem grows — a structural demand mechanism that auto-compounds as more games launch. Immutable zkEVM expands the TAM from pure NFT infrastructure to a full EVM-compatible gaming L2.
+    </div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:85%"></div></div><span class="rs">8.5 / 10</span></div>
+  </div>
+  <div class="section">
+    <div class="sec-title"><span class="num">02</span>Competitors</div>
+    <div class="comp-grid">
+      <a class="comp-card" href="https://x.com/0xPolygon" target="_blank"><div style="font-size:1.6rem;margin-bottom:8px">🔷</div><div class="cn">Polygon (POL)</div><div class="cd">Strong gaming ecosystem. Has Ubisoft, Adidas, and major NFT brands. Direct competitor for gaming NFT infrastructure.</div></a>
+      <a class="comp-card" href="https://x.com/RoninNetwork" target="_blank"><div style="font-size:1.6rem;margin-bottom:8px">⚔️</div><div class="cn">Ronin Network</div><div class="cd">Axie Infinity chain. Purpose-built gaming blockchain with proven active player base and P2E model.</div></a>
+      <a class="comp-card" href="https://x.com/flow_blockchain" target="_blank"><div style="font-size:1.6rem;margin-bottom:8px">🌊</div><div class="cn">Flow (FLOW)</div><div class="cd">NBA Top Shot blockchain. Focused on sports NFTs and mainstream brand partnerships.</div></a>
+      <a class="comp-card" href="https://x.com/arbitrum" target="_blank"><div style="font-size:1.6rem;margin-bottom:8px">🔵</div><div class="cn">Arbitrum (ARB)</div><div class="cd">General L2 with growing gaming ecosystem. Scale and developer adoption advantages.</div></a>
+      <a class="comp-card" href="https://x.com/base" target="_blank"><div style="font-size:1.6rem;margin-bottom:8px">🟦</div><div class="cn">Base (Coinbase)</div><div class="cd">Fast-growing Coinbase L2 expanding into NFT and gaming space aggressively.</div></a>
+      <a class="comp-card" href="https://x.com/SorareHQ" target="_blank"><div style="font-size:1.6rem;margin-bottom:8px">⚽</div><div class="cn">Sorare</div><div class="cd">Fantasy sports NFT platform targeting sports collectibles and gaming crossover.</div></a>
+    </div>
+    <div class="comment">
+      <span class="cl">📊 Analysis</span>
+      IMX's key differentiator over all competitors is its exclusive ZK-rollup focus on NFT gaming — combining ZK security, zero gas fees, and an EVM-compatible chain targeting AAA gaming studios. No direct competitor matches this combination. Polygon is the most threatening due to established brand relationships. Ronin has proven adoption but is limited to the Axie ecosystem. Base (Coinbase) is growing fast but is general-purpose. IMX's Tencent relationship and AAA studio partnerships give it a competitive moat in the premium gaming segment.
+    </div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:72%"></div></div><span class="rs">7.2 / 10</span></div>
+  </div>
+</div>
+
+<!-- TECHNICAL -->
+<div id="tab-technical" class="tab-page">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Technical Analysis</div>
+    <div class="level-grid">
+      <div class="lc">
+        <div class="lt sup">🟢 Support Levels</div>
+        <div class="li2">$0.1693 <small>MA(30) — dynamic support</small></div>
+        <div class="li2">$0.1600 <small>Recent base / pivot</small></div>
+        <div class="li2">$0.1593 <small>MA(200) — key support</small></div>
+        <div class="li2">$0.1305 <small>ATL (Apr 05, 2026)</small></div>
+      </div>
+      <div class="lc">
+        <div class="lt res">🔴 Resistance Levels</div>
+        <div class="li2">$0.1766 <small>24h high / current ceiling</small></div>
+        <div class="li2">$0.1790 <small>Short-term resistance</small></div>
+        <div class="li2">$0.2000 <small>Psychological resistance</small></div>
+        <div class="li2">$0.2500 – $0.3000 <small>Major recovery zone</small></div>
+      </div>
+    </div>
+    <div class="g-auto">
+      <div class="mc"><div class="ml">RSI (14)</div><div class="mv up">62.26 — Bullish</div><div class="ms up">Momentum building</div></div>
+      <div class="mc"><div class="ml">MA(7)</div><div class="mv up">$0.1727</div><div class="ms up">Below price ✅</div></div>
+      <div class="mc"><div class="ml">MA(30)</div><div class="mv up">$0.1693</div><div class="ms up">Below price ✅</div></div>
+      <div class="mc"><div class="ml">MA(200)</div><div class="mv up">$0.1593</div><div class="ms up">Below price ✅</div></div>
+      <div class="mc"><div class="ml">MACD</div><div class="mv up">+0.0006</div><div class="ms up">Positive — bullish</div></div>
+      <div class="mc"><div class="ml">Trend</div><div class="mv up">Recovering</div><div class="ms up">All MAs below price ✅</div></div>
+    </div>
+    <div class="comment">
+      <span class="cl">📊 Analysis</span>
+      The technical picture is IMX's strongest current area. Price is above ALL three moving averages (MA7, MA30, MA200) — a textbook bullish alignment that hasn't been seen since 2024. RSI at 62.26 shows strong momentum without being overbought (overbought would be above 70). MACD is positive at +0.0006 confirming the bullish momentum. The +34% recovery from ATL in just 31 days shows strong accumulation at these levels. Key level: sustaining above $0.1700 would confirm the uptrend. A break above $0.1790 opens the path to $0.20+.
+    </div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:75%"></div></div><span class="rs">7.5 / 10</span></div>
+  </div>
+  <div class="section">
+    <div class="sec-title"><span class="num">02</span>Catalysts &amp; Entry / Exit Strategy</div>
+    <table class="tbl" style="margin-bottom:12px">
+      <tr><th>Type</th><th>Catalyst</th><th>Impact</th></tr>
+      <tr><td><span class="tag tg">Bullish</span></td><td>AAA game launch on Immutable zkEVM gains mainstream traction</td><td>Very High</td></tr>
+      <tr><td><span class="tag tg">Bullish</span></td><td>NFT market recovery — trading volumes return to 2021 levels</td><td>Very High</td></tr>
+      <tr><td><span class="tag tg">Bullish</span></td><td>Tencent partnership announcement or game integration reveal</td><td>Very High</td></tr>
+      <tr><td><span class="tag tg">Bullish</span></td><td>ETH price recovery — IMX correlates strongly with ETH</td><td>High</td></tr>
+      <tr><td><span class="tag tg">Bullish</span></td><td>Break and hold above $0.20 resistance with volume</td><td>Medium</td></tr>
+      <tr><td><span class="tag tr">Bearish</span></td><td>NFT market continues declining — no recovery in 2026</td><td>Very High</td></tr>
+      <tr><td><span class="tag tr">Bearish</span></td><td>Break below $0.1600 support — retests ATL</td><td>High</td></tr>
+      <tr><td><span class="tag tr">Bearish</span></td><td>Polygon or Base gains dominant gaming market share</td><td>High</td></tr>
+      <tr><td><span class="tag tr">Bearish</span></td><td>BTC/ETH macro downturn — altcoins suffer most</td><td>Very High</td></tr>
+    </table>
+    <div class="g-auto">
+      <div class="mc"><div class="ml">🟢 Buy Zone</div><div class="mv up">$0.1305 – $0.1650</div></div>
+      <div class="mc"><div class="ml">🎯 Take Profit 1</div><div class="mv warn">$0.2000 – $0.2500</div></div>
+      <div class="mc"><div class="ml">🎯 Take Profit 2</div><div class="mv warn">$0.3500 – $0.5000</div></div>
+      <div class="mc"><div class="ml">🎯 Take Profit 3</div><div class="mv warn">$1.00 – $2.00</div><div class="ms">Bull market target</div></div>
+      <div class="mc"><div class="ml">🛑 Stop Loss</div><div class="mv down">Below $0.1200</div></div>
+      <div class="mc"><div class="ml">Risk Level</div><div class="mv warn">Medium – High</div></div>
+    </div>
+    <div class="comment" style="font-size:.68rem">⚠️ Not financial advice. Educational research only. Always DYOR and manage your risk carefully. Crypto is high risk.</div>
+  </div>
+  <div class="section">
+    <div class="sec-title"><span class="num">03</span>Fundamental Scoring</div>
+    <div class="score-row"><div class="sc">Team &amp; Founders</div><div class="sw">×20%</div><div class="sb"><div class="sbf" style="width:90%"></div></div><div class="sv">9.0</div></div>
+    <div class="score-row"><div class="sc">Tokenomics</div><div class="sw">×20%</div><div class="sb"><div class="sbf" style="width:82%"></div></div><div class="sv">8.2</div></div>
+    <div class="score-row"><div class="sc">Technology</div><div class="sw">×15%</div><div class="sb"><div class="sbf" style="width:88%"></div></div><div class="sv">8.8</div></div>
+    <div class="score-row"><div class="sc">Protocol Metrics</div><div class="sw">×15%</div><div class="sb"><div class="sbf" style="width:40%"></div></div><div class="sv">4.0</div></div>
+    <div class="score-row"><div class="sc">Investors / Backing</div><div class="sw">×10%</div><div class="sb"><div class="sbf" style="width:95%"></div></div><div class="sv">9.5</div></div>
+    <div class="score-row"><div class="sc">Competitors</div><div class="sw">×10%</div><div class="sb"><div class="sbf" style="width:72%"></div></div><div class="sv">7.2</div></div>
+    <div class="score-row"><div class="sc">Community</div><div class="sw">×5%</div><div class="sb"><div class="sbf" style="width:80%"></div></div><div class="sv">8.0</div></div>
+    <div class="score-row"><div class="sc">Technical (Price)</div><div class="sw">×5%</div><div class="sb"><div class="sbf" style="width:75%"></div></div><div class="sv">7.5</div></div>
+    <div class="sc-wrap" style="margin-top:18px">
+      <div class="sc-circle"><div class="sc-num">7.9</div></div>
+      <div><div style="font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;color:#fff;margin-bottom:3px">Weighted Score: 79 / 100</div><div style="font-size:.68rem;color:var(--muted)">Strong Fundamentals · Recovering Price · NFT Narrative Risk</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- VERDICT -->
+<div id="tab-verdict" class="tab-page">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Final Verdict</div>
+    <div class="verdict-box">
+      <div class="vl">Overall Verdict</div>
+      <div class="vt">🟡 ACCUMULATE ON DIPS</div>
+      <div class="vd">Immutable is one of the best-fundamentally-positioned projects in blockchain gaming. Elite team, Temasek-led $322M raise, ZK-rollup technology advantage, and 100% supply already circulating with zero dilution risk ahead. The technical setup is bullish — price above all MAs with RSI at 62. The main risk is NFT market adoption recovery. For believers in the blockchain gaming thesis, current levels near ATL represent a strategic accumulation zone with multi-year upside.</div>
+      <div class="vg">
+        <div class="vi"><div class="vil">Verdict</div><div class="viv" style="color:var(--success)">ACCUMULATE</div></div>
+        <div class="vi"><div class="vil">Time Horizon</div><div class="viv">12–36 Months</div></div>
+        <div class="vi"><div class="vil">Risk Level</div><div class="viv" style="color:var(--warning)">MEDIUM–HIGH</div></div>
+        <div class="vi"><div class="vil">Position Size</div><div class="viv">2–5% Portfolio</div></div>
+        <div class="vi"><div class="vil">Fund. Score</div><div class="viv" style="color:var(--success)">79 / 100</div></div>
+        <div class="vi"><div class="vil">Key Risk</div><div class="viv" style="color:var(--danger)">NFT Recovery</div></div>
+      </div>
+    </div>
+    <div style="margin-top:13px;font-size:.6rem;color:var(--muted);text-align:center;letter-spacing:.5px;line-height:1.6">⚠️ This report is for educational and research purposes only. Not financial advice. Always DYOR and manage your risk carefully.</div>
+  </div>
+</div>
+
+</div>
+<script>
+function showTab(name,btn){document.querySelectorAll('.tab-page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+name).classList.add('active');btn.classList.add('active');window.scrollTo({top:0,behavior:'smooth'})}
+function toggleBio(btn){const card=btn.closest('.team-card');const panel=card.querySelector('.bio-panel');const isOpen=panel.classList.contains('open');panel.classList.toggle('open',!isOpen);btn.textContent=isOpen?'▼ Bio':'▲ Bio';btn.classList.toggle('active',!isOpen)}
+</script>
+</body>
+</html>
