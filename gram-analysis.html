@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GRAM (TON) — Fundamental Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue: #0088cc;
+    --accent: #29b6f6;
+    --danger: #ff4444;
+    --success: #00e676;
+    --warning: #ffab00;
+    --card: rgba(0, 10, 30, 0.85);
+    --border: rgba(0, 136, 204, 0.25);
+    --text: #e1f5fe;
+    --muted: #4fc3f7;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Mono', monospace; color: var(--text); min-height: 100vh; position: relative; }
+  #bg { position: fixed; inset: 0; background-image: url('https://i.ibb.co/tP3g1P1M/images-29.jpg'); background-size: cover; background-position: center; z-index: -2; }
+  #bg::after { content: ''; position: absolute; inset: 0; background: rgba(0, 5, 20, 0.88); z-index: -1; }
+  header { background: linear-gradient(180deg,rgba(0,10,30,0.98),rgba(0,10,30,0.94)); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(16px); }
+  .hdr-main { display: flex; align-items: center; gap: 13px; padding: 13px 18px 10px; flex-wrap: wrap; }
+  .hdr-logo { width: 46px; height: 46px; border-radius: 11px; object-fit: cover; border: 2px solid var(--blue); box-shadow: 0 0 16px rgba(0,136,204,0.5); flex-shrink: 0; }
+  .hdr-info { flex: 1; min-width: 0; }
+  .hdr-name { font-family: 'Syne',sans-serif; font-size: 1.25rem; font-weight: 800; color: #fff; line-height: 1; }
+  .hdr-sub { font-size: 0.58rem; color: var(--accent); letter-spacing: 2.5px; text-transform: uppercase; margin-top: 3px; }
+  .hdr-price { text-align: right; flex-shrink: 0; }
+  .hdr-price .pv { font-family: 'Syne',sans-serif; font-size: 1.15rem; font-weight: 700; color: #fff; }
+  .hdr-price .rk { font-size: 0.62rem; color: var(--accent); letter-spacing: 1px; margin-top: 2px; }
+  .contract-strip { background: rgba(0,0,0,0.45); border-top: 1px solid rgba(0,136,204,0.12); padding: 5px 18px; font-size: 0.57rem; color: var(--muted); display: flex; align-items: center; gap: 7px; overflow: hidden; }
+  .contract-strip span { color: var(--accent); font-size: 0.59rem; word-break: break-all; }
+  .nav-tabs { display: flex; overflow-x: auto; border-top: 1px solid var(--border); scrollbar-width: none; }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .nav-tab { flex-shrink: 0; padding: 9px 15px; font-size: 0.6rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap; background: none; border-top: none; border-left: none; border-right: none; font-family: 'DM Mono',monospace; }
+  .nav-tab:hover { color: var(--text); }
+  .nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .hero { background: linear-gradient(135deg,rgba(0,50,100,0.6),rgba(0,10,40,0.45)); border-bottom: 1px solid var(--border); padding: 26px 18px 20px; text-align: center; position: relative; overflow: hidden; }
+  .hero::before { content:''; position: absolute; top:-60px; left:50%; transform:translateX(-50%); width:400px; height:200px; background: radial-gradient(ellipse,rgba(0,136,204,0.18) 0%,transparent 70%); pointer-events: none; }
+  .live-badge { display: inline-flex; align-items: center; gap: 7px; background: rgba(0,136,204,0.15); border: 1px solid rgba(0,136,204,0.4); border-radius: 20px; padding: 5px 13px; font-size: 0.6rem; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; }
+  .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.8)} }
+  .hero-title { font-family: 'Syne',sans-serif; font-size: 2.6rem; font-weight: 800; color: #fff; line-height: .9; letter-spacing: -1px; margin-bottom: 5px; }
+  .hero-title span { color: var(--accent); }
+  .hero-sub { font-size: 0.6rem; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 8px; }
+  .contract-scroll { font-size: 0.57rem; color: rgba(0,136,204,0.5); letter-spacing: .8px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; margin-bottom: 18px; padding: 0 10px; }
+  .hero-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 420px; margin: 0 auto; }
+  .hs { background: rgba(0,0,0,0.32); border: 1px solid var(--border); border-radius: 11px; padding: 13px; }
+  .hs .v { font-family: 'Syne',sans-serif; font-size: 1.3rem; font-weight: 800; color: #fff; line-height: 1; }
+  .hs .l { font-size: 0.56rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 3px; }
+  .hs .c { font-size: 0.62rem; margin-top: 3px; }
+  .up{color:var(--success)} .down{color:var(--danger)} .warn{color:var(--warning)}
+  #main { max-width: 960px; margin: 0 auto; padding: 18px 14px 60px; }
+  .tab-page { display: none; }
+  .tab-page.active { display: block; }
+  .section { background: var(--card); border: 1px solid var(--border); border-radius: 15px; padding: 18px 16px; margin-bottom: 14px; backdrop-filter: blur(10px); box-shadow: 0 4px 28px rgba(0,0,0,0.35); }
+  .sec-title { font-family: 'Syne',sans-serif; font-size: 0.72rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 2.5px; display: flex; align-items: center; gap: 9px; margin-bottom: 14px; }
+  .sec-title .num { width: 24px; height: 24px; background: rgba(0,136,204,0.15); border: 1px solid var(--border); border-radius: 6px; display:flex; align-items:center; justify-content:center; font-size: 0.6rem; color: var(--accent); flex-shrink: 0; }
+  .sec-title::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,var(--border),transparent); }
+  .g-auto { display: grid; grid-template-columns: repeat(auto-fill,minmax(165px,1fr)); gap: 9px; }
+  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+  .mc { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 9px; padding: 11px 13px; }
+  .ml { font-size: 0.56rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
+  .mv { font-family: 'Syne',sans-serif; font-size: 0.95rem; font-weight: 700; color: #fff; }
+  .ms { font-size: 0.6rem; color: var(--muted); margin-top: 2px; }
+  .comment { background: rgba(0,136,204,0.07); border-left: 3px solid var(--blue); border-radius: 0 10px 10px 0; padding: 13px 15px; margin-top: 13px; font-size: 0.76rem; line-height: 1.75; color: var(--text); }
+  .cl { font-size: 0.56rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 7px; display: block; }
+  .rating { display: flex; align-items: center; gap: 11px; margin-top: 11px; }
+  .rl { font-size: 0.6rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
+  .rt { flex:1; height:5px; background:rgba(255,255,255,0.07); border-radius:3px; overflow:hidden; }
+  .rf { height:100%; border-radius:3px; background:linear-gradient(90deg,var(--blue),var(--accent)); }
+  .rs { font-family:'Syne',sans-serif; font-weight:700; font-size:.82rem; color:var(--accent); white-space:nowrap; }
+  .tbl { width:100%; border-collapse:collapse; font-size:.73rem; }
+  .tbl th { background:rgba(0,136,204,0.15); color:var(--accent); font-size:.58rem; text-transform:uppercase; letter-spacing:1.5px; padding:8px 11px; text-align:left; border-bottom:1px solid var(--border); }
+  .tbl td { padding:8px 11px; border-bottom:1px solid rgba(255,255,255,0.04); color:var(--text); vertical-align:middle; }
+  .tbl tr:nth-child(even) td { background:rgba(0,136,204,0.03); }
+  .tbl tr:hover td { background:rgba(0,136,204,0.08); }
+  .tag { display:inline-block; padding:2px 7px; border-radius:4px; font-size:.58rem; letter-spacing:.5px; }
+  .tg { background:rgba(0,230,118,0.1); color:var(--success); border:1px solid rgba(0,230,118,0.24); }
+  .tr { background:rgba(255,68,68,0.11); color:#ff7777; border:1px solid rgba(255,68,68,0.24); }
+  .ty { background:rgba(255,171,0,0.1); color:var(--warning); border:1px solid rgba(255,171,0,0.24); }
+  .tb { background:rgba(0,136,204,0.12); color:var(--accent); border:1px solid rgba(0,136,204,0.25); }
+  .social-card { display:flex; align-items:center; gap:11px; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:11px; padding:11px 13px; text-decoration:none; color:var(--text); transition:all .2s; }
+  .social-card:hover { border-color:var(--blue); background:rgba(0,136,204,0.1); transform:translateY(-2px); }
+  .si { width:32px; height:32px; border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; background:rgba(0,136,204,0.15); flex-shrink:0; }
+  .sn { font-family:'Syne',sans-serif; font-size:.8rem; font-weight:700; }
+  .ss { font-size:.62rem; color:var(--muted); margin-top:2px; }
+  .team-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(245px,1fr)); gap:11px; }
+  .team-card { background:rgba(0,0,0,0.35); border:1px solid var(--border); border-radius:13px; overflow:hidden; transition:border-color .2s; }
+  .team-card:hover { border-color:var(--blue); }
+  .t-top { display:flex; align-items:center; gap:12px; padding:14px 14px 0; }
+  .t-photo { width:54px; height:54px; border-radius:11px; object-fit:cover; border:2px solid var(--border); flex-shrink:0; background:rgba(0,136,204,0.15); }
+  .t-name { font-family:'Syne',sans-serif; font-size:.88rem; font-weight:700; color:#fff; }
+  .t-role { font-size:.6rem; color:var(--accent); text-transform:uppercase; letter-spacing:1px; margin-top:3px; }
+  .t-actions { display:flex; gap:6px; padding:9px 14px 13px; flex-wrap:wrap; }
+  .btn { display:inline-flex; align-items:center; gap:4px; padding:5px 10px; border-radius:6px; font-family:'DM Mono',monospace; font-size:.6rem; cursor:pointer; border:none; transition:all .2s; text-decoration:none; letter-spacing:.5px; }
+  .bbio { background:rgba(0,136,204,0.12); color:var(--accent); border:1px solid rgba(0,136,204,0.28); }
+  .bbio:hover,.bbio.active { background:rgba(0,136,204,0.28); border-color:var(--blue); }
+  .btw { background:rgba(255,255,255,0.06); color:#fff; border:1px solid rgba(255,255,255,0.1); }
+  .btw:hover { background:rgba(255,255,255,0.11); }
+  .btg { background:rgba(0,136,204,0.11); color:#29b6f6; border:1px solid rgba(0,136,204,0.24); }
+  .btg:hover { background:rgba(0,136,204,0.2); }
+  .bio-panel { display:none; padding:11px 14px 14px; font-size:.72rem; line-height:1.7; color:var(--muted); border-top:1px solid var(--border); animation:fadeIn .2s ease; }
+  .bio-panel.open { display:block; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:translateY(0)} }
+  .inv-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:9px; }
+  .inv-card { background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:11px; padding:13px; transition:all .2s; }
+  .inv-card:hover { border-color:var(--blue); background:rgba(0,136,204,0.07); transform:translateY(-2px); }
+  .in { font-family:'Syne',sans-serif; font-size:.8rem; font-weight:700; color:#fff; margin-bottom:5px; }
+  .ib { font-size:.63rem; color:var(--muted); line-height:1.52; }
+  .il { display:inline-block; background:rgba(255,171,0,0.11); color:var(--warning); border:1px solid rgba(255,171,0,0.27); border-radius:4px; padding:1px 7px; font-size:.53rem; letter-spacing:1px; text-transform:uppercase; margin-bottom:6px; }
+  .comp-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(148px,1fr)); gap:9px; }
+  .comp-card { background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:11px; padding:13px; text-align:center; color:var(--text); transition:all .2s; display:block; }
+  .comp-card:hover { border-color:var(--blue); background:rgba(0,136,204,0.08); transform:translateY(-2px); }
+  .comp-icon { width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.4rem; border:2px solid var(--border); margin:0 auto 7px; background:rgba(0,136,204,0.1); }
+  .cn { font-family:'Syne',sans-serif; font-size:.75rem; font-weight:700; color:#fff; margin-bottom:3px; }
+  .cd { font-size:.6rem; color:var(--muted); line-height:1.4; }
+  .risk-grid { display:grid; grid-template-columns:1fr 1fr; gap:11px; }
+  .risk-col { background:rgba(0,0,0,0.22); border-radius:11px; padding:13px; }
+  .risk-title { font-family:'Syne',sans-serif; font-size:.67rem; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:11px; display:flex; align-items:center; gap:6px; }
+  .risk-title.red { color:var(--danger); }
+  .risk-title.green { color:var(--success); }
+  .ri { display:flex; align-items:flex-start; gap:7px; font-size:.7rem; color:var(--text); margin-bottom:8px; line-height:1.5; }
+  .rd { width:6px; height:6px; border-radius:50%; margin-top:5px; flex-shrink:0; }
+  .rd.red { background:var(--danger); }
+  .rd.green { background:var(--success); }
+  .score-row { display:flex; align-items:center; gap:9px; margin-bottom:9px; }
+  .sc { font-size:.68rem; color:var(--text); width:168px; flex-shrink:0; }
+  .sw { font-size:.56rem; color:var(--muted); width:36px; flex-shrink:0; }
+  .sb { flex:1; height:6px; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; }
+  .sbf { height:100%; border-radius:3px; background:linear-gradient(90deg,var(--blue),var(--accent)); }
+  .sv { font-family:'Syne',sans-serif; font-weight:700; font-size:.76rem; color:var(--accent); width:34px; text-align:right; flex-shrink:0; }
+  .roadmap { position:relative; padding-left:20px; }
+  .roadmap::before { content:''; position:absolute; left:6px; top:8px; bottom:8px; width:2px; background:linear-gradient(180deg,var(--blue),transparent); }
+  .rmi { position:relative; margin-bottom:14px; }
+  .rmi::before { content:''; position:absolute; left:-16px; top:5px; width:10px; height:10px; border-radius:50%; border:2px solid var(--blue); background:#000a1e; }
+  .rmi.done::before { background:var(--success); border-color:var(--success); }
+  .rmi.soon::before { background:var(--warning); border-color:var(--warning); }
+  .rmi.upcoming::before { background:var(--blue); border-color:var(--accent); }
+  .rp { font-size:.58rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:3px; }
+  .rm { font-size:.75rem; color:var(--text); line-height:1.5; }
+  .uc-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:10px; }
+  .uci { background:rgba(0,0,0,0.28); border:1px solid var(--border); border-radius:11px; padding:14px 15px; transition:all .2s; }
+  .uci:hover { border-color:var(--blue); background:rgba(0,136,204,0.07); transform:translateY(-2px); }
+  .uci-num { font-family:'Syne',sans-serif; font-size:.58rem; font-weight:700; color:var(--accent); letter-spacing:2px; text-transform:uppercase; margin-bottom:5px; }
+  .uci-title { font-family:'Syne',sans-serif; font-size:.8rem; font-weight:700; color:#fff; margin-bottom:5px; }
+  .uci-desc { font-size:.67rem; color:var(--muted); line-height:1.55; }
+  .level-grid { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-bottom:11px; }
+  .lc { background:rgba(0,0,0,0.22); border-radius:9px; padding:11px 13px; }
+  .lt { font-size:.58rem; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:7px; }
+  .lt.sup { color:var(--success); } .lt.res { color:var(--danger); }
+  .li2 { font-family:'Syne',sans-serif; font-size:.77rem; font-weight:600; color:#fff; margin-bottom:4px; }
+  .li2 small { font-family:'DM Mono',monospace; font-size:.58rem; font-weight:400; color:var(--muted); margin-left:5px; }
+  .verdict-box { background:linear-gradient(135deg,rgba(0,50,100,0.5),rgba(0,136,204,0.06)); border:1px solid var(--blue); border-radius:15px; padding:22px; text-align:center; }
+  .vl { font-size:.58rem; text-transform:uppercase; letter-spacing:3px; color:var(--muted); margin-bottom:7px; }
+  .vt { font-family:'Syne',sans-serif; font-size:1.6rem; font-weight:800; color:var(--success); margin-bottom:9px; }
+  .vd { font-size:.75rem; color:var(--muted); line-height:1.7; max-width:500px; margin:0 auto 16px; }
+  .vg { display:grid; grid-template-columns:repeat(auto-fit,minmax(125px,1fr)); gap:8px; }
+  .vi { background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:9px; padding:10px 11px; }
+  .vil { font-size:.53rem; text-transform:uppercase; letter-spacing:1.5px; color:var(--muted); margin-bottom:4px; }
+  .viv { font-family:'Syne',sans-serif; font-size:.8rem; font-weight:700; color:#fff; }
+  .sc-wrap { display:flex; align-items:center; justify-content:center; gap:18px; margin:14px 0; flex-wrap:wrap; }
+  .sc-circle { width:90px; height:90px; border-radius:50%; display:flex; align-items:center; justify-content:center; position:relative; background:conic-gradient(var(--blue) 0deg,var(--accent) 237.6deg,rgba(255,255,255,0.05) 237.6deg); }
+  .sc-circle::before { content:''; position:absolute; width:70px; height:70px; border-radius:50%; background:#000a1e; }
+  .sc-num { font-family:'Syne',sans-serif; font-size:1.2rem; font-weight:800; color:#fff; position:relative; z-index:1; }
+  .perf-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-bottom:12px; }
+  .perf-card { background:rgba(0,0,0,0.28); border:1px solid var(--border); border-radius:9px; padding:10px; text-align:center; }
+  .perf-period { font-size:.55rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+  .perf-val { font-family:'Syne',sans-serif; font-size:.85rem; font-weight:700; }
+  .date-note { font-size:.57rem; color:rgba(41,182,246,0.6); text-align:center; margin-bottom:10px; letter-spacing:1px; text-transform:uppercase; }
+  .alloc-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(175px,1fr)); gap:9px; }
+  .alloc-card { background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:10px; padding:12px 14px; }
+  .alloc-dot { width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px; flex-shrink:0; }
+  .alloc-name { font-family:'Syne',sans-serif; font-size:.75rem; font-weight:700; color:#fff; display:flex; align-items:center; margin-bottom:6px; }
+  .alloc-row { display:flex; justify-content:space-between; font-size:.6rem; color:var(--muted); margin-bottom:2px; }
+  .alloc-val { color:var(--text); }
+  @media(max-width:560px){.risk-grid{grid-template-columns:1fr}.level-grid{grid-template-columns:1fr}.g2{grid-template-columns:1fr}.hero-title{font-size:2rem}.sc{width:115px}.perf-grid{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<div id="bg"></div>
+
+<header>
+  <div class="hdr-main">
+    <img class="hdr-logo" src="https://i.ibb.co/Kp89Zgps/images-2.png" alt="GRAM">
+    <div class="hdr-info">
+      <div class="hdr-name">GRAM (TON) — The Open Network</div>
+      <div class="hdr-sub">Fundamental Analysis · June 7, 2026</div>
+    </div>
+    <div class="hdr-price">
+      <div class="pv">$1.698</div>
+      <div class="rk">RANK #20</div>
+    </div>
+  </div>
+  <div class="contract-strip">
+    <span style="color:var(--muted);flex-shrink:0">CONTRACT:</span>
+    <span>0x76a797a59ba2c17726896976b7b3747bfd1d220f</span>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showTab('overview',this)">Overview</button>
+    <button class="nav-tab" onclick="showTab('market',this)">Market Data</button>
+    <button class="nav-tab" onclick="showTab('tokenomics',this)">Tokenomics</button>
+    <button class="nav-tab" onclick="showTab('team',this)">Team</button>
+    <button class="nav-tab" onclick="showTab('investors',this)">Investors</button>
+    <button class="nav-tab" onclick="showTab('ecosystem',this)">Ecosystem</button>
+    <button class="nav-tab" onclick="showTab('technical',this)">Technical</button>
+    <button class="nav-tab" onclick="showTab('verdict',this)">Verdict</button>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="live-badge"><div class="live-dot"></div>As of June 7, 2026</div>
+  <div class="hero-title">GRAM <span>(TON)</span></div>
+  <div class="hero-sub">Layer 1 · BFT Proof-of-Stake · Telegram Ecosystem · 1B+ Users</div>
+  <div class="contract-scroll">0x76a797a59ba2c17726896976b7b3747bfd1d220f</div>
+  <div class="hero-stats">
+    <div class="hs"><div class="v">$1.698</div><div class="l">Current Price</div><div class="c down">▼ 79.4% from ATH</div></div>
+    <div class="hs"><div class="v">$4.54B</div><div class="l">Market Cap</div><div class="c" style="color:var(--accent)">Rank #20</div></div>
+    <div class="hs"><div class="v">$8.82B</div><div class="l">FDV</div><div class="c warn">MCAP/FDV: 0.51</div></div>
+    <div class="hs"><div class="v">$8.235</div><div class="l">All-Time High</div><div class="c" style="color:var(--muted)">Jun 15, 2024</div></div>
+  </div>
+</div>
+
+<div id="main">
+
+<!-- OVERVIEW -->
+<div id="tab-overview" class="tab-page active">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Project Overview</div>
+    <div class="comment" style="margin-top:0">
+      <span class="cl">What is GRAM (TON)?</span>
+      GRAM — formerly known as Toncoin — is the native cryptocurrency of The Open Network (TON), a high-performance, BFT Proof-of-Stake Layer 1 blockchain originally designed by Pavel and Nikolai Durov (founders of Telegram) in 2018. After a legal dispute with the U.S. SEC forced Telegram to abandon the project in 2020, an independent open-source community revived the network under the TON Foundation. In May 2026, Telegram officially reclaimed control — becoming TON's largest validator under the "Make TON Great Again" (MTONGA) roadmap — and the native token was rebranded back to its original name: <strong style="color:#fff">GRAM</strong>. TON is now the exclusive blockchain powering Telegram's entire Mini App ecosystem, giving it direct access to over 1 billion monthly active users — an unmatched distribution advantage in all of crypto.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><span class="num">02</span>Key Stats</div>
+    <div class="date-note">📅 As of June 7, 2026</div>
+    <div class="g-auto">
+      <div class="mc"><div class="ml">Price</div><div class="mv">$1.698</div><div class="ms up">+13.10% (24h)</div></div>
+      <div class="mc"><div class="ml">Market Cap</div><div class="mv">$4.54B</div></div>
+      <div class="mc"><div class="ml">FDV</div><div class="mv">$8.82B</div></div>
+      <div class="mc"><div class="ml">MCAP / FDV</div><div class="mv warn">0.51</div></div>
+      <div class="mc"><div class="ml">Volume 24h</div><div class="mv">$249.67M</div></div>
+      <div class="mc"><div class="ml">Circulating Supply</div><div class="mv">2.67B GRAM</div></div>
+      <div class="mc"><div class="ml">Total Supply</div><div class="mv">5.19B GRAM</div></div>
+      <div class="mc"><div class="ml">Max Supply</div><div class="mv warn">Unlimited</div></div>
+      <div class="mc"><div class="ml">ATH</div><div class="mv">$8.235</div></div>
+      <div class="mc"><div class="ml">ATL</div><div class="mv">$0.3906</div></div>
+      <div class="mc"><div class="ml">From ATH</div><div class="mv down">−79.4%</div></div>
+      <div class="mc"><div class="ml">Rank</div><div class="mv">#20</div></div>
+      <div class="mc"><div class="ml">Market Dominance</div><div class="mv">0.21%</div></div>
+      <div class="mc"><div class="ml">24h Range</div><div class="mv" style="font-size:.78rem">$1.449 – $1.768</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><span class="num">03</span>Price Performance</div>
+    <div class="date-note">📅 As of June 7, 2026</div>
+    <div class="perf-grid">
+      <div class="perf-card"><div class="perf-period">24h</div><div class="perf-val up">+13.10%</div></div>
+      <div class="perf-card"><div class="perf-period">7 Days</div><div class="perf-val down">−8.44%</div></div>
+      <div class="perf-card"><div class="perf-period">30 Days</div><div class="perf-val down">−36.20%</div></div>
+      <div class="perf-card"><div class="perf-period">90 Days</div><div class="perf-val up">+28.91%</div></div>
+      <div class="perf-card"><div class="perf-period">YTD</div><div class="perf-val up">+0.31%</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><span class="num">04</span>Risk Matrix</div>
+    <div class="risk-grid">
+      <div class="risk-col">
+        <div class="risk-title red">🔴 Red Flags</div>
+        <div class="ri"><div class="rd red"></div>−79.4% from ATH — significant value erosion since Jun 2024 peak</div>
+        <div class="ri"><div class="rd red"></div>Unlimited supply — no hard cap; inflation ~0.6–3.6%/yr post Catchain 2.0</div>
+        <div class="ri"><div class="rd red"></div>44.9% supply still locked — Believers Fund unlocking ~36.6M GRAM/month through Oct 2028</div>
+        <div class="ri"><div class="rd red"></div>Telegram centralization — now largest validator, raising decentralization concerns</div>
+        <div class="ri"><div class="rd red"></div>Pavel Durov legal exposure — ongoing case in France creates regulatory uncertainty</div>
+        <div class="ri"><div class="rd red"></div>High whale concentration — 68%+ supply held by large wallets</div>
+        <div class="ri"><div class="rd red"></div>Single distribution dependency — heavy reliance on Telegram as sole channel</div>
+      </div>
+      <div class="risk-col">
+        <div class="risk-title green">✅ White Flags</div>
+        <div class="ri"><div class="rd green"></div>1 billion+ Telegram monthly active users — unmatched crypto distribution</div>
+        <div class="ri"><div class="rd green"></div>Exclusive blockchain for all Telegram Mini Apps — locked-in utility demand</div>
+        <div class="ri"><div class="rd green"></div>Catchain 2.0 live (Apr 2026) — sub-second finality, ~6x faster blocks</div>
+        <div class="ri"><div class="rd green"></div>USDT natively on TON since April 2024 — largest stablecoin integrated</div>
+        <div class="ri"><div class="rd green"></div>$400M+ institutional investment — Sequoia, Pantera, Benchmark backing</div>
+        <div class="ri"><div class="rd green"></div>Open-source with multiple security audits (Zellic, Softstack, Cyberscope)</div>
+        <div class="ri"><div class="rd green"></div>Large-cap #20 Layer 1 — established market position with real traction</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><span class="num">05</span>Overall Comment</div>
+    <div class="comment" style="margin-top:0;font-size:.78rem;line-height:1.85">
+      <span class="cl">📋 Summary</span>
+      GRAM (TON) is arguably the most uniquely positioned Layer 1 in crypto: the only blockchain with exclusive, direct access to over 1 billion Telegram users. The May 2026 MTONGA announcement — where Telegram officially replaced the TON Foundation as primary driver and became the network's largest validator — is a structural shift no other blockchain can replicate. Catchain 2.0 (sub-second finality, April 2026) and a planned 6x fee reduction bring the network technically in line with Solana and ahead of Ethereum for consumer use cases.<br><br>
+      That said, risk is real and must be respected: the token sits −79.4% below its ATH, Believers Fund unlocks (~36.6M GRAM/month through October 2028) create persistent sell pressure, and the Telegram validator concentration introduces centralization and regulatory risks. Pavel Durov's ongoing legal situation in France adds a layer of uncertainty that fundamentally affects the project's independence.<br><br>
+      <strong style="color:#fff">Bottom line:</strong> GRAM is a high-conviction, medium-to-high risk large-cap Layer 1 with the strongest consumer distribution moat in crypto. The bull case is backed by institutional capital and Telegram's billion-user engine. Risk management and position sizing are essential.
+    </div>
+    <div style="margin-top:11px;display:flex;flex-wrap:wrap;gap:5px">
+      <span class="tag tr">🔴 −79.4% From ATH</span>
+      <span class="tag tr">🔴 Monthly Unlock Pressure</span>
+      <span class="tag tr">🔴 Telegram Centralization</span>
+      <span class="tag tg">✅ 1B+ Telegram Users</span>
+      <span class="tag tg">✅ Exclusive Mini App Chain</span>
+      <span class="tag tg">✅ USDT Native on TON</span>
+      <span class="tag tg">✅ Top-Tier VC Backing</span>
+      <span class="tag tg">✅ Catchain 2.0 Live</span>
+    </div>
+    <div class="rating"><span class="rl">Overall Score</span><div class="rt"><div class="rf" style="width:66%"></div></div><span class="rs">66 / 100</span></div>
+  </div>
+</div>
+
+<!-- MARKET DATA -->
+<div id="tab-market" class="tab-page">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Market Overview</div>
+    <div class="date-note">📅 As of June 7, 2026</div>
+    <div class="g-auto">
+      <div class="mc"><div class="ml">Current Price</div><div class="mv">$1.698</div><div class="ms up">+13.10% (24h)</div></div>
+      <div class="mc"><div class="ml">24h High</div><div class="mv">$1.768</div></div>
+      <div class="mc"><div class="ml">24h Low</div><div class="mv">$1.449</div></div>
+      <div class="mc"><div class="ml">Market Cap</div><div class="mv">$4.54B</div></div>
+      <div class="mc"><div class="ml">Fully Diluted MCAP</div><div class="mv">$8.82B</div></div>
+      <div class="mc"><div class="ml">MCAP / FDV</div><div class="mv warn">0.51</div><div class="ms">~49% supply still locked</div></div>
+      <div class="mc"><div class="ml">Volume 24h</div><div class="mv">$249.67M</div></div>
+      <div class="mc"><div class="ml">Circulating Supply</div><div class="mv">2.67B GRAM</div></div>
+      <div class="mc"><div class="ml">Total Supply</div><div class="mv">5.19B GRAM</div></div>
+      <div class="mc"><div class="ml">Max Supply</div><div class="mv warn">Unlimited</div></div>
+      <div class="mc"><div class="ml">All Time High</div><div class="mv">$8.235</div><div class="ms">Jun 15, 2024</div></div>
+      <div class="mc"><div class="ml">All Time Low</div><div class="mv">$0.3906</div></div>
+      <div class="mc"><div class="ml">From ATH</div><div class="mv down">−79.4%</div></div>
+      <div class="mc"><div class="ml">Market Dominance</div><div class="mv">0.21%</div></div>
+      <div class="mc"><div class="ml">Rank</div><div class="mv">#20</div></div>
+    </div>
+    <div class="comment">
+      <span class="cl">📊 Analysis</span>
+      GRAM holds a strong #20 rank with a $4.54B market cap — a legitimate large-cap Layer 1 asset. The MCAP/FDV ratio of 0.51 signals that roughly half the total supply is yet to enter circulation, with the Believers Fund unlocking ~36.6M GRAM monthly through October 2028 creating persistent dilution pressure. The 24h volume of $249.67M represents approximately 5.5% of market cap — a healthy liquidity ratio for a large-cap asset. The +13.10% single-day bounce coincides with positive sentiment around the MTONGA roadmap and Catchain 2.0 momentum.
+    </div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:60%"></div></div><span class="rs">6.0 / 10</span></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><span class="num">02</span>Price Performance</div>
+    <div class="date-note">📅 As of June 7, 2026</div>
+    <div class="perf-grid">
+      <div class="perf-card"><div class="perf-period">24h</div><div class="perf-val up">+13.10%</div></div>
+      <div class="perf-card"><div class="perf-period">7 Days</div><div class="perf-val down">−8.44%</div></div>
+      <div class="perf-card"><div class="perf-period">30 Days</div><div class="perf-val down">−36.20%</div></div>
+      <div class="perf-card"><div class="perf-period">90 Days</div><div class="perf-val up">+28.91%</div></div>
+      <div class="perf-card"><div class="perf-period">YTD</div><div class="perf-val up">+0.31%</div></div>
+    </div>
+    <div class="comment">
+      <span class="cl">📊 Analysis</span>
+      The 30-day drop of −36.20% is the most alarming figure — a major May–June 2026 correction driven by Believers Fund unlock pressure and macro weakness. The 90-day +28.91% shows GRAM had a strong Q1 2026 rally that preceded the recent selloff. YTD of just +0.31% means the year has been essentially flat for holders — ATH gains are far from recovered. The 24h +13.10% bounce is encouraging but must hold above MA(30) at $1.753 to confirm a true reversal.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><span class="num">03</span>Social Media</div>
+    <div class="g2">
+      <a class="social-card" href="https://x.com/ton_blockchain" target="_blank">
+        <div class="si" style="font-size:1rem;font-weight:900">𝕏</div>
+        <div><div class="sn">X (Twitter)</div><div class="ss">@ton_blockchain</div><div class="ss up" style="margin-top:2px">2.1M Followers · High Engagement</div></div>
+      </a>
+      <a class="social-card" href="https://t.me/toncoin" target="_blank">
+        <div class="si" style="font-size:1.1rem">✈</div>
+        <div><div class="sn">Telegram</div><div class="ss">@toncoin</div><div class="ss up" style="margin-top:2px">200K Subscribers</div></div>
+      </a>
+    </div>
+    <div class="comment">
+      <span class="cl">📊 Analysis</span>
+      2.1M followers on X with consistently high engagement across many posts signals an active and vocal community — well above average for a top-20 asset. The Telegram community of 200K subscribers is respectable, though modest relative to the project's Telegram-native thesis. The MTONGA announcement in May 2026 generated a significant engagement spike. Community sentiment is split — bulls cite Telegram distribution, bears focus on unlock pressure and centralization. Overall social health is above average for the sector.
+    </div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:65%"></div></div><span class="rs">6.5 / 10</span></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><span class="num">04</span>Roadmap</div>
+    <div class="roadmap">
+      <div class="rmi done"><div class="rp">2018</div><div class="rm">Pavel &amp; Nikolai Durov design The Open Network. $1.7B raised in private sale. <span class="tag tg">✅ Done</span></div></div>
+      <div class="rmi done"><div class="rp">2020</div><div class="rm">Telegram settles with SEC ($18.5M fine), open-sources TON code. Community takes over. <span class="tag tg">✅ Done</span></div></div>
+      <div class="rmi done"><div class="rp">Apr 2024</div><div class="rm">USDT (Tether) launches natively on TON — massive stablecoin liquidity milestone. <span class="tag tg">✅ Done</span></div></div>
+      <div class="rmi done"><div class="rp">Jun 2024</div><div class="rm">ATH of $8.235 reached — peak market euphoria and Telegram integration boom. <span class="tag tg">✅ Done</span></div></div>
+      <div class="rmi done"><div class="rp">Jan 2025</div><div class="rm">TON becomes exclusive blockchain for all Telegram Mini Apps — deepened exclusive partnership. <span class="tag tg">✅ Done</span></div></div>
+      <div class="rmi done"><div class="rp">Jul 2025</div><div class="rm">Self-custodial TON Wallet rolled out to ~87 million US Telegram users. <span class="tag tg">✅ Done</span></div></div>
+      <div class="rmi done"><div class="rp">Apr 2026</div><div class="rm">Catchain 2.0 goes live — sub-second finality, approximately 6x faster block production. <span class="tag tg">✅ Done</span></div></div>
+      <div class="rmi done"><div class="rp">May 2026</div><div class="rm">Telegram replaces TON Foundation as largest validator — MTONGA roadmap announced. Token rebranded back to GRAM. <span class="tag tg">✅ Done</span></div></div>
+      <div class="rmi soon"><div class="rp">Mid-2026</div><div class="rm">TON Teleport Bridge — trustless Bitcoin bridge bringing BTC liquidity into the TON ecosystem. <span class="tag ty">⏳ In Progress</span></div></div>
+      <div class="rmi soon"><div class="rp">2026</div><div class="rm">~6x fee reduction rollout — targeting near-zero transaction costs for all Mini App users. <span class="tag ty">⏳ In Progress</span></div></div>
+      <div class="rmi upcoming"><div class="rp">2026–2028</div><div class="rm">Believers Fund unlock period — ~36.6M GRAM/month distributed through October 2028. <span class="tag tr">⚠️ Risk</span></div></div>
+      <div class="rmi upcoming"><div class="rp">2028 Target</div><div class="rm">500 million crypto users onboarded through the Telegram ecosystem. <span class="tag tb">🔵 Target</span></div></div>
+    </div>
+    <div class="comment">
+      <span class="cl">📊 Analysis</span>
+      GRAM's roadmap is one of the most execution-heavy in all of crypto. The project has consistently delivered milestones — from USDT launch to Catchain 2.0 — and the MTONGA pivot marks a bold strategic realignment. The Bitcoin Teleport Bridge and fee reduction are the next critical catalysts for adoption. The primary structural risk over the roadmap timeline is the Believers Fund unlock period running concurrently with growth initiatives — creating a tug-of-war between buy-side catalysts and sell-side pressure through October 2028.
+    </div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:72%"></div></div><span class="rs">7.2 / 10</span></div>
+  </div>
+</div>
+
+<!-- TOKENOMICS -->
+<div id="tab-tokenomics" class="tab-page">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Supply Distribution</div>
+    <div class="g-auto" style="margin-bottom:14px">
+      <div class="mc"><div class="ml">Total Supply</div><div class="mv">5.19B GRAM</div></div>
+      <div class="mc"><div class="ml">Unlocked (54.3%)</div><div class="mv up">2.81B GRAM</div><div class="ms">~$4.79B value</div></div>
+      <div class="mc"><div class="ml">Locked (44.9%)</div><div class="mv warn">2.33B GRAM</div><div class="ms">~$3.96B value</div></div>
+      <div class="mc"><div class="ml">Next Unlock (0%)</div><div class="mv">171.86K GRAM</div><div class="ms">~$292.30K value</div></div>
+      <div class="mc"><div class="ml">Max Supply</div><div class="mv warn">Unlimited</div><div class="ms">~0.6–3.6% inflation/yr</div></div>
+      <div class="mc"><div class="ml">Believers Fund Monthly</div><div class="mv down">~36.6M GRAM</div><div class="ms">Through Oct 2028</div></div>
+    </div>
+    <div class="alloc-grid">
+      <div class="alloc-card">
+        <div class="alloc-name"><span class="alloc-dot" style="background:#5b9bd5"></span>Pre Mined</div>
+        <div class="alloc-row"><span>Total Allocation</span><span class="alloc-val">44.2%</span></div>
+        <div class="alloc-row"><span>Unlocked</span><span class="alloc-val up">43.9%</span></div>
+        <div class="alloc-row"><span>Locked</span><span class="alloc-val">—</span></div>
+      </div>
+      <div class="alloc-card">
+        <div class="alloc-name"><span class="alloc-dot" style="background:#e88fa0"></span>Believers Fund</div>
+        <div class="alloc-row"><span>Total Allocation</span><span class="alloc-val">25.6%</span></div>
+        <div class="alloc-row"><span>Unlocked</span><span class="alloc-val up">4.8%</span></div>
+        <div class="alloc-row"><span>Locked</span><span class="alloc-val warn">20.6%</span></div>
+      </div>
+      <div class="alloc-card">
+        <div class="alloc-name"><span class="alloc-dot" style="background:#7ab8e8"></span>Inactive Miners</div>
+        <div class="alloc-row"><span>Total Allocation</span><span class="alloc-val">21%</span></div>
+        <div class="alloc-row"><span>Unlocked</span><span class="alloc-val">—</span></div>
+        <div class="alloc-row"><span>Locked</span><span class="alloc-val warn">20.8%</span></div>
+      </div>
+      <div class="alloc-card">
+        <div class="alloc-name"><span class="alloc-dot" style="background:#5dbf8a"></span>Vested Wallets</div>
+        <div class="alloc-row"><span>Total Allocation</span><span class="alloc-val">6.24%</span></div>
+        <div class="alloc-row"><span>Unlocked</span><span class="alloc-val up">3.29%</span></div>
+        <div class="alloc-row"><span>Locked</span><span class="alloc-val">2.9%</span></div>
+      </div>
+      <div class="alloc-card">
+        <div class="alloc-name"><span class="alloc-dot" style="background:#9b7fc4"></span>Inflation</div>
+        <div class="alloc-row"><span>Total Allocation</span><span class="alloc-val">2.96%</span></div>
+        <div class="alloc-row"><span>Unlocked</span><span class="alloc-val">2.3%</span></div>
+        <div class="alloc-row"><span>Locked</span><span class="alloc-val">0.63%</span></div>
+      </div>
+    </div>
+    <div class="comment">
+      <span class="cl">📊 Analysis</span>
+      GRAM's tokenomics reflect its unique origins as a community-revived blockchain. The Pre-Mined allocation (44.2%) was distributed through PoW Giver smart contracts — a fair launch mechanism with no VC pre-mine advantage. The Believers Fund (25.6%) represents early community supporters, but their monthly unlocks (~36.6M GRAM) are the primary source of sustained sell pressure. The Inactive Miners bucket (21%) is largely still locked — representing dormant wallets that have never moved their tokens, a sleeping supply risk. With 44.9% of total supply still locked, meaningful dilution pressure will persist through 2028.
+    </div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:55%"></div></div><span class="rs">5.5 / 10</span></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><span class="num">02</span>Token Utility</div>
+    <div class="g-auto">
+      <div class="mc"><div class="ml">Transaction Fees</div><div class="mv" style="font-size:.8rem">Gas & Storage</div><div class="ms">All on-chain operations paid in GRAM</div></div>
+      <div class="mc"><div class="ml">Validator Stakes</div><div class="mv" style="font-size:.8rem">PoS Security</div><div class="ms">Validators lock GRAM to produce blocks</div></div>
+      <div class="mc"><div class="ml">Staking Rewards</div><div class="mv" style="font-size:.8rem">~20% / yr</div><div class="ms">Validators earn ~20% of stake annually</div></div>
+      <div class="mc"><div class="ml">Slash & Burn</div><div class="mv" style="font-size:.8rem">Deflationary</div><div class="ms">Misbehaving validators slashed &amp; burned</div></div>
+      <div class="mc"><div class="ml">Mini App Payments</div><div class="mv" style="font-size:.8rem">Telegram Native</div><div class="ms">Exclusive crypto for Telegram services</div></div>
+      <div class="mc"><div class="ml">Governance</div><div class="mv" style="font-size:.8rem">On-chain Votes</div><div class="ms">Protocol upgrades via validator consensus</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><span class="num">03</span>Inflation Model (Whitepaper)</div>
+    <div class="comment" style="margin-top:0">
+      <span class="cl">📄 Dr. Nikolai Durov — TON Whitepaper</span>
+      The total supply of GRAM coins is originally limited to 5 Gigatons (5 billion). This supply grows slowly as validator rewards for producing new masterchain and shardchain blocks accumulate. Validators earn approximately 20% of their staked amount per year for diligent participation. With approximately 10% of total supply expected to be staked at any given time, the baseline inflation rate is approximately 2% per year — potentially doubling supply to ~10 billion in around 35 years. Catchain 2.0 (April 2026) increased block frequency significantly, which may elevate annual inflation from ~0.6% toward ~3.6%. Counterbalancing this: a portion of transaction fees are burned, and slashed validator stakes are also burned — creating deflationary pressure that scales with network usage and validator misbehaviour.
+    </div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:55%"></div></div><span class="rs">5.5 / 10</span></div>
+  </div>
+</div>
+
+<!-- TEAM -->
+<div id="tab-team" class="tab-page">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Core Team</div>
+    <div class="team-grid">
+
+      <div class="team-card">
+        <div class="t-top">
+          <img class="t-photo" src="https://i.ibb.co/HLfJ4NVq/images-26.jpg" alt="Pavel Durov">
+          <div><div class="t-name">Pavel Durov</div><div class="t-role">Co-Founder · Telegram CEO</div></div>
+        </div>
+        <div class="t-actions">
+          <button class="btn bbio" onclick="toggleBio(this)">▼ Bio</button>
+          <a class="btn btw" href="https://x.com/durov" target="_blank">𝕏 Twitter</a>
+          <a class="btn btg" href="https://t.me/durov" target="_blank">✈ Telegram</a>
+        </div>
+        <div class="bio-panel">Pavel Durov (born October 10, 1984, Leningrad) is one of the most influential figures in tech and crypto. He co-founded VKontakte (VK), Russia's largest social network, before being forced out by Kremlin-aligned investors in 2014. He then founded Telegram, which grew to over 1 billion monthly active users. In 2018, he and his brother Nikolai designed The Open Network and raised $1.7 billion in a private token sale. After the SEC forced a shutdown and $18.5M settlement in 2020, the community revived the project independently. In May 2026, Durov announced Telegram would take back direct control of TON — becoming its largest validator under the MTONGA roadmap — and rebranded the native token back to its original name: GRAM. He was arrested in Paris in August 2024 over content moderation disputes, adding ongoing regulatory risk to the project's independence.</div>
+      </div>
+
+      <div class="team-card">
+        <div class="t-top">
+          <img class="t-photo" src="https://i.ibb.co/9H3V5Xzh/images-27.jpg" alt="Nikolai Durov">
+          <div><div class="t-name">Nikolai Durov</div><div class="t-role">Co-Founder · Chief Architect</div></div>
+        </div>
+        <div class="t-actions">
+          <button class="btn bbio" onclick="toggleBio(this)">▼ Bio</button>
+        </div>
+        <div class="bio-panel">Nikolai Durov is the technical genius behind The Open Network. A mathematician and programmer of extraordinary ability, he holds a PhD and is widely regarded as one of the most brilliant engineers in the blockchain space. The TON whitepaper is formally attributed to Dr. Nikolai Durov and covers the entire architecture: the Infinite Sharding Paradigm, BFT Proof-of-Stake consensus (Catchain protocol), Instant Hypercube Routing, the TON Virtual Machine (TVM), Fift programming language, and the payment channel architecture. He co-founded both VKontakte and Telegram with Pavel, and designed the MTProto encryption protocol used by Telegram. He maintains an extremely low public profile with no active social media — letting his code speak for itself.</div>
+      </div>
+
+      <div class="team-card">
+        <div class="t-top">
+          <img class="t-photo" src="https://i.ibb.co/6cJdm1Vx/images-28.jpg" alt="Steve Yun">
+          <div><div class="t-name">Steve Yun</div><div class="t-role">President · Founding Member</div></div>
+        </div>
+        <div class="t-actions">
+          <button class="btn bbio" onclick="toggleBio(this)">▼ Bio</button>
+          <a class="btn btw" href="https://x.com/steveyun" target="_blank">𝕏 Twitter</a>
+        </div>
+        <div class="bio-panel">Steve Yun serves as President of the TON Foundation and is one of its founding members. He has been instrumental in building TON's institutional credibility and securing its exclusive partnership with Telegram. Under his leadership, the Foundation navigated the critical transition from a community-led project to a Telegram-aligned blockchain ecosystem. Yun oversaw major milestones including the USDT launch on TON (April 2024), the exclusive Mini App blockchain designation (January 2025), and institutional fundraising from Sequoia Capital, Pantera, and Benchmark. His active presence on X and track record of delivery make him one of the most important operational figures in the GRAM ecosystem.</div>
+      </div>
+
+      <div class="team-card">
+        <div class="t-top">
+          <img class="t-photo" src="https://i.ibb.co/S42zSPFP/1626067980744.jpg" alt="Andrew Rogozov">
+          <div><div class="t-name">Andrew Rogozov</div><div class="t-role">Founding Member</div></div>
+        </div>
+        <div class="t-actions">
+          <button class="btn bbio" onclick="toggleBio(this)">▼ Bio</button>
+          <a class="btn btw" href="https://x.com/rogozov" target="_blank">𝕏 Twitter</a>
+        </div>
+        <div class="bio-panel">Andrew Rogozov joined the TON Foundation as a founding member in January 2022, bringing an extensive background in tech leadership. He previously served as CEO of VK (VKontakte) — the same company where he and Pavel Durov first worked together — giving him a unique shared history with the project's origins. At the TON Foundation, Rogozov leads product strategy and ecosystem development, leveraging his experience scaling one of the largest social platforms in Eastern Europe. His deep familiarity with both the Durov brothers and Telegram's product-led growth philosophy makes him a culturally and strategically aligned member of the founding team.</div>
+      </div>
+
+    </div>
+    <div class="comment">
+      <span class="cl">📊 Analysis</span>
+      GRAM's team is among the strongest in all of crypto. The Durov brothers are proven builders who created two of the most significant internet platforms to come out of Russia (VK and Telegram). Nikolai's whitepaper is considered a technical masterpiece in blockchain architecture. Steve Yun brings the institutional bridge that pure-tech founders typically lack, while Andrew Rogozov adds rare real-world experience running a billion-user social platform. The team's main vulnerabilities are Nikolai's complete public invisibility and Pavel's ongoing legal exposure in France — both carry communication and regulatory risk that the market cannot fully price in.
+    </div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:82%"></div></div><span class="rs">8.2 / 10</span></div>
+  </div>
+</div>
+
+<!-- INVESTORS -->
+<div id="tab-investors" class="tab-page">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Funding History</div>
+    <div class="g-auto" style="margin-bottom:13px">
+      <div class="mc"><div class="ml">Original Raise (2018)</div><div class="mv up">$1.7 Billion</div><div class="ms">Private token sale by Telegram — later refunded after SEC settlement</div></div>
+      <div class="mc"><div class="ml">Institutional Round (2024–25)</div><div class="mv up">$400M+</div><div class="ms">Token-based investment: Sequoia, Benchmark, Pantera</div></div>
+      <div class="mc"><div class="ml">Convertible Bonds (2025)</div><div class="mv up">$1.7 Billion</div><div class="ms">Telegram's convertible bond issuance to fuel TON growth</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><span class="num">02</span>Investor Profiles</div>
+    <div class="inv-grid">
+      <div class="inv-card">
+        <div class="il">TIER-1 VC</div>
+        <div class="in">Sequoia Capital</div>
+        <div class="ib">One of Silicon Valley's most prestigious venture capital firms — backers of Apple, Google, Airbnb, and Stripe. Sequoia's participation in TON's institutional round is one of the strongest credibility signals a blockchain project can receive.</div>
+      </div>
+      <div class="inv-card">
+        <div class="il">TIER-1 VC</div>
+        <div class="in">Benchmark</div>
+        <div class="ib">Among the most selective VCs in the world, known for early bets on Twitter, Uber, and Snap. Their participation alongside Sequoia signals broad institutional conviction in the Telegram-blockchain convergence thesis.</div>
+      </div>
+      <div class="inv-card">
+        <div class="il">CRYPTO-NATIVE VC</div>
+        <div class="in">Pantera Capital</div>
+        <div class="ib">One of the oldest and most respected crypto-native investment funds. Participated in TON's institutional rounds and The Open Platform (TOP) unicorn raise. Their crypto domain expertise adds deep ecosystem strategic value.</div>
+      </div>
+      <div class="inv-card">
+        <div class="il">GAMING / FINTECH VC</div>
+        <div class="in">Yolo Investments</div>
+        <div class="ib">Made an $8 million investment in Toncoin, citing strong conviction in TON's gaming and Mini App ecosystem potential. As a VC focused on gaming, fintech, and blockchain, their bet aligns with the growing GameFi activity on TON.</div>
+      </div>
+      <div class="inv-card">
+        <div class="il">FINTECH VC</div>
+        <div class="in">Ribbit Capital</div>
+        <div class="ib">Led the $28.5M investment in The Open Platform (TOP) — the first TON-focused unicorn — with Pantera co-investing. Ribbit's fintech focus signals conviction that TON's payment infrastructure is ready for mainstream financial applications.</div>
+      </div>
+    </div>
+    <div class="comment">
+      <span class="cl">📊 Analysis</span>
+      GRAM has one of the strongest institutional backing lineups of any Layer 1 blockchain outside the top 10. Sequoia and Benchmark are as prestigious as it gets in venture capital globally. Pantera adds crypto-native depth. Total disclosed institutional capital exceeds $400M, on top of Telegram's own $1.7B convertible bond raise in 2025. This is a stark contrast to most blockchain projects that rely on anonymous or second-tier investors. The institutional vote of confidence substantially de-risks execution credibility — though it does not eliminate token price risk from unlock pressure or macro conditions.
+    </div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:85%"></div></div><span class="rs">8.5 / 10</span></div>
+  </div>
+</div>
+
+<!-- ECOSYSTEM -->
+<div id="tab-ecosystem" class="tab-page">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Use Cases</div>
+    <div class="uc-grid">
+      <div class="uci">
+        <div class="uci-num">USE CASE 01</div>
+        <div class="uci-title">Telegram Mini App Payments</div>
+        <div class="uci-desc">GRAM is the exclusive payment token for all Telegram Mini Apps — giving it direct access to 1 billion+ users with zero additional onboarding friction. The largest consumer crypto gateway ever built.</div>
+      </div>
+      <div class="uci">
+        <div class="uci-num">USE CASE 02</div>
+        <div class="uci-title">Stablecoin Transfers (USDT)</div>
+        <div class="uci-desc">Tether's USDT launched natively on TON in April 2024. Users send USDT directly inside Telegram at near-zero fees — one of the largest organic fiat-to-crypto on-ramps in 2026.</div>
+      </div>
+      <div class="uci">
+        <div class="uci-num">USE CASE 03</div>
+        <div class="uci-title">Validator Staking</div>
+        <div class="uci-desc">GRAM holders can stake as validators or nominators to secure the network and earn approximately 20% annual rewards on staked capital, per the whitepaper's BFT PoS design.</div>
+      </div>
+      <div class="uci">
+        <div class="uci-num">USE CASE 04</div>
+        <div class="uci-title">Transaction Fees & Gas</div>
+        <div class="uci-desc">All on-chain computations, smart contract executions, message processing, and storage payments across the TON ecosystem are denominated exclusively in GRAM.</div>
+      </div>
+      <div class="uci">
+        <div class="uci-num">USE CASE 05</div>
+        <div class="uci-title">TON DNS</div>
+        <div class="uci-desc">A decentralized naming service assigning human-readable .ton domain names to wallets, smart contracts, and services — enabling a browser-like Web3 experience natively inside Telegram.</div>
+      </div>
+      <div class="uci">
+        <div class="uci-num">USE CASE 06</div>
+        <div class="uci-title">TON Storage</div>
+        <div class="uci-desc">A distributed torrent-like file storage network built into TON's core architecture. Developers and users can store arbitrary files decentrally — powered and settled in GRAM.</div>
+      </div>
+      <div class="uci">
+        <div class="uci-num">USE CASE 07</div>
+        <div class="uci-title">TON Proxy (Anonymizer)</div>
+        <div class="uci-desc">A privacy layer similar to I2P that hides the IP addresses and identities of network nodes — protecting validators and users who require anonymity for sensitive or high-value transactions.</div>
+      </div>
+      <div class="uci">
+        <div class="uci-num">USE CASE 08</div>
+        <div class="uci-title">TON Payments (Lightning)</div>
+        <div class="uci-desc">Off-chain payment channels enabling instant micropayments. Only two blockchain transactions required — one to open and one to close — regardless of how many payments occur in between.</div>
+      </div>
+      <div class="uci">
+        <div class="uci-num">USE CASE 09</div>
+        <div class="uci-title">Yield-Bearing Stablecoins</div>
+        <div class="uci-desc">Ethena's tsUSDe (announced May 2025) brings ~10% APY yield-bearing stablecoins directly inside Telegram — combining DeFi yield with TON's unmatched consumer distribution.</div>
+      </div>
+      <div class="uci">
+        <div class="uci-num">USE CASE 10</div>
+        <div class="uci-title">NFT & Digital Collectibles</div>
+        <div class="uci-desc">Telegram Gifts (NFT collectibles) are minted and verified on TON. Collaborations with Snoop Dogg and Khabib Nurmagomedov generated millions in NFT sales directly on-chain in 2025.</div>
+      </div>
+      <div class="uci">
+        <div class="uci-num">USE CASE 11</div>
+        <div class="uci-title">Telegram Ad Revenue Sharing</div>
+        <div class="uci-desc">Telegram's advertising platform pays channel owners 50% of ad revenue in GRAM — creating a direct fiat-to-GRAM demand pipeline from Telegram's own commercial operations.</div>
+      </div>
+      <div class="uci">
+        <div class="uci-num">USE CASE 12</div>
+        <div class="uci-title">DeFi & Liquid Staking</div>
+        <div class="uci-desc">A growing DeFi ecosystem including liquid staking protocols, DEXs, and lending markets. TVL reached ~$158.9M in late 2025 with continued growth trajectory driven by Telegram user onboarding.</div>
+      </div>
+      <div class="uci">
+        <div class="uci-num">USE CASE 13</div>
+        <div class="uci-title">Cross-Border Remittances</div>
+        <div class="uci-desc">Financial firms use TON for cross-border remittances via low-fee transfers and Telegram Wallet — targeting underbanked populations in Southeast Asia, Africa, and Latin America.</div>
+      </div>
+    </div>
+    <div class="comment">
+      <span class="cl">📊 Analysis</span>
+      GRAM's use case coverage is exceptional and spans nearly every major category of blockchain utility — payments, DeFi, storage, privacy, DNS, NFTs, and developer infrastructure. What sets it apart from all competitors is that use cases 01, 02, 09, 10, and 11 are already live and generating real organic demand through Telegram's billion-user platform. The whitepaper's vision of TON as a "distributed supercomputer" hosting all reasonable applications is actively being realized through the Mini App ecosystem. No other Layer 1 in 2026 combines this technical breadth with this consumer distribution scale.
+    </div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:85%"></div></div><span class="rs">8.5 / 10</span></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><span class="num">02</span>Key Partnerships</div>
+    <div class="inv-grid">
+      <div class="inv-card">
+        <div class="il">STRATEGIC — EXCLUSIVE</div>
+        <div class="in">Telegram Messenger</div>
+        <div class="ib">TON is the exclusive blockchain for all Telegram Mini Apps (Jan 2025). In May 2026, Telegram became TON's largest validator under MTONGA — effectively merging the two ecosystems. 1 billion+ MAU funnel directly into GRAM.</div>
+      </div>
+      <div class="inv-card">
+        <div class="il">STABLECOIN</div>
+        <div class="in">Tether (USDT)</div>
+        <div class="ib">USDT launched natively on TON in April 2024, alongside XAUT (gold-backed). This brought the world's largest stablecoin directly into the Telegram Wallet, dramatically expanding payment utility.</div>
+      </div>
+      <div class="inv-card">
+        <div class="il">DEFI</div>
+        <div class="in">Ethena Labs</div>
+        <div class="ib">Announced at Token2049 Dubai (May 2025). Ethena's tsUSDe — a yield-bearing stablecoin earning ~10% APY — launched inside Telegram, creating a DeFi-native savings product for Telegram's global user base.</div>
+      </div>
+      <div class="inv-card">
+        <div class="il">ENTERPRISE SECURITY</div>
+        <div class="in">Fireblocks</div>
+        <div class="ib">Enterprise wallet infrastructure provider Fireblocks integrated with TON alongside Dynamic, providing institutional-grade wallet and DeFi on-ramps for Telegram-based financial products.</div>
+      </div>
+      <div class="inv-card">
+        <div class="il">REGULATED ACCESS</div>
+        <div class="in">SCRYPT (Swiss)</div>
+        <div class="ib">TON Foundation partnered with SCRYPT to provide Swiss-regulated business access to USDT on TON — opening institutional and compliant enterprise use of TON's payment rails in Europe.</div>
+      </div>
+      <div class="inv-card">
+        <div class="il">EXCHANGE</div>
+        <div class="in">Rakuten Wallet</div>
+        <div class="ib">Japan's Rakuten Wallet listed GRAM for spot trading in April 2026 — providing regulated access to the Japanese retail crypto market, one of the world's largest and most compliance-forward markets.</div>
+      </div>
+      <div class="inv-card">
+        <div class="il">SECURITY AUDIT</div>
+        <div class="in">Zellic / Cyberscope / Softstack</div>
+        <div class="ib">Multiple independent security firms have audited the TON codebase. Zellic assessed tonlib and the TVM. Cyberscope became an official TON ecosystem auditor in April 2026. Softstack audits TON ecosystem projects.</div>
+      </div>
+    </div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:82%"></div></div><span class="rs">8.2 / 10</span></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><span class="num">03</span>Competitors</div>
+    <div class="comp-grid">
+      <div class="comp-card">
+        <div class="comp-icon">⟠</div>
+        <div class="cn">Ethereum (ETH)</div>
+        <div class="cd"><strong style="color:var(--accent)">Competes in:</strong> Smart contracts, DeFi TVL, NFTs, developer ecosystem. ETH dominates TVL ($60B+) but GRAM wins on speed, fees, and consumer UX via Telegram.</div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-icon">◎</div>
+        <div class="cn">Solana (SOL)</div>
+        <div class="cd"><strong style="color:var(--accent)">Competes in:</strong> High-throughput payments, consumer apps, gaming. Solana leads raw TPS but lacks GRAM's billion-user distribution channel through Telegram.</div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-icon">⬡</div>
+        <div class="cn">BNB Chain (BNB)</div>
+        <div class="cd"><strong style="color:var(--accent)">Competes in:</strong> Retail DeFi, low fees, DEX volume. BNB has Binance distribution; GRAM has Telegram — both target mainstream retail users at scale.</div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-icon">₮</div>
+        <div class="cn">TRON (TRX)</div>
+        <div class="cd"><strong style="color:var(--accent)">Competes in:</strong> USDT transfers, stablecoin payments, micropayments. TRON is #1 for USDT volume today — but GRAM's Telegram Wallet integration directly threatens this dominance.</div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-icon">⚛</div>
+        <div class="cn">Cosmos (ATOM)</div>
+        <div class="cd"><strong style="color:var(--accent)">Competes in:</strong> Interoperability, multi-chain architecture, IBC cross-chain. Cosmos leads cross-chain communication but lacks GRAM's consumer-facing distribution advantage.</div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-icon">🌊</div>
+        <div class="cn">Sui (SUI)</div>
+        <div class="cd"><strong style="color:var(--accent)">Competes in:</strong> Gaming, consumer apps, sub-second finality. Sui is GRAM's closest technical rival for consumer UX but has no comparable distribution moat.</div>
+      </div>
+    </div>
+    <div class="comment">
+      <span class="cl">📊 Analysis</span>
+      GRAM competes across the entire Layer 1 landscape but holds a structurally unique position: no other blockchain in 2026 has exclusive access to a 1-billion-user messaging platform as its primary distribution channel. While Solana leads on raw TPS and Ethereum dominates institutional DeFi, GRAM's competitive moat is the Telegram integration — a moat that cannot be replicated by any competitor. The most direct competitive threat is TRON in the USDT stablecoin payment space, where TRON currently processes the majority of global USDT transfers. GRAM's ability to capture this market through Telegram Wallet is one of the most significant competitive battles to watch in 2026–2027.
+    </div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:75%"></div></div><span class="rs">7.5 / 10</span></div>
+  </div>
+</div>
+
+<!-- TECHNICAL -->
+<div id="tab-technical" class="tab-page">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Technology (Whitepaper)</div>
+    <div class="g-auto" style="margin-bottom:13px">
+      <div class="mc"><div class="ml">Consensus</div><div class="mv" style="font-size:.8rem">BFT Proof-of-Stake</div><div class="ms">Catchain protocol (5th-gen design)</div></div>
+      <div class="mc"><div class="ml">Architecture</div><div class="mv" style="font-size:.8rem">Masterchain + Workchains</div><div class="ms">Up to 2³² workchains, 2⁶⁰ shards each</div></div>
+      <div class="mc"><div class="ml">Sharding</div><div class="mv" style="font-size:.8rem">Infinite Sharding</div><div class="ms">Bottom-up, dynamic split &amp; merge</div></div>
+      <div class="mc"><div class="ml">Block Time (Catchain 2.0)</div><div class="mv up">~400ms</div><div class="ms">Sub-second finality — live Apr 2026</div></div>
+      <div class="mc"><div class="ml">Cross-Shard Routing</div><div class="mv" style="font-size:.8rem">Instant Hypercube</div><div class="ms">Efficient cross-shard message delivery</div></div>
+      <div class="mc"><div class="ml">Smart Contracts</div><div class="mv" style="font-size:.8rem">TVM (Turing Complete)</div><div class="ms">TON Virtual Machine + Fift language</div></div>
+      <div class="mc"><div class="ml">Theoretical Throughput</div><div class="mv up">Millions TPS</div><div class="ms">Via infinite sharding paradigm</div></div>
+      <div class="mc"><div class="ml">Self-Healing</div><div class="mv up">✅ Yes</div><div class="ms">Vertical blockchain replaces invalid blocks</div></div>
+      <div class="mc"><div class="ml">Open Source</div><div class="mv up">✅ Yes</div><div class="ms">github.com/ton-blockchain</div></div>
+      <div class="mc"><div class="ml">Security Audits</div><div class="mv up">✅ Multiple</div><div class="ms">Zellic, Softstack, Cyberscope</div></div>
+    </div>
+    <div class="comment">
+      <span class="cl">📄 Whitepaper Tech Deep Dive — Dr. Nikolai Durov</span>
+      TON's architecture is among the most sophisticated in blockchain. The Infinite Sharding Paradigm treats each account as its own shardchain in the extreme case — enabling near-unlimited horizontal scaling. The Masterchain coordinates all workchains and shardchains, storing validator sets, sharding parameters, and hashes of all recent blocks. Instant Hypercube Routing ensures cross-shard messages are delivered efficiently regardless of sharding depth. The self-healing vertical blockchain mechanism allows invalid blocks to be replaced without forking the horizontal chain. The TVM natively supports Merkle proof operations — an architectural decision made at the design stage to future-proof the payment channel layer. Catchain 2.0 (April 2026) delivered approximately 6x faster block production, bringing block time down to sub-400ms finality.
+    </div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:88%"></div></div><span class="rs">8.8 / 10</span></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><span class="num">02</span>Price & Technical Analysis</div>
+    <div class="date-note">📅 As of June 7, 2026</div>
+    <div class="level-grid">
+      <div class="lc">
+        <div class="lt sup">🟢 Support Levels</div>
+        <div class="li2">$1.449 <small>24h Low / near-term floor</small></div>
+        <div class="li2">$1.590 <small>MA(7) — short-term base</small></div>
+        <div class="li2">$1.72–$1.76 <small>Key mid-range support zone</small></div>
+        <div class="li2">$1.30 <small>Mid-term support / April level</small></div>
+      </div>
+      <div class="lc">
+        <div class="lt res">🔴 Resistance Levels</div>
+        <div class="li2">$1.753 <small>MA(30) — immediate ceiling</small></div>
+        <div class="li2">$2.011 <small>MA(200) — major resistance</small></div>
+        <div class="li2">$2.20 <small>Near-term retest target</small></div>
+        <div class="li2">$2.265 <small>Recent swing high</small></div>
+      </div>
+    </div>
+    <div class="g-auto">
+      <div class="mc"><div class="ml">RSI (14)</div><div class="mv warn">50.982 — Neutral</div></div>
+      <div class="mc"><div class="ml">MA(7)</div><div class="mv up">$1.590</div><div class="ms">Price above — bullish short-term</div></div>
+      <div class="mc"><div class="ml">MA(30)</div><div class="mv down">$1.753</div><div class="ms">Acting as immediate resistance</div></div>
+      <div class="mc"><div class="ml">MA(200)</div><div class="mv down">$2.011</div><div class="ms">Far above — bearish medium-term</div></div>
+      <div class="mc"><div class="ml">MACD</div><div class="mv up">+0.020</div><div class="ms">DIF: −0.068 / DEA: −0.087</div></div>
+      <div class="mc"><div class="ml">BTC Pair (24h)</div><div class="mv up">+12.17%</div><div class="ms">0.00002754 BTC</div></div>
+    </div>
+    <div class="comment">
+      <span class="cl">📊 Analysis — As of June 7, 2026</span>
+      GRAM is in a recovering downtrend following the −36.20% 30-day correction. The +13.10% 24h bounce has pushed price above MA(7) at $1.590 — a positive short-term signal. However, MA(30) at $1.753 and MA(200) at $2.011 both sit above current price as significant resistance zones. The RSI of 50.982 is neutral — neither overbought nor oversold — suggesting the bounce could extend if buying pressure continues. The MACD shows a positive value (+0.020) with DIF beginning to cross above DEA, which is an early bullish divergence signal. First bullish confirmation requires a clean daily close above MA(30) at $1.753. Full trend recovery requires reclaiming MA(200) at $2.011. The primary bear case remains the ongoing Believers Fund monthly unlocks which create structural ceiling pressure.
+    </div>
+    <div class="rating"><span class="rl">Rating</span><div class="rt"><div class="rf" style="width:48%"></div></div><span class="rs">4.8 / 10</span></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><span class="num">03</span>Catalysts & Strategy</div>
+    <table class="tbl" style="margin-bottom:13px">
+      <tr><th>Type</th><th>Catalyst</th><th>Impact</th></tr>
+      <tr><td><span class="tag tg">Bullish</span></td><td>TON Teleport Bridge (Bitcoin bridge) goes live — BTC liquidity enters TON</td><td>Very High</td></tr>
+      <tr><td><span class="tag tg">Bullish</span></td><td>6x fee reduction fully deployed — mass adoption of Mini App payments</td><td>Very High</td></tr>
+      <tr><td><span class="tag tg">Bullish</span></td><td>Telegram Stars → GRAM conversion pipeline scales — creator economy buy pressure</td><td>High</td></tr>
+      <tr><td><span class="tag tg">Bullish</span></td><td>Broader BTC/ETH bull market — large-cap Layer 1s benefit significantly</td><td>Very High</td></tr>
+      <tr><td><span class="tag tg">Bullish</span></td><td>Pavel Durov legal resolution — removes key regulatory overhang</td><td>High</td></tr>
+      <tr><td><span class="tag tg">Bullish</span></td><td>New top-tier exchange listings or spot ETF inclusion</td><td>High</td></tr>
+      <tr><td><span class="tag tr">Bearish</span></td><td>Believers Fund unlocks continue (~36.6M GRAM/month through Oct 2028)</td><td>High</td></tr>
+      <tr><td><span class="tag tr">Bearish</span></td><td>Pavel Durov conviction or Telegram regulatory shutdown</td><td>Very High</td></tr>
+      <tr><td><span class="tag tr">Bearish</span></td><td>Catchain 2.0 inflation increase (~3.6%/yr) overwhelms organic demand</td><td>Medium</td></tr>
+      <tr><td><span class="tag tr">Bearish</span></td><td>Broader macro crypto downturn — large-caps correct heavily</td><td>Very High</td></tr>
+    </table>
+    <div class="g-auto">
+      <div class="mc"><div class="ml">🟢 Accumulation Zone</div><div class="mv up">$1.40 – $1.60</div></div>
+      <div class="mc"><div class="ml">🎯 Take Profit 1</div><div class="mv warn">$2.00 – $2.20</div></div>
+      <div class="mc"><div class="ml">🎯 Take Profit 2</div><div class="mv warn">$3.00 – $4.00</div></div>
+      <div class="mc"><div class="ml">🛑 Stop Loss</div><div class="mv down">Below $1.25</div></div>
+      <div class="mc"><div class="ml">Time Horizon</div><div class="mv">6 – 18 months</div></div>
+      <div class="mc"><div class="ml">Risk Level</div><div class="mv warn">MEDIUM-HIGH</div></div>
+    </div>
+    <div class="comment" style="font-size:.68rem;margin-top:10px">⚠️ Not financial advice. This is educational research only. GRAM is a medium-to-high risk large-cap asset. Always DYOR. Never invest more than you can afford to lose entirely. As of June 7, 2026.</div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title"><span class="num">04</span>Fundamental Score</div>
+    <div class="score-row"><div class="sc">Team & Founders</div><div class="sw">×20%</div><div class="sb"><div class="sbf" style="width:82%"></div></div><div class="sv">8.2</div></div>
+    <div class="score-row"><div class="sc">Tokenomics</div><div class="sw">×20%</div><div class="sb"><div class="sbf" style="width:55%"></div></div><div class="sv">5.5</div></div>
+    <div class="score-row"><div class="sc">Technology / Product</div><div class="sw">×15%</div><div class="sb"><div class="sbf" style="width:88%"></div></div><div class="sv">8.8</div></div>
+    <div class="score-row"><div class="sc">Protocol Metrics</div><div class="sw">×15%</div><div class="sb"><div class="sbf" style="width:60%"></div></div><div class="sv">6.0</div></div>
+    <div class="score-row"><div class="sc">Investors / Backing</div><div class="sw">×10%</div><div class="sb"><div class="sbf" style="width:85%"></div></div><div class="sv">8.5</div></div>
+    <div class="score-row"><div class="sc">Competitors / Moat</div><div class="sw">×10%</div><div class="sb"><div class="sbf" style="width:75%"></div></div><div class="sv">7.5</div></div>
+    <div class="score-row"><div class="sc">Community</div><div class="sw">×5%</div><div class="sb"><div class="sbf" style="width:65%"></div></div><div class="sv">6.5</div></div>
+    <div class="score-row"><div class="sc">Technical (Price)</div><div class="sw">×5%</div><div class="sb"><div class="sbf" style="width:48%"></div></div><div class="sv">4.8</div></div>
+    <div class="sc-wrap" style="margin-top:18px">
+      <div class="sc-circle"><div class="sc-num">6.6</div></div>
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;color:#fff;margin-bottom:3px">Weighted Score: 66 / 100</div>
+        <div style="font-size:.68rem;color:var(--muted)">Medium-High Risk · Strong Fundamentals · Unlock Headwind</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VERDICT -->
+<div id="tab-verdict" class="tab-page">
+  <div class="section">
+    <div class="sec-title"><span class="num">01</span>Final Verdict</div>
+    <div class="verdict-box">
+      <div class="vl">Overall Verdict — As of June 7, 2026</div>
+      <div class="vt">🔵 CAUTIOUS ACCUMULATE</div>
+      <div class="vd">GRAM (TON) is the only Layer 1 blockchain with exclusive, direct access to over 1 billion Telegram users — a structural advantage no competitor can replicate. The Durov brothers' technical brilliance, Telegram's takeover as the largest validator (MTONGA), Catchain 2.0 delivery, USDT integration, and Sequoia/Pantera/Benchmark backing all point to a project with genuine long-term merit. The risk is real: Believers Fund unlocks (~36.6M GRAM/month through Oct 2028), Pavel Durov's legal exposure in France, and Telegram centralization are headwinds that cannot be ignored. At current prices (~79% below ATH), risk/reward is reasonably favorable for patient investors with disciplined position sizing.</div>
+      <div class="vg">
+        <div class="vi"><div class="vil">Verdict</div><div class="viv" style="color:var(--accent)">CAUTIOUS BUY</div></div>
+        <div class="vi"><div class="vil">Time Horizon</div><div class="viv">6–18 Months</div></div>
+        <div class="vi"><div class="vil">Risk Level</div><div class="viv" style="color:var(--warning)">MEDIUM-HIGH</div></div>
+        <div class="vi"><div class="vil">Position Size</div><div class="viv" style="color:var(--warning)">2–5% Portfolio</div></div>
+        <div class="vi"><div class="vil">Fund. Score</div><div class="viv" style="color:var(--accent)">66 / 100</div></div>
+        <div class="vi"><div class="vil">Key Risk</div><div class="viv" style="color:var(--danger)">Unlocks + Legal</div></div>
+      </div>
+    </div>
+    <div style="margin-top:13px;font-size:.6rem;color:rgba(79,195,247,0.45);text-align:center;letter-spacing:.5px;line-height:1.6">⚠️ This report is for educational and research purposes only. Not financial advice. Always DYOR and never invest more than you can afford to lose entirely. As of June 7, 2026.</div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function showTab(name, btn) {
+  document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function toggleBio(btn) {
+  const card = btn.closest('.team-card');
+  const panel = card.querySelector('.bio-panel');
+  const isOpen = panel.classList.contains('open');
+  panel.classList.toggle('open', !isOpen);
+  btn.textContent = isOpen ? '▼ Bio' : '▲ Bio';
+  btn.classList.toggle('active', !isOpen);
+}
+</script>
+</body>
+</html>
