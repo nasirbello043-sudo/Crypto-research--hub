@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy — Crypto Research Vault</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Exo+2:wght@200;300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#020810;--bg2:#05101f;--nav-bg:rgba(2,8,16,0.92);--card:#060d1c;--tw:#ddeeff;--tm:#5a9bbf;--td:#2a5570;--c:#00f5ff;--g:#ffd700;--r:#ff0040;--p:#bf00ff;--divider:rgba(0,245,255,0.08);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--tw);font-family:'Exo 2',sans-serif;min-height:100vh;line-height:1.7;}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:12px 20px;background:var(--nav-bg);backdrop-filter:blur(16px);border-bottom:1px solid var(--divider);}
+.back-btn{font-family:'Share Tech Mono',monospace;font-size:0.65rem;letter-spacing:2px;color:var(--c);background:rgba(0,245,255,0.04);border:1px solid rgba(0,245,255,0.2);padding:8px 14px;border-radius:4px;cursor:pointer;transition:all 0.2s;text-decoration:none;display:flex;align-items:center;gap:7px;}
+.back-btn:hover{background:rgba(0,245,255,0.1);}
+.nav-brand{font-family:'Orbitron',monospace;font-size:0.62rem;font-weight:700;letter-spacing:3px;color:var(--c);opacity:0.7;}
+.scanline{position:fixed;top:-4px;left:0;width:100%;height:3px;background:linear-gradient(transparent,rgba(0,245,255,0.08),transparent);animation:scan 8s linear infinite;z-index:200;pointer-events:none;}
+@keyframes scan{from{top:-4px}to{top:100vh}}
+.hero{padding:90px 20px 40px;text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:500px;height:250px;background:radial-gradient(ellipse,rgba(0,245,255,0.06) 0%,rgba(191,0,255,0.03) 40%,transparent 70%);pointer-events:none;}
+.hero-eye{font-family:'Share Tech Mono',monospace;font-size:0.62rem;letter-spacing:5px;color:var(--g);margin-bottom:14px;opacity:0.8;}
+.hero-title{font-family:'Orbitron',monospace;font-size:clamp(1.4rem,5vw,2.4rem);font-weight:900;letter-spacing:3px;color:var(--c);text-shadow:0 0 20px rgba(0,245,255,0.6),0 0 40px rgba(0,245,255,0.3);}
+.hero-sub{font-family:'Share Tech Mono',monospace;font-size:0.68rem;letter-spacing:2px;color:var(--td);margin-top:10px;}
+.hero-date{font-family:'Share Tech Mono',monospace;font-size:0.6rem;letter-spacing:2px;color:rgba(255,215,0,0.6);margin-top:6px;}
+.main{max-width:760px;margin:0 auto;padding:20px 20px 60px;}
+.toc{background:var(--card);border:1px solid var(--divider);border-left:3px solid var(--c);border-radius:5px;padding:20px 22px;margin-bottom:36px;}
+.toc-title{font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;letter-spacing:2px;color:var(--c);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.toc-title::before{content:'//';color:var(--g);opacity:0.5;}
+.toc-list{list-style:none;display:flex;flex-direction:column;gap:6px;}
+.toc-list a{font-family:'Share Tech Mono',monospace;font-size:0.65rem;letter-spacing:1px;color:var(--tm);text-decoration:none;display:flex;align-items:center;gap:8px;transition:color 0.2s;}
+.toc-list a::before{content:'▸';color:var(--c);font-size:0.6rem;}
+.toc-list a:hover{color:var(--c);}
+.pp-section{margin-bottom:36px;scroll-margin-top:70px;}
+.pp-section-title{font-family:'Orbitron',monospace;font-size:0.82rem;font-weight:700;letter-spacing:2px;color:var(--c);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--divider);display:flex;align-items:center;gap:10px;}
+.sec-num{font-size:0.6rem;color:var(--g);background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.2);padding:2px 7px;border-radius:2px;}
+.pp-text{font-size:0.92rem;color:var(--tm);line-height:1.85;font-weight:300;margin-bottom:14px;}
+.pp-text strong{color:var(--tw);font-weight:600;}
+.pp-text a{color:var(--c);text-decoration:none;}
+.pp-text a:hover{text-decoration:underline;}
+.data-box{background:var(--card);border:1px solid var(--divider);border-radius:4px;padding:16px 18px;margin-bottom:14px;}
+.data-box-title{font-family:'Share Tech Mono',monospace;font-size:0.65rem;letter-spacing:2px;color:var(--g);margin-bottom:10px;}
+.data-item{display:flex;gap:12px;margin-bottom:8px;align-items:flex-start;}
+.data-item:last-child{margin-bottom:0;}
+.di-dot{color:var(--c);font-size:0.75rem;flex-shrink:0;margin-top:2px;}
+.di-text{font-size:0.88rem;color:var(--tm);line-height:1.6;font-weight:300;}
+.di-text strong{color:var(--tw);}
+.highlight-box{background:rgba(0,245,255,0.03);border:1px solid rgba(0,245,255,0.12);border-left:3px solid var(--c);border-radius:4px;padding:14px 16px;margin-bottom:14px;}
+.highlight-box.warning{background:rgba(255,0,64,0.03);border-color:rgba(255,0,64,0.12);border-left-color:var(--r);}
+.highlight-box.gold{background:rgba(255,215,0,0.03);border-color:rgba(255,215,0,0.12);border-left-color:var(--g);}
+.hb-text{font-size:0.88rem;color:var(--tm);line-height:1.75;font-weight:300;}
+.hb-text strong{color:var(--tw);}
+.rights-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+.right-card{background:var(--card);border:1px solid var(--divider);border-radius:4px;padding:14px;}
+.right-icon{font-size:1.2rem;margin-bottom:6px;}
+.right-title{font-family:'Orbitron',monospace;font-size:0.6rem;font-weight:700;letter-spacing:1px;color:var(--tw);margin-bottom:5px;}
+.right-text{font-size:0.78rem;color:var(--tm);line-height:1.6;font-weight:300;}
+.contact-row{display:flex;align-items:center;gap:14px;padding:13px 16px;background:var(--card);border:1px solid var(--divider);border-radius:3px;margin-bottom:10px;transition:border-color 0.2s;}
+.contact-row:hover{border-color:rgba(0,245,255,0.18);}
+.cr-ic{font-size:1rem;width:26px;text-align:center;flex-shrink:0;}
+.cr-lb{font-family:'Share Tech Mono',monospace;font-size:0.58rem;letter-spacing:1.5px;color:var(--td);margin-bottom:2px;}
+.cr-vl{font-size:0.88rem;color:var(--tw);font-weight:600;}
+.cr-vl a{color:var(--c);text-decoration:none;}
+.cr-vl a:hover{text-decoration:underline;}
+footer{border-top:1px solid var(--divider);padding:22px 20px;text-align:center;}
+.ftxt{font-family:'Share Tech Mono',monospace;font-size:0.58rem;letter-spacing:1.5px;color:var(--td);}
+.ftxt span{color:var(--c);}
+.ftxt a{color:var(--c);text-decoration:none;}
+@media(max-width:480px){.rights-grid{grid-template-columns:1fr;}.hero-title{font-size:1.3rem;letter-spacing:1px;}}
+</style>
+</head>
+<body>
+<div class="scanline"></div>
+<nav>
+  <a class="back-btn" href="index.html">← BACK TO VAULT</a>
+  <div class="nav-brand">CRV · PRIVACY</div>
+</nav>
+
+<div class="hero">
+  <div class="hero-eye">◈ LEGAL DOCUMENT ◈</div>
+  <div class="hero-title">PRIVACY POLICY</div>
+  <div class="hero-sub">CRYPTO RESEARCH VAULT</div>
+  <div class="hero-date">Last Updated: June 10, 2026 &nbsp;·&nbsp; Effective: June 10, 2026</div>
+</div>
+
+<div class="main">
+
+  <div class="highlight-box gold">
+    <p class="hb-text"><strong>Welcome to Crypto Research Vault ("CRV", "we", "us", or "our").</strong> This Privacy Policy explains how we collect, use, store, and protect your personal information when you use our platform at <a href="https://nasirbello043-sudo.github.io/Crypto-research--hub/">nasirbello043-sudo.github.io/Crypto-research--hub</a>. By using CRV, you agree to the practices described in this policy. If you do not agree, please do not use our platform.</p>
+  </div>
+
+  <div class="toc">
+    <div class="toc-title">TABLE OF CONTENTS</div>
+    <ul class="toc-list">
+      <li><a href="#s1">1. Who We Are</a></li>
+      <li><a href="#s2">2. Information We Collect</a></li>
+      <li><a href="#s3">3. How We Use Your Information</a></li>
+      <li><a href="#s4">4. How We Store Your Data</a></li>
+      <li><a href="#s5">5. Third-Party Services</a></li>
+      <li><a href="#s6">6. Cookies &amp; Local Storage</a></li>
+      <li><a href="#s7">7. Your Rights</a></li>
+      <li><a href="#s8">8. Children's Privacy</a></li>
+      <li><a href="#s9">9. Data Retention</a></li>
+      <li><a href="#s10">10. Security</a></li>
+      <li><a href="#s11">11. Changes to This Policy</a></li>
+      <li><a href="#s12">12. Contact Us</a></li>
+    </ul>
+  </div>
+
+  <div class="pp-section" id="s1">
+    <div class="pp-section-title"><span class="sec-num">01</span> WHO WE ARE</div>
+    <p class="pp-text">Crypto Research Vault is an independent cryptocurrency research and analysis platform owned and operated by <strong>Nasir Bello</strong>, based in <strong>Kontagora, Niger State, Nigeria</strong>. The platform publishes fundamental analysis reports, research documents, white papers, and market intelligence content related to blockchain and cryptocurrency projects.</p>
+    <p class="pp-text">CRV is a personal project and is not affiliated with any financial institution, exchange, or investment firm. All content is for <strong>informational and educational purposes only</strong> and does not constitute financial advice.</p>
+  </div>
+
+  <div class="pp-section" id="s2">
+    <div class="pp-section-title"><span class="sec-num">02</span> INFORMATION WE COLLECT</div>
+    <p class="pp-text">When you create an account or use CRV, we may collect the following information:</p>
+    <div class="data-box">
+      <div class="data-box-title">INFORMATION YOU PROVIDE DIRECTLY</div>
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>Full Name</strong> — provided during account registration</div></div>
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>Username</strong> — your chosen display name on the platform</div></div>
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>Email Address</strong> — used for account creation, login, and communications</div></div>
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>Country</strong> — provided during registration for regional context</div></div>
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>Phone Number</strong> — optional, provided at your discretion</div></div>
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>Password</strong> — encrypted and never stored in plain text</div></div>
+    </div>
+    <div class="data-box">
+      <div class="data-box-title">INFORMATION COLLECTED AUTOMATICALLY</div>
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>Bookmarks</strong> — reports you save are stored locally on your device</div></div>
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>Session data</strong> — login tokens stored in your browser's local storage</div></div>
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>Usage patterns</strong> — general platform interactions via GitHub API requests</div></div>
+    </div>
+    <div class="highlight-box warning">
+      <p class="hb-text"><strong>We do not collect:</strong> payment information, government ID, location data, device fingerprints, or any sensitive personal data beyond what is listed above.</p>
+    </div>
+  </div>
+
+  <div class="pp-section" id="s3">
+    <div class="pp-section-title"><span class="sec-num">03</span> HOW WE USE YOUR INFORMATION</div>
+    <p class="pp-text">We use the information we collect for the following purposes:</p>
+    <div class="data-box">
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>Account Management</strong> — to create, maintain, and secure your account</div></div>
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>Authentication</strong> — to verify your identity when you sign in</div></div>
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>Email Verification</strong> — to confirm your email address is valid</div></div>
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>Password Recovery</strong> — to send password reset links when requested</div></div>
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>Platform Improvements</strong> — to understand how users interact with the platform</div></div>
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>Communications</strong> — to send important platform updates or announcements</div></div>
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>Bookmarks</strong> — to allow you to save and retrieve your favourite research reports</div></div>
+    </div>
+    <div class="highlight-box">
+      <p class="hb-text"><strong>We will never:</strong> sell your personal data to third parties, use your data for advertising purposes, share your information with data brokers, or contact you with unsolicited commercial messages.</p>
+    </div>
+  </div>
+
+  <div class="pp-section" id="s4">
+    <div class="pp-section-title"><span class="sec-num">04</span> HOW WE STORE YOUR DATA</div>
+    <p class="pp-text">Your account data is stored securely using <strong>Supabase</strong> — a trusted, enterprise-grade database and authentication platform hosted on servers located in <strong>West EU (Ireland)</strong>.</p>
+    <p class="pp-text">Your bookmarks and session tokens are stored in your browser's <strong>local storage</strong> on your own device. This data never leaves your device unless you explicitly interact with the platform.</p>
+    <div class="highlight-box">
+      <p class="hb-text"><strong>Passwords are never stored in plain text.</strong> All passwords are encrypted using industry-standard bcrypt hashing before being stored. Even we cannot see your password.</p>
+    </div>
+  </div>
+
+  <div class="pp-section" id="s5">
+    <div class="pp-section-title"><span class="sec-num">05</span> THIRD-PARTY SERVICES</div>
+    <p class="pp-text">CRV uses the following trusted third-party services to operate:</p>
+    <div class="data-box">
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>Supabase</strong> — database and authentication. Stores your account information securely. Privacy policy: <a href="https://supabase.com/privacy" target="_blank">supabase.com/privacy</a></div></div>
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>GitHub Pages</strong> — website hosting. Serves the CRV platform files. Privacy policy: <a href="https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement" target="_blank">github.com/privacy</a></div></div>
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>GitHub API</strong> — used to fetch and display research reports automatically. No personal data is sent to GitHub API.</div></div>
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>Google Fonts</strong> — loads typography for the platform. May collect basic request data per Google's privacy policy.</div></div>
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>Google Docs Viewer</strong> — used to display PDF documents in-browser. PDFs are loaded from GitHub via Google's viewer service.</div></div>
+    </div>
+  </div>
+
+  <div class="pp-section" id="s6">
+    <div class="pp-section-title"><span class="sec-num">06</span> COOKIES &amp; LOCAL STORAGE</div>
+    <p class="pp-text">CRV does not use tracking cookies. However, we use your browser's <strong>local storage</strong> to save the following data on your device:</p>
+    <div class="data-box">
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>crv_session</strong> — your login session token, kept so you stay logged in between visits</div></div>
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>crv_bookmarks</strong> — your saved report bookmarks</div></div>
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>crv_files_cache</strong> — a temporary cache of report file names to speed up page loading (refreshes every 5 minutes)</div></div>
+    </div>
+    <p class="pp-text">You can clear this data at any time by clearing your browser's local storage or by signing out of your account. Signing out automatically removes your session token.</p>
+  </div>
+
+  <div class="pp-section" id="s7">
+    <div class="pp-section-title"><span class="sec-num">07</span> YOUR RIGHTS</div>
+    <p class="pp-text">You have the following rights regarding your personal data:</p>
+    <div class="rights-grid">
+      <div class="right-card"><div class="right-icon">👁</div><div class="right-title">RIGHT TO ACCESS</div><div class="right-text">You can request a copy of all personal data we hold about you at any time.</div></div>
+      <div class="right-card"><div class="right-icon">✏️</div><div class="right-title">RIGHT TO CORRECT</div><div class="right-text">You can request corrections to any inaccurate personal information we hold.</div></div>
+      <div class="right-card"><div class="right-icon">🗑</div><div class="right-title">RIGHT TO DELETE</div><div class="right-text">You can request complete deletion of your account and all associated data.</div></div>
+      <div class="right-card"><div class="right-icon">📦</div><div class="right-title">RIGHT TO PORTABILITY</div><div class="right-text">You can request your data in a readable format to transfer elsewhere.</div></div>
+      <div class="right-card"><div class="right-icon">🚫</div><div class="right-title">RIGHT TO OBJECT</div><div class="right-text">You can object to how we process your data for certain purposes.</div></div>
+      <div class="right-card"><div class="right-icon">⏸</div><div class="right-title">RIGHT TO RESTRICT</div><div class="right-text">You can request we limit how we use your data while a concern is resolved.</div></div>
+    </div>
+    <p class="pp-text">To exercise any of these rights, contact us at <a href="mailto:nasirbello008@gmail.com">nasirbello008@gmail.com</a>. We will respond within <strong>30 days</strong>.</p>
+  </div>
+
+  <div class="pp-section" id="s8">
+    <div class="pp-section-title"><span class="sec-num">08</span> CHILDREN'S PRIVACY</div>
+    <p class="pp-text">CRV is not intended for use by individuals under the age of <strong>18</strong>. Cryptocurrency markets involve significant financial risk and require adult judgment. We do not knowingly collect personal information from anyone under 18 years of age.</p>
+    <p class="pp-text">If you are a parent or guardian and believe your child has provided us with personal information, please contact us immediately at <a href="mailto:nasirbello008@gmail.com">nasirbello008@gmail.com</a> and we will delete that information promptly.</p>
+  </div>
+
+  <div class="pp-section" id="s9">
+    <div class="pp-section-title"><span class="sec-num">09</span> DATA RETENTION</div>
+    <p class="pp-text">We retain your personal data for as long as your account is active or as needed to provide you with our services:</p>
+    <div class="data-box">
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>Account data</strong> — retained until you delete your account</div></div>
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>Session tokens</strong> — expire automatically or when you sign out</div></div>
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>Bookmarks</strong> — stored locally on your device, deleted when you clear browser data or sign out</div></div>
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>Deleted accounts</strong> — all personal data permanently removed within 30 days of deletion request</div></div>
+    </div>
+  </div>
+
+  <div class="pp-section" id="s10">
+    <div class="pp-section-title"><span class="sec-num">10</span> SECURITY</div>
+    <p class="pp-text">We take the security of your personal data seriously. The following measures are in place:</p>
+    <div class="data-box">
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>Password Encryption</strong> — all passwords are hashed using bcrypt before storage</div></div>
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>HTTPS Encryption</strong> — all data transmitted between your browser and our servers is encrypted via SSL/TLS</div></div>
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>JWT Tokens</strong> — authentication uses secure JSON Web Tokens with automatic expiry</div></div>
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>Rate Limiting</strong> — Supabase automatically blocks excessive login attempts to prevent brute force attacks</div></div>
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text"><strong>Email Verification</strong> — all new accounts require email verification before access is granted</div></div>
+    </div>
+    <div class="highlight-box warning">
+      <p class="hb-text"><strong>Important:</strong> While we implement strong security measures, no system is 100% secure. You are responsible for keeping your password confidential and for any activity that occurs under your account. Never share your password with anyone.</p>
+    </div>
+  </div>
+
+  <div class="pp-section" id="s11">
+    <div class="pp-section-title"><span class="sec-num">11</span> CHANGES TO THIS POLICY</div>
+    <p class="pp-text">We may update this Privacy Policy from time to time as our platform grows and new features are added. When we make significant changes, we will:</p>
+    <div class="data-box">
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text">Update the <strong>"Last Updated"</strong> date at the top of this page</div></div>
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text">Notify registered users via email where required by law</div></div>
+      <div class="data-item"><div class="di-dot">▸</div><div class="di-text">Post a notice on the CRV platform</div></div>
+    </div>
+    <p class="pp-text">Your continued use of the platform after changes are posted constitutes your acceptance of the updated Privacy Policy.</p>
+  </div>
+
+  <div class="pp-section" id="s12">
+    <div class="pp-section-title"><span class="sec-num">12</span> CONTACT US</div>
+    <p class="pp-text">If you have any questions, concerns, or requests regarding this Privacy Policy or how we handle your personal data, please contact us:</p>
+    <div class="contact-row"><div class="cr-ic">👤</div><div><div class="cr-lb">DATA CONTROLLER</div><div class="cr-vl">Nasir Bello — Crypto Research Vault</div></div></div>
+    <div class="contact-row"><div class="cr-ic">📧</div><div><div class="cr-lb">EMAIL</div><div class="cr-vl"><a href="mailto:nasirbello008@gmail.com">nasirbello008@gmail.com</a></div></div></div>
+    <div class="contact-row"><div class="cr-ic">📍</div><div><div class="cr-lb">LOCATION</div><div class="cr-vl">Kontagora, Niger State, Nigeria</div></div></div>
+    <div class="contact-row"><div class="cr-ic">🌐</div><div><div class="cr-lb">PLATFORM</div><div class="cr-vl"><a href="index.html">nasirbello043-sudo.github.io/Crypto-research--hub</a></div></div></div>
+    <br>
+    <div class="highlight-box gold">
+      <p class="hb-text">We are committed to responding to all privacy-related inquiries within <strong>30 days</strong>. For urgent matters involving data breaches or unauthorized access, please mark your email as <strong>URGENT: Privacy</strong> in the subject line.</p>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p class="ftxt">© 2026 <span>CRYPTO RESEARCH VAULT</span> · All Rights Reserved · <a href="index.html">Back to Vault</a></p>
+  <p class="ftxt" style="margin-top:6px;opacity:0.6;">This Privacy Policy was last updated on June 10, 2026</p>
+</footer>
+</body>
+</html>
