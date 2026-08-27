@@ -1,782 +1,475 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reports — CRV</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>All Reports — NBZ Research</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
 <style>
-[data-theme="dark"]{--bg:#0a0a0f;--bg2:#0f0f1a;--bg3:#13131f;--sidebar-bg:#0c0c16;--card-bg:#111120;--card-bg2:#161628;--border:rgba(139,92,246,0.12);--border2:rgba(139,92,246,0.06);--accent:#8b5cf6;--accent2:#7c3aed;--accent-glow:rgba(139,92,246,0.25);--cyan:#06b6d4;--gold:#f59e0b;--green:#10b981;--red:#ef4444;--text:#f1f5f9;--text-muted:#94a3b8;--text-dim:#475569;--nav-bg:rgba(10,10,15,0.95);}
-[data-theme="light"]{--bg:#f8f9ff;--bg2:#f0f0fa;--bg3:#e8e8f5;--sidebar-bg:#f0f0fa;--card-bg:#ffffff;--card-bg2:#f4f4ff;--border:rgba(139,92,246,0.15);--border2:rgba(139,92,246,0.08);--accent:#7c3aed;--accent2:#6d28d9;--accent-glow:rgba(139,92,246,0.2);--cyan:#0891b2;--gold:#d97706;--green:#059669;--red:#dc2626;--text:#0f0f1a;--text-muted:#475569;--text-dim:#94a3b8;--nav-bg:rgba(248,249,255,0.97);}
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background 0.3s,color 0.3s;}
+body{font-family:'Inter',sans-serif;background:#0d0d0d;color:#f0f0f0;min-height:100vh;overflow-x:hidden;}
 a{text-decoration:none;color:inherit;}
 button{cursor:pointer;border:none;background:none;font-family:inherit;}
+ul{list-style:none;}
 
-/* NAV */
-.top-nav{position:fixed;top:0;left:0;right:0;z-index:200;height:60px;display:flex;align-items:center;gap:14px;padding:0 20px;background:var(--nav-bg);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
-.nav-logo{display:flex;align-items:center;gap:10px;flex-shrink:0;}
-.nav-logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;box-shadow:0 0 16px var(--accent-glow);}
-.nav-logo-crv{font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;letter-spacing:2px;color:var(--text);}
-.nav-logo-sub{font-size:0.52rem;letter-spacing:1px;color:var(--text-muted);text-transform:uppercase;}
-.nav-search-wrap{flex:1;max-width:440px;position:relative;}
-.nav-search{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:24px;padding:9px 40px 9px 16px;font-size:0.85rem;color:var(--text);outline:none;transition:all 0.2s;font-family:'Inter',sans-serif;}
-.nav-search::placeholder{color:var(--text-dim);}
-.nav-search:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow);}
-.nav-search-icon{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--text-dim);font-size:0.9rem;pointer-events:none;}
-.nav-right{display:flex;align-items:center;gap:10px;margin-left:auto;flex-shrink:0;}
-.nav-social-btn{width:36px;height:36px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;color:var(--text-muted);transition:all 0.2s;position:relative;}
-.nav-social-btn:hover{border-color:var(--accent);color:var(--text);}
-.soon-tooltip{position:absolute;bottom:-28px;left:50%;transform:translateX(-50%);font-size:0.5rem;letter-spacing:1px;color:var(--gold);background:var(--bg2);border:1px solid var(--border);padding:2px 6px;border-radius:4px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity 0.2s;}
-.nav-social-btn:hover .soon-tooltip{opacity:1;}
-.subscribe-btn{display:flex;align-items:center;gap:7px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-radius:8px;padding:8px 16px;font-size:0.8rem;font-weight:600;transition:all 0.2s;box-shadow:0 0 16px var(--accent-glow);white-space:nowrap;}
-.subscribe-btn:hover{transform:translateY(-1px);}
-.auth-nav-btn{width:36px;height:36px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all 0.2s;}
-.auth-nav-btn:hover{border-color:var(--gold);}
-.user-badge{display:none;align-items:center;gap:8px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:6px 12px;cursor:pointer;position:relative;}
-.user-badge.show{display:flex;}
-.user-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite;}
-@keyframes pulse{0%,100%{opacity:0.7}50%{opacity:1}}
-.user-name-display{font-size:0.78rem;font-weight:600;color:var(--text);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.user-dropdown{position:absolute;top:calc(100% + 8px);right:0;background:var(--card-bg);border:1px solid var(--border);border-radius:10px;min-width:200px;box-shadow:0 16px 40px rgba(0,0,0,0.4);display:none;flex-direction:column;overflow:hidden;z-index:300;}
-.user-dropdown.show{display:flex;}
-.ud-header{padding:12px 16px;border-bottom:1px solid var(--border);}
-.ud-email{font-size:0.75rem;color:var(--text-muted);word-break:break-all;}
-.ud-item{display:flex;align-items:center;gap:10px;padding:11px 16px;font-size:0.85rem;font-weight:500;color:var(--text-muted);transition:all 0.2s;width:100%;text-align:left;}
-.ud-item:hover{background:var(--bg3);color:var(--text);}
-.ud-item.logout:hover{color:var(--red);}
-.ham-btn{display:none;flex-direction:column;gap:4px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px;flex-shrink:0;transition:border-color 0.2s;}
-.ham-btn:hover{border-color:var(--accent);}
-.ham-line{width:18px;height:2px;background:var(--text-muted);border-radius:2px;transition:all 0.3s;}
-.ham-btn.open .ham-line:nth-child(1){transform:rotate(45deg) translate(4px,4px);}
-.ham-btn.open .ham-line:nth-child(2){opacity:0;}
-.ham-btn.open .ham-line:nth-child(3){transform:rotate(-45deg) translate(4px,-4px);}
+.page{display:flex;min-height:100vh;}
 
-/* LAYOUT */
-.layout{display:flex;padding-top:60px;min-height:100vh;}
-
-/* SIDEBAR */
-.sidebar{position:fixed;top:60px;left:0;width:220px;height:calc(100vh - 60px);background:var(--sidebar-bg);border-right:1px solid var(--border2);display:flex;flex-direction:column;overflow-y:auto;z-index:100;transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);}
+/* ══ SIDEBAR ══ */
+.sidebar{
+  width:260px;flex-shrink:0;
+  background:#111118;
+  border-right:1px solid rgba(139,92,246,0.2);
+  display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;bottom:0;
+  overflow-y:auto;z-index:100;
+  transition:transform 0.3s ease;
+}
 .sidebar::-webkit-scrollbar{width:3px;}
-.sidebar::-webkit-scrollbar-thumb{background:var(--border);}
-.sb-section{padding:16px 0 8px;}
-.sb-label{font-size:0.62rem;font-weight:600;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase;padding:0 18px 8px;}
-.nav-link{display:flex;align-items:center;gap:11px;padding:10px 18px;font-size:0.88rem;font-weight:500;color:var(--text-muted);transition:all 0.2s;border-left:3px solid transparent;width:100%;text-align:left;}
-.nav-link:hover{color:var(--text);background:rgba(139,92,246,0.06);border-left-color:rgba(139,92,246,0.3);}
-.nav-link.active{color:var(--accent);background:rgba(139,92,246,0.1);border-left-color:var(--accent);}
-.nav-link-icon{font-size:1rem;width:20px;text-align:center;flex-shrink:0;}
-.sb-divider{height:1px;background:var(--border2);margin:4px 18px;}
-.theme-row{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;cursor:pointer;}
-.theme-row-label{display:flex;align-items:center;gap:11px;font-size:0.88rem;font-weight:500;color:var(--text-muted);}
-.theme-toggle{width:40px;height:22px;background:var(--bg3);border:1px solid var(--border);border-radius:11px;position:relative;transition:all 0.3s;cursor:pointer;}
-.theme-toggle::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--accent);transition:transform 0.3s;box-shadow:0 0 6px var(--accent-glow);}
-[data-theme="light"] .theme-toggle::after{transform:translateX(18px);}
-.pro-box{margin:12px 14px 16px;background:linear-gradient(135deg,rgba(139,92,246,0.1),rgba(124,58,237,0.06));border:1px solid rgba(139,92,246,0.2);border-radius:12px;padding:16px;}
-.pro-crown{font-size:1.4rem;margin-bottom:6px;}
-.pro-title{font-family:'Orbitron',monospace;font-size:0.68rem;font-weight:700;letter-spacing:1px;color:var(--gold);margin-bottom:12px;}
-.pro-feat{display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--text-muted);margin-bottom:6px;}
-.pro-feat::before{content:'✓';color:var(--green);font-size:0.7rem;flex-shrink:0;}
-.pro-btn{width:100%;margin-top:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-radius:8px;padding:9px;font-size:0.75rem;font-weight:700;font-family:'Orbitron',monospace;letter-spacing:1px;transition:all 0.2s;}
-.pro-btn:hover{transform:translateY(-1px);}
+.sidebar::-webkit-scrollbar-thumb{background:rgba(139,92,246,0.3);}
+.sb-logo-wrap{
+  display:flex;align-items:center;justify-content:center;
+  padding:28px 20px 20px;
+  border-bottom:1px solid rgba(139,92,246,0.15);
+}
+.sb-logo{
+  width:90px;height:90px;border-radius:50%;
+  border:3px solid #8b5cf6;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;background:#1a1a2e;
+  box-shadow:0 0 24px rgba(139,92,246,0.3);
+}
+.sb-logo-nbz{font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:900;color:#fff;letter-spacing:1px;}
+.sb-logo-sub{font-size:0.48rem;letter-spacing:2px;color:#8b5cf6;text-transform:uppercase;margin-top:1px;}
+.sb-section{padding:18px 20px 10px;}
+.sb-section-title{
+  font-size:0.65rem;font-weight:700;letter-spacing:2px;
+  color:#8b5cf6;text-transform:uppercase;
+  display:flex;align-items:center;gap:8px;margin-bottom:12px;
+}
+.sb-text{font-size:0.8rem;color:#a0a0b0;line-height:1.7;}
+.sb-disclaimer{
+  font-size:0.68rem;color:#6b6b80;
+  background:rgba(139,92,246,0.06);
+  border:1px solid rgba(139,92,246,0.15);
+  border-radius:6px;padding:8px 10px;margin-top:8px;
+  line-height:1.6;font-style:italic;
+}
+.sb-do-list{display:flex;flex-direction:column;gap:8px;}
+.sb-do-item{display:flex;align-items:flex-start;gap:9px;font-size:0.78rem;color:#c0c0d0;line-height:1.5;}
+.sb-do-check{
+  width:18px;height:18px;border-radius:50%;
+  background:linear-gradient(135deg,#8b5cf6,#7c3aed);
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.55rem;color:#fff;flex-shrink:0;margin-top:1px;
+}
+.sb-tools-list{display:flex;flex-direction:column;gap:6px;}
+.sb-tool{
+  display:flex;align-items:center;gap:10px;
+  padding:7px 10px;border-radius:8px;
+  background:#1a1a28;border:1px solid rgba(139,92,246,0.1);
+  font-size:0.78rem;color:#c0c0d0;transition:all 0.2s;
+}
+.sb-tool:hover{border-color:rgba(139,92,246,0.3);color:#fff;}
+.sb-tool-icon{font-size:0.9rem;width:18px;text-align:center;flex-shrink:0;}
+.sb-contact-list{display:flex;flex-direction:column;gap:8px;}
+.sb-contact-item{display:flex;align-items:center;gap:9px;font-size:0.78rem;color:#a0a0b0;}
+.sb-contact-icon{font-size:0.85rem;width:18px;text-align:center;flex-shrink:0;}
+.sb-contact-item a{color:#8b5cf6;transition:color 0.2s;}
+.sb-contact-item a:hover{color:#a78bfa;}
+.sb-divider{height:1px;background:rgba(139,92,246,0.1);margin:4px 20px;}
 
-/* MAIN */
-.main{margin-left:220px;flex:1;display:flex;flex-direction:column;}
-.main-content{flex:1;padding:28px 28px 60px;max-width:1100px;width:100%;}
+/* ══ MAIN ══ */
+.main{margin-left:260px;flex:1;padding:36px 40px 60px;max-width:1100px;}
 
-/* PAGE HEADER */
-.page-header{margin-bottom:28px;}
-.page-eyebrow{font-size:0.68rem;font-weight:600;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:10px;}
-.page-title{font-family:'Orbitron',monospace;font-size:clamp(1.4rem,3vw,2rem);font-weight:900;color:var(--text);margin-bottom:8px;}
-.page-sub{font-size:0.9rem;color:var(--text-muted);line-height:1.6;}
+/* HEADER */
+.header-row{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:20px;}
+.header-left{flex:1;}
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:0.76rem;color:#8b5cf6;font-weight:600;margin-bottom:14px;}
+.back-link:hover{color:#a78bfa;}
+.header-name{font-size:clamp(1.7rem,3.5vw,2.4rem);font-weight:900;line-height:1.1;margin-bottom:4px;}
+.header-name span{color:#8b5cf6;}
+.header-desc{font-size:0.85rem;color:#a0a0b0;line-height:1.6;max-width:600px;}
+.header-logo{display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0;}
+.header-logo-nbz{font-family:'Orbitron',monospace;font-size:1.4rem;font-weight:900;color:#fff;letter-spacing:2px;}
+.header-logo-sub{font-size:0.5rem;letter-spacing:3px;color:#8b5cf6;text-transform:uppercase;margin-top:1px;}
 
-/* FILTER BAR */
-.filter-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:24px;padding:14px 18px;background:var(--card-bg);border:1px solid var(--border);border-radius:12px;}
-.filter-label{font-size:0.72rem;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;flex-shrink:0;}
-.filter-btn{font-size:0.75rem;font-weight:500;padding:6px 14px;border-radius:20px;border:1px solid var(--border);color:var(--text-muted);background:var(--bg3);transition:all 0.2s;flex-shrink:0;}
-.filter-btn:hover{border-color:var(--accent);color:var(--accent);}
-.filter-btn.active{background:rgba(139,92,246,0.15);border-color:var(--accent);color:var(--accent);}
-.filter-count{margin-left:auto;font-size:0.72rem;color:var(--text-dim);}
+/* TABS */
+.tabs{display:flex;gap:10px;margin:24px 0 22px;border-bottom:1px solid rgba(139,92,246,0.15);}
+.tab-btn{
+  padding:10px 18px;font-size:0.78rem;font-weight:700;letter-spacing:0.5px;
+  color:#6b6b80;border-bottom:2px solid transparent;transition:all 0.2s;
+  text-transform:uppercase;
+}
+.tab-btn.active{color:#8b5cf6;border-bottom-color:#8b5cf6;}
+.tab-btn.airdrop.active{color:#f59e0b;border-bottom-color:#f59e0b;}
+.tab-count{
+  display:inline-block;margin-left:6px;background:rgba(139,92,246,0.15);
+  color:#a78bfa;border-radius:10px;padding:1px 8px;font-size:0.68rem;
+}
+.tab-btn.airdrop .tab-count{background:rgba(245,158,11,0.15);color:#fbbf24;}
 
-/* SECTION DIVIDER */
-.sec-divider{display:flex;align-items:center;gap:14px;margin-bottom:20px;margin-top:36px;}
-.sec-divider-line{flex:1;height:1px;background:var(--border);}
-.sec-divider-title{font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;letter-spacing:2px;color:var(--text);text-transform:uppercase;white-space:nowrap;}
-.sec-divider-badge{font-size:0.62rem;padding:3px 10px;border-radius:20px;font-weight:600;white-space:nowrap;}
-.sec-divider-count{font-size:0.72rem;color:var(--text-dim);white-space:nowrap;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
 
-/* REPORTS GRID */
-.reports-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:12px;}
+/* GRID OF REPORT CARDS */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
+.rcard{
+  background:#111120;border:1px solid rgba(139,92,246,0.2);
+  border-radius:12px;overflow:hidden;cursor:pointer;
+  transition:border-color 0.2s,transform 0.2s;
+  display:flex;flex-direction:column;
+}
+.rcard:hover{border-color:rgba(139,92,246,0.5);transform:translateY(-2px);}
+.rcard.airdrop{border-color:rgba(245,158,11,0.2);}
+.rcard.airdrop:hover{border-color:rgba(245,158,11,0.5);}
+.rc-cover{
+  height:150px;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#1a0a2e,#0d0820);
+  display:flex;align-items:center;justify-content:center;
+}
+.rc-cover img{width:100%;height:100%;object-fit:cover;display:block;}
+.rc-cover-ph{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:12px;text-align:center;}
+.rc-cover-ph-nbz{font-family:'Orbitron',monospace;font-size:0.62rem;font-weight:900;color:#8b5cf6;letter-spacing:2px;}
+.rc-cover-ph-title{font-size:0.74rem;font-weight:800;color:#fff;line-height:1.3;}
+.rc-body{padding:12px 14px 14px;flex:1;display:flex;flex-direction:column;gap:4px;}
+.rc-title{font-size:0.78rem;font-weight:700;color:#f0f0f0;line-height:1.4;}
+.rc-sub{font-size:0.66rem;color:#6b6b80;letter-spacing:0.5px;text-transform:uppercase;}
 
-/* REPORT CARD */
-.report-card{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:transform 0.25s,border-color 0.25s,box-shadow 0.25s;cursor:pointer;position:relative;}
-.report-card:hover{transform:translateY(-4px);border-color:var(--accent);box-shadow:0 8px 30px rgba(139,92,246,0.15);}
-.rc-cover{position:relative;height:160px;overflow:hidden;background:linear-gradient(135deg,#1a0a2e,#0d0d20);}
-.rc-cover img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s;}
-.report-card:hover .rc-cover img{transform:scale(1.05);}
-.rc-cover-placeholder{width:100%;height:100%;background:linear-gradient(135deg,rgba(139,92,246,0.2),rgba(124,58,237,0.1));display:flex;align-items:center;justify-content:center;font-size:3rem;}
-.rc-badge{position:absolute;top:10px;left:10px;font-size:0.6rem;font-weight:700;letter-spacing:1px;padding:3px 9px;border-radius:20px;text-transform:uppercase;}
-.rc-badge.new{background:rgba(16,185,129,0.2);color:var(--green);border:1px solid rgba(16,185,129,0.3);}
-.rc-badge.hot{background:rgba(239,68,68,0.2);color:var(--red);border:1px solid rgba(239,68,68,0.3);}
-.rc-badge.update{background:rgba(6,182,212,0.2);color:var(--cyan);border:1px solid rgba(6,182,212,0.3);}
-.rc-badge.default{background:rgba(139,92,246,0.2);color:var(--accent);border:1px solid rgba(139,92,246,0.3);}
-.rc-star{position:absolute;top:10px;right:10px;width:28px;height:28px;border-radius:6px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:0.8rem;color:rgba(255,255,255,0.5);transition:all 0.2s;z-index:2;}
-.rc-star:hover,.rc-star.saved{color:var(--gold);border-color:rgba(245,158,11,0.4);background:rgba(245,158,11,0.1);}
-.rc-body{padding:16px;}
-.rc-category{font-size:0.62rem;font-weight:600;letter-spacing:1px;color:var(--accent);text-transform:uppercase;margin-bottom:7px;}
-.rc-title{font-size:0.92rem;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:7px;}
-.rc-desc{font-size:0.78rem;color:var(--text-muted);line-height:1.6;margin-bottom:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.rc-footer{display:flex;justify-content:space-between;align-items:center;}
-.rc-date{font-size:0.65rem;color:var(--text-dim);}
-.rc-read{font-size:0.65rem;color:var(--text-dim);display:flex;align-items:center;gap:4px;}
-
-/* WHITEPAPER CARD — different style */
-.wp-card{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:transform 0.25s,border-color 0.25s,box-shadow 0.25s;cursor:pointer;}
-.wp-card:hover{transform:translateY(-4px);border-color:var(--gold);box-shadow:0 8px 30px rgba(245,158,11,0.12);}
-.wp-cover{position:relative;height:140px;overflow:hidden;}
-.wp-cover img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s;}
-.wp-card:hover .wp-cover img{transform:scale(1.05);}
-.wp-cover-placeholder{width:100%;height:100%;background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(245,158,11,0.04));display:flex;align-items:center;justify-content:center;font-size:3rem;}
-.wp-body{padding:14px;}
-.wp-label{font-size:0.6rem;font-weight:600;letter-spacing:1px;color:var(--gold);text-transform:uppercase;margin-bottom:6px;}
-.wp-title{font-size:0.88rem;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:8px;}
-.wp-footer{display:flex;justify-content:space-between;align-items:center;}
-.wp-date{font-size:0.65rem;color:var(--text-dim);}
-.wp-arrow{font-size:0.85rem;color:var(--gold);opacity:0;transform:translateX(-4px);transition:all 0.25s;}
-.wp-card:hover .wp-arrow{opacity:1;transform:translateX(0);}
-
-/* EMPTY STATE */
-.empty-state{grid-column:1/-1;text-align:center;padding:60px 20px;}
-.empty-icon{font-size:3rem;margin-bottom:16px;}
-.empty-title{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:8px;}
-.empty-sub{font-size:0.85rem;color:var(--text-muted);line-height:1.6;max-width:400px;margin:0 auto;}
+.fc-empty{
+  background:#111120;border:1px solid rgba(139,92,246,0.15);
+  border-radius:12px;padding:40px;text-align:center;
+}
+.fc-empty-icon{font-size:2.5rem;margin-bottom:10px;}
+.fc-empty-title{font-size:0.9rem;font-weight:700;color:#f0f0f0;margin-bottom:6px;}
+.fc-empty-sub{font-size:0.78rem;color:#6b6b80;line-height:1.6;}
 
 /* SKELETON */
-.skeleton{background:linear-gradient(90deg,var(--bg3) 25%,var(--card-bg2) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px;}
+.skeleton{background:linear-gradient(90deg,#1a1a28 25%,#22222f 50%,#1a1a28 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:10px;}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.skel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
 
-/* REVEAL */
-.reveal{opacity:0;transform:translateY(16px);transition:opacity 0.5s ease,transform 0.5s ease;}
-.reveal.visible{opacity:1;transform:translateY(0);}
-
-/* SEARCH RESULTS */
-.search-results{position:fixed;top:62px;left:50%;transform:translateX(-50%);width:90%;max-width:500px;background:var(--card-bg);border:1px solid var(--border);border-radius:12px;z-index:400;max-height:55vh;overflow-y:auto;display:none;box-shadow:0 16px 40px rgba(0,0,0,0.5);}
-.search-results.show{display:block;}
-.sr-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border2);transition:background 0.2s;cursor:pointer;}
-.sr-item:hover{background:var(--bg3);}
-.sr-item:last-child{border-bottom:none;}
-.sr-badge{font-size:0.58rem;letter-spacing:1px;padding:2px 7px;border-radius:4px;flex-shrink:0;}
-.sr-name{font-size:0.82rem;font-weight:600;color:var(--text);}
-.sr-empty{padding:24px;text-align:center;font-size:0.82rem;color:var(--text-dim);}
-
-/* PDF VIEWER */
-.pdf-viewer-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:600;display:none;flex-direction:column;}
-.pdf-viewer-overlay.on{display:flex;}
-.pdf-viewer-header{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid var(--border);background:var(--bg2);flex-shrink:0;}
-.pdf-viewer-title{font-family:'Orbitron',monospace;font-size:0.75rem;font-weight:700;letter-spacing:2px;color:var(--gold);}
-.pdf-viewer-actions{display:flex;gap:10px;align-items:center;}
-.pdf-dl-btn{font-size:0.72rem;font-weight:600;color:var(--gold);border:1px solid rgba(245,158,11,0.3);padding:6px 12px;border-radius:6px;text-decoration:none;background:rgba(245,158,11,0.06);transition:all 0.2s;}
-.pdf-dl-btn:hover{background:rgba(245,158,11,0.12);}
-.pdf-close-btn{width:32px;height:32px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.9rem;color:var(--text-muted);transition:all 0.2s;}
-.pdf-close-btn:hover{color:var(--red);border-color:rgba(239,68,68,0.4);}
-.pdf-viewer-body{flex:1;position:relative;display:flex;}
-.pdf-viewer-body iframe{width:100%;height:100%;border:none;display:none;}
-#pdf-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;}
-.pdf-load-text{font-family:'JetBrains Mono',monospace;font-size:0.75rem;letter-spacing:2px;color:var(--gold);}
-.pdf-load-bar{width:160px;height:2px;background:var(--border);border-radius:2px;overflow:hidden;}
-.pdf-load-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--cyan));animation:loadAnim 1.5s ease infinite alternate;}
-@keyframes loadAnim{from{width:20%}to{width:85%}}
-
-/* SIDEBAR OVERLAY */
+/* MOBILE */
+.mob-header{
+  display:none;position:fixed;top:0;left:0;right:0;z-index:200;
+  height:56px;background:#111118;border-bottom:1px solid rgba(139,92,246,0.2);
+  align-items:center;padding:0 16px;gap:12px;
+}
+.mob-logo{font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:#fff;letter-spacing:2px;}
+.mob-ham{
+  width:36px;height:36px;background:#1a1a28;
+  border:1px solid rgba(139,92,246,0.2);border-radius:8px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+}
+.mob-ham-line{width:16px;height:2px;background:#a0a0b0;border-radius:2px;}
 .sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99;display:none;backdrop-filter:blur(4px);}
 .sidebar-overlay.show{display:block;}
 
-/* MODALS */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(10px);z-index:500;display:none;align-items:center;justify-content:center;padding:16px;}
-.overlay.on{display:flex;animation:fadeIn 0.2s ease;}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.mbox{background:var(--card-bg);border:1px solid var(--border);border-radius:16px;max-width:520px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,0.6);animation:slideUp 0.25s ease;}
-@keyframes slideUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
-.mbox::-webkit-scrollbar{width:3px;}
-.mbox::-webkit-scrollbar-thumb{background:var(--border);}
-.mhead{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--card-bg);z-index:2;border-radius:16px 16px 0 0;}
-.mtitle{font-family:'Orbitron',monospace;font-size:0.78rem;font-weight:700;letter-spacing:2px;color:var(--accent);}
-.mclose{width:28px;height:28px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.85rem;color:var(--text-muted);transition:all 0.2s;}
-.mclose:hover{color:var(--red);border-color:rgba(239,68,68,0.4);}
-.mbody{padding:20px;}
-.ci{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;transition:border-color 0.2s;}
-.ci:hover{border-color:var(--accent);}
-.ci-ic{font-size:1rem;width:24px;text-align:center;flex-shrink:0;}
-.ci-lb{font-size:0.6rem;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:2px;font-family:'JetBrains Mono',monospace;}
-.ci-vl{font-size:0.85rem;color:var(--text);font-weight:600;}
-.ci-vl a{color:var(--accent);}
-.balert{font-size:0.72rem;color:var(--red);background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:10px 14px;margin-bottom:16px;}
-.fg2{margin-bottom:14px;}
-.flbl{font-size:0.62rem;letter-spacing:1.5px;color:var(--text-dim);display:block;margin-bottom:6px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;}
-.finput,.fsel,.ftxtarea{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:'Inter',sans-serif;font-size:0.86rem;padding:9px 12px;border-radius:8px;outline:none;transition:border-color 0.2s;resize:vertical;}
-.finput:focus,.fsel:focus,.ftxtarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow);}
-.ftxtarea{min-height:85px;}
-.fsel option{background:var(--bg);}
-.fsub{width:100%;font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;letter-spacing:2px;color:#fff;background:linear-gradient(135deg,var(--red),#c0392b);border:none;padding:12px 18px;border-radius:8px;cursor:pointer;transition:all 0.2s;}
-.fsub:hover{opacity:0.9;transform:translateY(-1px);}
-.ahero{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:18px;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;position:relative;overflow:hidden;}
-.ahero::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);}
-.pimgw{flex-shrink:0;}
-.pimg{width:76px;height:76px;object-fit:cover;border-radius:10px;border:2px solid var(--accent);box-shadow:0 0 16px var(--accent-glow);}
-.pinfo{flex:1;min-width:140px;}
-.pname{font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:var(--text);margin-bottom:4px;}
-.prole{font-size:0.65rem;letter-spacing:2px;color:var(--gold);margin-bottom:10px;font-family:'JetBrains Mono',monospace;}
-.ptags{display:flex;gap:5px;flex-wrap:wrap;}
-.ptag{font-size:0.62rem;color:var(--accent);border:1px solid rgba(139,92,246,0.2);padding:2px 8px;border-radius:20px;background:rgba(139,92,246,0.08);}
-.ablk{margin-bottom:16px;}
-.ahead{font-size:0.68rem;font-weight:700;letter-spacing:2px;color:var(--accent);margin-bottom:9px;display:flex;align-items:center;gap:7px;text-transform:uppercase;}
-.ahead::before{content:'//';color:var(--gold);opacity:0.5;}
-.atxt{font-size:0.85rem;color:var(--text-muted);line-height:1.8;font-weight:300;}
-.aitem{display:flex;gap:9px;margin-bottom:11px;}
-.adot{color:var(--accent);font-size:0.75rem;flex-shrink:0;margin-top:2px;}
-.aib strong{color:var(--text);display:block;font-size:0.84rem;margin-bottom:2px;font-weight:600;}
-.aib p{font-size:0.8rem;color:var(--text-muted);line-height:1.7;font-weight:300;}
-.vbox{background:rgba(139,92,246,0.04);border:1px solid rgba(139,92,246,0.15);border-left:3px solid var(--accent);border-radius:8px;padding:14px 16px;margin-bottom:16px;}
-.vbul{display:flex;gap:8px;margin-bottom:8px;align-items:flex-start;}
-.vicon{color:var(--gold);font-size:0.7rem;flex-shrink:0;margin-top:3px;}
-.vbt strong{color:var(--text);font-size:0.83rem;}
-.vbt p{font-size:0.77rem;color:var(--text-muted);margin-top:1px;font-weight:300;}
-
-/* AUTH CSS included via shared.js — just need these overrides */
-.auth-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(12px);z-index:500;display:none;align-items:center;justify-content:center;padding:16px;}
-.auth-overlay.on{display:flex;animation:fadeIn 0.2s ease;}
-.auth-box{background:var(--card-bg);border:1px solid var(--border);border-radius:16px;max-width:420px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,0.6);animation:slideUp 0.25s ease;position:relative;}
-.auth-box::-webkit-scrollbar{width:3px;}
-.auth-box::-webkit-scrollbar-thumb{background:var(--border);}
-.auth-header{padding:22px 22px 16px;border-bottom:1px solid var(--border);text-align:center;position:relative;}
-.auth-header::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);}
-.auth-eyebrow{font-family:'JetBrains Mono',monospace;font-size:0.62rem;letter-spacing:3px;color:var(--gold);margin-bottom:8px;}
-.auth-title{font-family:'Orbitron',monospace;font-size:1rem;font-weight:900;letter-spacing:2px;color:var(--accent);}
-.auth-close{position:absolute;top:12px;right:12px;background:var(--bg3);border:1px solid var(--border);color:var(--text-muted);width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:0.8rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
-.auth-close:hover{color:var(--red);border-color:rgba(239,68,68,0.4);}
-.auth-body{padding:22px;}
-.auth-tabs{display:flex;margin-bottom:22px;background:var(--bg3);border-radius:8px;padding:4px;gap:4px;}
-.auth-tab{flex:1;font-family:'JetBrains Mono',monospace;font-size:0.62rem;letter-spacing:1px;color:var(--text-dim);background:none;border:none;padding:8px;border-radius:6px;cursor:pointer;transition:all 0.2s;text-transform:uppercase;}
-.auth-tab.active{color:var(--accent);background:rgba(139,92,246,0.15);}
-.auth-form{display:none;}
-.auth-form.active{display:block;}
-.af-group{margin-bottom:14px;}
-.af-label{font-family:'JetBrains Mono',monospace;font-size:0.6rem;letter-spacing:1.5px;color:var(--text-dim);display:block;margin-bottom:6px;text-transform:uppercase;}
-.af-input{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:'Inter',sans-serif;font-size:0.9rem;padding:10px 12px;border-radius:8px;outline:none;transition:all 0.2s;}
-.af-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow);}
-.af-input.error{border-color:var(--red);}
-.pw-strength{margin-top:5px;}
-.pw-bar-track{height:2px;background:var(--border);border-radius:2px;overflow:hidden;}
-.pw-bar-fill{height:100%;border-radius:2px;width:0;transition:width 0.3s,background 0.3s;}
-.pw-text{font-family:'JetBrains Mono',monospace;font-size:0.55rem;letter-spacing:1px;margin-top:3px;}
-.af-check-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:16px;}
-.af-check{width:16px;height:16px;accent-color:var(--accent);flex-shrink:0;margin-top:2px;}
-.af-check-label{font-family:'JetBrains Mono',monospace;font-size:0.6rem;letter-spacing:0.5px;color:var(--text-dim);line-height:1.5;}
-.af-check-label a{color:var(--accent);}
-.auth-msg{font-family:'JetBrains Mono',monospace;font-size:0.68rem;letter-spacing:1px;padding:10px 14px;border-radius:8px;margin-bottom:14px;display:none;text-align:center;}
-.auth-msg.error{color:var(--red);background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);display:block;}
-.auth-msg.success{color:var(--green);background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);display:block;}
-.auth-msg.info{color:var(--gold);background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.2);display:block;}
-.af-submit{width:100%;font-family:'Orbitron',monospace;font-size:0.72rem;font-weight:700;letter-spacing:2px;color:#fff;background:var(--accent);border:none;padding:12px 20px;border-radius:8px;cursor:pointer;transition:all 0.25s;box-shadow:0 0 20px var(--accent-glow);margin-bottom:16px;position:relative;overflow:hidden;}
-.af-submit:hover{background:var(--accent2);transform:translateY(-1px);}
-.af-submit:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
-.af-submit.loading::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);animation:shimmer 1s infinite;}
-.af-divider{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
-.af-divider::before,.af-divider::after{content:'';flex:1;height:1px;background:var(--border);}
-.af-divider span{font-family:'JetBrains Mono',monospace;font-size:0.58rem;letter-spacing:1px;color:var(--text-dim);}
-.af-switch{text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.62rem;letter-spacing:0.5px;color:var(--text-dim);}
-.af-switch a{color:var(--accent);cursor:pointer;}
-.af-forgot{font-family:'JetBrains Mono',monospace;font-size:0.58rem;letter-spacing:0.5px;color:var(--text-dim);text-align:right;margin-top:-8px;margin-bottom:14px;}
-.af-forgot a{color:var(--accent);cursor:pointer;}
-.verify-notice{text-align:center;padding:10px 0;}
-.vn-icon{font-size:2.5rem;margin-bottom:12px;}
-.vn-title{font-family:'Orbitron',monospace;font-size:0.8rem;font-weight:700;letter-spacing:2px;color:var(--accent);margin-bottom:10px;}
-.vn-text{font-size:0.85rem;color:var(--text-muted);line-height:1.7;font-weight:300;}
-.bookmarks-section{padding:20px 22px;}
-.bm-title{font-family:'Orbitron',monospace;font-size:0.7rem;font-weight:700;letter-spacing:2px;color:var(--accent);margin-bottom:14px;}
-.bm-empty{font-family:'JetBrains Mono',monospace;font-size:0.65rem;letter-spacing:1px;color:var(--text-dim);text-align:center;padding:20px;}
-.bm-item{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;}
-.bm-name{font-size:0.82rem;font-weight:600;color:var(--text);}
-.bm-actions{display:flex;gap:8px;}
-.bm-open{font-size:0.72rem;color:var(--accent);border:1px solid rgba(139,92,246,0.2);padding:3px 8px;border-radius:4px;transition:all 0.2s;cursor:pointer;}
-.bm-open:hover{background:rgba(139,92,246,0.1);}
-.bm-remove{background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:0.75rem;transition:color 0.2s;padding:3px 6px;}
-.bm-remove:hover{color:var(--red);}
-
-/* FOOTER */
-footer{border-top:1px solid var(--border);padding:18px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;background:var(--bg2);}
-.ft-copy{font-size:0.72rem;color:var(--text-dim);}
-.ft-copy span{color:var(--accent);}
-.ft-made{font-size:0.72rem;color:var(--text-dim);}
-.ft-made span{color:var(--red);}
-.ft-made strong{color:var(--accent);}
+/* PDF VIEWER */
+.pdf-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.96);z-index:600;display:none;flex-direction:column;}
+.pdf-overlay.on{display:flex;}
+.pdf-hdr{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;border-bottom:1px solid rgba(139,92,246,0.2);background:#111118;flex-shrink:0;}
+.pdf-ttl{font-family:'Orbitron',monospace;font-size:0.7rem;font-weight:700;letter-spacing:2px;color:#f59e0b;}
+.pdf-acts{display:flex;gap:9px;align-items:center;}
+.pdf-dl{font-size:0.7rem;font-weight:600;color:#f59e0b;border:1px solid rgba(245,158,11,0.3);padding:5px 11px;border-radius:6px;text-decoration:none;background:rgba(245,158,11,0.06);}
+.pdf-cl{width:30px;height:30px;background:#1a1a28;border:1px solid rgba(139,92,246,0.2);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.85rem;color:#a0a0b0;}
+.pdf-cl:hover{color:#ef4444;}
+.pdf-bdy{flex:1;position:relative;display:flex;}
+.pdf-bdy iframe{width:100%;height:100%;border:none;display:none;}
+#pdf-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;}
+.pdf-lt{font-size:0.72rem;letter-spacing:2px;color:#f59e0b;}
+.pdf-lb{width:150px;height:2px;background:#1a1a28;border-radius:2px;overflow:hidden;}
+.pdf-lf{height:100%;background:linear-gradient(90deg,#8b5cf6,#06b6d4);animation:pLoad 1.5s ease infinite alternate;}
+@keyframes pLoad{from{width:20%}to{width:85%}}
 
 /* RESPONSIVE */
-@media(max-width:900px){.reports-grid{grid-template-columns:repeat(2,1fr);}}
-@media(max-width:768px){
-  .sidebar{transform:translateX(-220px);}
+@media(max-width:900px){
+  .sidebar{transform:translateX(-260px);}
   .sidebar.open{transform:translateX(0);}
-  .main{margin-left:0;}
-  .ham-btn{display:flex;}
-  .nav-search-wrap{display:none;}
-  .subscribe-btn span{display:none;}
-  .subscribe-btn{padding:8px;}
-  .main-content{padding:16px 14px 40px;}
-  .reports-grid{grid-template-columns:repeat(2,1fr);gap:12px;}
+  .main{margin-left:0;padding:76px 18px 50px;}
+  .mob-header{display:flex;}
+  .header-row{flex-direction:column;}
 }
-@media(max-width:480px){.reports-grid{grid-template-columns:1fr;}}
+@media(max-width:560px){
+  .grid,.skel-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;}
+  .rc-cover{height:120px;}
+  .main{padding:68px 12px 50px;}
+}
 </style>
 </head>
 <body>
 
-<nav class="top-nav">
-  <button class="ham-btn" id="ham-btn" onclick="openSidebar()">
-    <div class="ham-line"></div><div class="ham-line"></div><div class="ham-line"></div>
+<!-- MOBILE HEADER -->
+<div class="mob-header" id="mob-header">
+  <button class="mob-ham" onclick="toggleSidebar()">
+    <div class="mob-ham-line"></div>
+    <div class="mob-ham-line"></div>
+    <div class="mob-ham-line"></div>
   </button>
-  <a class="nav-logo" href="index.html">
-    <div class="nav-logo-icon">🔮</div>
-    <div class="nav-logo-text">
-      <div class="nav-logo-crv">CRV</div>
-      <div class="nav-logo-sub">Crypto Research Vault</div>
-    </div>
-  </a>
-  <div class="nav-search-wrap">
-    <input class="nav-search" type="text" id="search-input" placeholder="Search reports, coins, topics..." autocomplete="off" oninput="handleSearch(this.value)" onfocus="showSearchResults()">
-    <span class="nav-search-icon">⌕</span>
-  </div>
-  <div class="nav-right">
-    <div class="nav-social-btn">𝕏<span class="soon-tooltip">COMING SOON</span></div>
-    <div class="nav-social-btn">▶<span class="soon-tooltip">COMING SOON</span></div>
-    <a class="subscribe-btn" href="index.html#newsletter"><span>👑</span><span>Subscribe</span></a>
-    <button class="auth-nav-btn" id="auth-btn" onclick="openAuth()" title="Sign In">🔐</button>
-    <div class="user-badge" id="user-badge" onclick="toggleUserDropdown()">
-      <div class="user-dot"></div>
-      <span class="user-name-display" id="user-name-display">USER</span>
-      <span style="font-size:0.6rem;color:var(--text-dim)">▾</span>
-      <div class="user-dropdown" id="user-dropdown">
-        <div class="ud-header"><div class="ud-email" id="user-email-display"></div></div>
-        <button class="ud-item" onclick="openBookmarks();closeUserDropdown()">🔖 My Bookmarks</button>
-        <button class="ud-item logout" onclick="signOut()">⬡ Sign Out</button>
-      </div>
-    </div>
-  </div>
-</nav>
+  <div class="mob-logo">NBZ RESEARCH</div>
+</div>
 
-<div class="search-results" id="search-results"></div>
-<div class="sidebar-overlay" id="sidebar-overlay"></div>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
 
+<!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
+  <div class="sb-logo-wrap">
+    <div class="sb-logo">
+      <div class="sb-logo-nbz">NBZ</div>
+      <div class="sb-logo-sub">— RESEARCH —</div>
+    </div>
+  </div>
   <div class="sb-section">
-    <div class="sb-label">Menu</div>
-    <a class="nav-link" data-page="dashboard" href="index.html"><span class="nav-link-icon">🏠</span> Dashboard</a>
-    <a class="nav-link active" data-page="reports" href="reports.html"><span class="nav-link-icon">📋</span> Reports</a>
-    <a class="nav-link" data-page="markets" href="markets.html"><span class="nav-link-icon">📈</span> Market Overview</a>
-    <a class="nav-link" href="#" onclick="requireLogin()"><span class="nav-link-icon">👁</span> Watchlist</a>
-    <a class="nav-link" href="#" onclick="oModal('about-modal')"><span class="nav-link-icon">ℹ</span> About CRV</a>
+    <div class="sb-section-title">👤 About Me</div>
+    <p class="sb-text">This is my personal website where I store and share my crypto research. I analyze projects, narratives, and airdrops so you don't have to do all the digging yourself.</p>
+    <div class="sb-disclaimer">⚠ Not financial advice. Always DYOR before investing.</div>
   </div>
   <div class="sb-divider"></div>
   <div class="sb-section">
-    <div class="sb-label">Settings</div>
-    <div class="theme-row" onclick="toggleTheme()">
-      <div class="theme-row-label"><span class="nav-link-icon">🌙</span><span id="theme-label">Light Mode</span></div>
-      <div class="theme-toggle"></div>
+    <div class="sb-section-title">📊 What I Do</div>
+    <div class="sb-do-list">
+      <div class="sb-do-item"><div class="sb-do-check">✓</div>In-depth project research and analysis</div>
+      <div class="sb-do-item"><div class="sb-do-check">✓</div>Market &amp; narrative research</div>
+      <div class="sb-do-item"><div class="sb-do-check">✓</div>Airdrop hunting &amp; reporting</div>
+      <div class="sb-do-item"><div class="sb-do-check">✓</div>Data collection &amp; insights</div>
+      <div class="sb-do-item"><div class="sb-do-check">✓</div>Clear, simple and actionable reports</div>
     </div>
   </div>
   <div class="sb-divider"></div>
   <div class="sb-section">
-    <div class="sb-label">Account</div>
-    <button class="nav-link" id="sb-auth-btn" onclick="openAuth()"><span class="nav-link-icon">🔐</span> Sign In / Sign Up</button>
-    <button class="nav-link" id="sb-logout-btn" style="display:none" onclick="signOut()"><span class="nav-link-icon">⬡</span> Sign Out</button>
-    <button class="nav-link" onclick="openBookmarks()"><span class="nav-link-icon">🔖</span> My Bookmarks</button>
-    <button class="nav-link" onclick="oModal('bug-modal')"><span class="nav-link-icon">⚡</span> Report a Bug</button>
+    <div class="sb-section-title">⚙ Tools I Use</div>
+    <div class="sb-tools-list">
+      <div class="sb-tool"><span class="sb-tool-icon">📊</span>CoinMarketCap</div>
+      <div class="sb-tool"><span class="sb-tool-icon">🦎</span>CoinGecko</div>
+      <div class="sb-tool"><span class="sb-tool-icon">🦙</span>DefiLlama</div>
+      <div class="sb-tool"><span class="sb-tool-icon">🔍</span>Dune Analytics</div>
+      <div class="sb-tool"><span class="sb-tool-icon">𝕏</span>X (Twitter)</div>
+      <div class="sb-tool"><span class="sb-tool-icon">💬</span>Discord</div>
+      <div class="sb-tool"><span class="sb-tool-icon">📋</span>Google Sheets</div>
+      <div class="sb-tool"><span class="sb-tool-icon">📝</span>Notion</div>
+    </div>
   </div>
   <div class="sb-divider"></div>
-  <div class="pro-box">
-    <div class="pro-crown">👑</div>
-    <div class="pro-title">CRV PREMIUM</div>
-    <div class="pro-feat">Unlock premium reports</div>
-    <div class="pro-feat">Exclusive insights</div>
-    <div class="pro-feat">Early alpha access</div>
-    <button class="pro-btn">Upgrade Now</button>
+  <div class="sb-section">
+    <div class="sb-section-title">✈ Contact</div>
+    <div class="sb-contact-list">
+      <div class="sb-contact-item"><span class="sb-contact-icon">✉</span><a href="mailto:nasirbello008@gmail.com">nasirbello008@gmail.com</a></div>
+      <div class="sb-contact-item"><span class="sb-contact-icon">𝕏</span><a href="https://twitter.com/NasirBello65107" target="_blank">@NasirBello65107</a></div>
+      <div class="sb-contact-item"><span class="sb-contact-icon">📍</span>Nigeria</div>
+      <div class="sb-contact-item"><span class="sb-contact-icon">🌐</span><a href="https://payhip.com/NBZacademy" target="_blank">payhip.com/NBZacademy</a></div>
+    </div>
   </div>
+  <div style="height:20px"></div>
 </aside>
 
-<div class="layout">
+<!-- MAIN -->
 <main class="main">
-<div class="main-content">
 
-  <div class="page-header reveal">
-    <div class="page-eyebrow">✦ NBZ Research</div>
-    <div class="page-title">Research Reports</div>
-    <div class="page-sub">In-depth fundamental analysis and white papers covering the most important projects in crypto.</div>
-  </div>
-
-  <!-- FILTER BAR -->
-  <div class="filter-bar reveal">
-    <span class="filter-label">Filter:</span>
-    <button class="filter-btn active" onclick="setFilter('all')">All</button>
-    <button class="filter-btn" onclick="setFilter('AI')">AI</button>
-    <button class="filter-btn" onclick="setFilter('DeFi')">DeFi</button>
-    <button class="filter-btn" onclick="setFilter('DePIN')">DePIN</button>
-    <button class="filter-btn" onclick="setFilter('Bitcoin')">Bitcoin</button>
-    <button class="filter-btn" onclick="setFilter('Layer1')">Layer 1</button>
-    <button class="filter-btn" onclick="setFilter('Layer2')">Layer 2</button>
-    <button class="filter-btn" onclick="setFilter('Gaming')">Gaming</button>
-    <button class="filter-btn" onclick="setFilter('Meme')">Meme</button>
-    <span class="filter-count" id="filter-count"></span>
+  <!-- HEADER -->
+  <div class="header-row">
+    <div class="header-left">
+      <a class="back-link" href="index.html">← Back to Home</a>
+      <div class="header-name">ALL <span>REPORTS</span></div>
+      <p class="header-desc">Every research and airdrop report I've published, pulled straight from the archive.</p>
+    </div>
+    <div class="header-logo">
+      <div class="header-logo-nbz">NBZ↗</div>
+      <div class="header-logo-sub">— RESEARCH —</div>
+    </div>
   </div>
 
-  <!-- RESEARCH REPORTS -->
-  <div class="sec-divider reveal">
-    <div class="sec-divider-line"></div>
-    <div class="sec-divider-title">Research Reports</div>
-    <span class="sec-divider-badge" style="background:rgba(139,92,246,0.15);color:var(--accent);border:1px solid rgba(139,92,246,0.25)" id="reports-count-badge">-- Reports</span>
-    <div class="sec-divider-line"></div>
-  </div>
-  <div class="reports-grid" id="reports-grid">
-    <div class="report-card skeleton" style="height:280px"></div>
-    <div class="report-card skeleton" style="height:280px"></div>
-    <div class="report-card skeleton" style="height:280px"></div>
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-btn-crypto" onclick="switchTab('crypto')">📈 Crypto Research<span class="tab-count" id="count-crypto">…</span></button>
+    <button class="tab-btn airdrop" id="tab-btn-airdrop" onclick="switchTab('airdrop')">🎁 Airdrops<span class="tab-count" id="count-airdrop">…</span></button>
   </div>
 
-  <!-- WHITE PAPERS -->
-  <div class="sec-divider reveal">
-    <div class="sec-divider-line"></div>
-    <div class="sec-divider-title">White Papers</div>
-    <span class="sec-divider-badge" style="background:rgba(245,158,11,0.12);color:var(--gold);border:1px solid rgba(245,158,11,0.25)" id="wp-count-badge">-- Papers</span>
-    <div class="sec-divider-line"></div>
-  </div>
-  <div class="reports-grid" id="wp-grid">
-    <div class="wp-card skeleton" style="height:220px"></div>
-    <div class="wp-card skeleton" style="height:220px"></div>
-    <div class="wp-card skeleton" style="height:220px"></div>
+  <!-- CRYPTO PANEL -->
+  <div class="tab-panel active" id="panel-crypto">
+    <div class="skel-grid" id="crypto-grid">
+      <div class="skeleton" style="height:210px"></div>
+      <div class="skeleton" style="height:210px"></div>
+      <div class="skeleton" style="height:210px"></div>
+      <div class="skeleton" style="height:210px"></div>
+    </div>
   </div>
 
-</div>
-<footer>
-  <div class="ft-copy">© 2026 <span>Crypto Research Vault (CRV)</span> · All Rights Reserved</div>
-  <div class="ft-made">MADE WITH <span>♥</span> BY <strong>NASIR BELLO</strong></div>
-</footer>
+  <!-- AIRDROP PANEL -->
+  <div class="tab-panel" id="panel-airdrop">
+    <div class="skel-grid" id="airdrop-grid">
+      <div class="skeleton" style="height:210px"></div>
+      <div class="skeleton" style="height:210px"></div>
+      <div class="skeleton" style="height:210px"></div>
+      <div class="skeleton" style="height:210px"></div>
+    </div>
+  </div>
+
 </main>
-</div>
 
 <!-- PDF VIEWER -->
-<div class="pdf-viewer-overlay" id="pdf-viewer">
-  <div class="pdf-viewer-header">
-    <span class="pdf-viewer-title" id="pdf-viewer-title">DOCUMENT</span>
-    <div class="pdf-viewer-actions">
-      <a id="pdf-dl-btn" href="" download target="_blank" class="pdf-dl-btn">⬇ Download</a>
-      <button class="pdf-close-btn" onclick="closePdf()">✕</button>
+<div class="pdf-overlay" id="pdf-viewer">
+  <div class="pdf-hdr">
+    <span class="pdf-ttl" id="pdf-ttl">DOCUMENT</span>
+    <div class="pdf-acts">
+      <a id="pdf-dl" href="" download target="_blank" class="pdf-dl">⬇ Download</a>
+      <button class="pdf-cl" onclick="closePdf()">✕</button>
     </div>
   </div>
-  <div class="pdf-viewer-body">
+  <div class="pdf-bdy">
     <div id="pdf-loading">
-      <div class="pdf-load-text">LOADING DOCUMENT...</div>
-      <div class="pdf-load-bar"><div class="pdf-load-fill"></div></div>
+      <div class="pdf-lt">LOADING...</div>
+      <div class="pdf-lb"><div class="pdf-lf"></div></div>
     </div>
-    <iframe id="pdf-iframe" src="" title="PDF Viewer"
+    <iframe id="pdf-iframe" src="" title="PDF"
       onload="document.getElementById('pdf-loading').style.display='none';this.style.display='block';">
     </iframe>
   </div>
 </div>
 
-<!-- ABOUT MODAL -->
-<div class="overlay" id="about-modal" onclick="oClick(event,'about-modal')">
-<div class="mbox">
-  <div class="mhead"><span class="mtitle">// ABOUT CRV</span><button class="mclose" onclick="cModal('about-modal')">✕</button></div>
-  <div class="mbody">
-    <div class="ahero">
-      <div class="pimgw"><img class="pimg" src="https://i.ibb.co/pBJBDqN5/images-3.jpg" alt="Nasir Bello" onerror="this.style.background='#1a0a2e'"></div>
-      <div class="pinfo">
-        <div class="pname">NASIR BELLO</div>
-        <div class="prole">TRADER · DEVELOPER · RESEARCHER</div>
-        <div class="ptags"><span class="ptag">DeFi</span><span class="ptag">Web3</span><span class="ptag">Blockchain</span></div>
-      </div>
-    </div>
-    <div class="ablk"><div class="ahead">MISSION</div><p class="atxt">Driven to decode the complexities of the decentralized world — turning complexity into clarity, one block at a time.</p></div>
-    <div class="vbox">
-      <div class="ahead">THE VISION</div>
-      <div class="vbul"><div class="vicon">◆</div><div class="vbt"><strong>Precision Research</strong><p>Automating real-time data collection.</p></div></div>
-      <div class="vbul"><div class="vicon">◆</div><div class="vbt"><strong>Master Analysis</strong><p>Decoding blockchain data into high-value intelligence.</p></div></div>
-      <p class="atxt" style="margin-top:12px;color:var(--gold);font-style:italic;">"Turning complexity into clarity — one block at a time."</p>
-    </div>
-  </div>
-</div>
-</div>
-
-<!-- BUG MODAL -->
-<div class="overlay" id="bug-modal" onclick="oClick(event,'bug-modal')">
-<div class="mbox">
-  <div class="mhead"><span class="mtitle" style="color:var(--red)">// REPORT A BUG</span><button class="mclose" onclick="cModal('bug-modal')">✕</button></div>
-  <div class="mbody">
-    <div class="balert">⚠ Found an issue? Report goes directly to the developer.</div>
-    <div class="fg2"><label class="flbl">YOUR NAME (OPTIONAL)</label><input class="finput" id="bug-name" type="text" placeholder="Anonymous"></div>
-    <div class="fg2"><label class="flbl">BUG TYPE</label><select class="fsel" id="bug-type"><option>UI / Visual Glitch</option><option>Data Not Loading</option><option>Broken Link</option><option>Performance</option><option>Other</option></select></div>
-    <div class="fg2"><label class="flbl">DESCRIBE THE BUG</label><textarea class="ftxtarea" id="bug-desc" placeholder="What happened?"></textarea></div>
-    <button class="fsub" onclick="submitBug()">TRANSMIT BUG REPORT</button>
-  </div>
-</div>
-</div>
-
-<!-- AUTH MODAL (inline since shared.js handles logic) -->
-<div class="auth-overlay" id="auth-overlay" onclick="authOverlayClick(event)">
-<div class="auth-box">
-  <div class="auth-header">
-    <div class="auth-eyebrow">◈ CRYPTO RESEARCH VAULT ◈</div>
-    <div class="auth-title" id="auth-title">ACCESS THE VAULT</div>
-    <button class="auth-close" onclick="closeAuth()">✕</button>
-  </div>
-  <div class="auth-body">
-    <div class="auth-tabs">
-      <button class="auth-tab active" id="tab-signin" onclick="switchAuthTab('signin')">SIGN IN</button>
-      <button class="auth-tab" id="tab-signup" onclick="switchAuthTab('signup')">CREATE ACCOUNT</button>
-    </div>
-    <div class="auth-msg" id="auth-msg"></div>
-    <div class="auth-form active" id="form-signin">
-      <div class="af-group"><label class="af-label">EMAIL ADDRESS</label><input class="af-input" type="email" id="si-email" placeholder="your@email.com" autocomplete="email"></div>
-      <div class="af-group"><label class="af-label">PASSWORD</label><input class="af-input" type="password" id="si-password" placeholder="••••••••" autocomplete="current-password"></div>
-      <div class="af-forgot"><a onclick="switchAuthTab('reset')">Forgot password?</a></div>
-      <button class="af-submit" id="si-submit" onclick="handleSignIn()">⬡ ENTER VAULT</button>
-      <div class="af-switch">No account? <a onclick="switchAuthTab('signup')">Create one →</a></div>
-    </div>
-    <div class="auth-form" id="form-signup">
-      <div class="af-group"><label class="af-label">FULL NAME</label><input class="af-input" type="text" id="su-name" placeholder="Nasir Bello" autocomplete="name"></div>
-      <div class="af-group"><label class="af-label">USERNAME</label><input class="af-input" type="text" id="su-username" placeholder="@yourname"></div>
-      <div class="af-group"><label class="af-label">EMAIL ADDRESS</label><input class="af-input" type="email" id="su-email" placeholder="your@email.com" autocomplete="email"></div>
-      <div class="af-group"><label class="af-label">COUNTRY</label><input class="af-input" type="text" id="su-country" placeholder="United States"></div>
-      <div class="af-group"><label class="af-label">PHONE (OPTIONAL)</label><input class="af-input" type="tel" id="su-phone" placeholder="+1..."></div>
-      <div class="af-group"><label class="af-label">PASSWORD</label><input class="af-input" type="password" id="su-password" placeholder="Min. 6 characters" oninput="checkPwStrength(this.value)" autocomplete="new-password"><div class="pw-strength"><div class="pw-bar-track"><div class="pw-bar-fill" id="pw-bar"></div></div><div class="pw-text" id="pw-text"></div></div></div>
-      <div class="af-group"><label class="af-label">CONFIRM PASSWORD</label><input class="af-input" type="password" id="su-confirm" placeholder="Repeat password" autocomplete="new-password"></div>
-      <div class="af-check-row"><input type="checkbox" class="af-check" id="su-terms"><label class="af-check-label" for="su-terms">I agree to the <a href="privacy.html" target="_blank">Terms of Service</a> and <a href="privacy.html" target="_blank">Privacy Policy</a></label></div>
-      <button class="af-submit" id="su-submit" onclick="handleSignUp()">⬡ CREATE ACCOUNT</button>
-      <div class="af-switch">Already have access? <a onclick="switchAuthTab('signin')">Sign in →</a></div>
-    </div>
-    <div class="auth-form" id="form-reset">
-      <p style="font-size:0.84rem;color:var(--text-muted);line-height:1.7;margin-bottom:16px">Enter your email and we will send a reset link.</p>
-      <div class="af-group"><label class="af-label">EMAIL ADDRESS</label><input class="af-input" type="email" id="reset-email" placeholder="your@email.com"></div>
-      <button class="af-submit" id="reset-submit" onclick="handleReset()">⬡ SEND RESET LINK</button>
-      <div class="af-switch"><a onclick="switchAuthTab('signin')">← Back to Sign In</a></div>
-    </div>
-    <div class="auth-form" id="form-verify">
-      <div class="verify-notice">
-        <div class="vn-icon">📧</div>
-        <div class="vn-title">CHECK YOUR EMAIL</div>
-        <p class="vn-text">A verification link has been sent. Please verify before signing in.</p>
-        <br><div class="af-switch"><a onclick="switchAuthTab('signin')">← Back to Sign In</a></div>
-      </div>
-    </div>
-  </div>
-</div>
-</div>
-
-<!-- BOOKMARKS MODAL -->
-<div class="overlay" id="bookmarks-modal" onclick="oClick(event,'bookmarks-modal')">
-<div class="mbox">
-  <div class="mhead"><span class="mtitle">// MY BOOKMARKS</span><button class="mclose" onclick="cModal('bookmarks-modal')">✕</button></div>
-  <div class="bookmarks-section">
-    <div class="bm-title">SAVED REPORTS</div>
-    <div id="bm-list"><div class="bm-empty">No bookmarks yet. Save reports by tapping the ★ icon.</div></div>
-  </div>
-</div>
-</div>
-
-<script src="shared.js"></script>
 <script>
-/* ══════════════════════════════════════
-   REPORTS.HTML
-══════════════════════════════════════ */
 const GH_USER = 'nasirbello043-sudo';
 const GH_REPO = 'Crypto-research--hub';
-const GH_RAW  = `https://raw.githubusercontent.com/${GH_USER}/${GH_REPO}/main`;
-const GH_BASE = `https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents`;
+const GH_RAW  = 'https://raw.githubusercontent.com/' + GH_USER + '/' + GH_REPO + '/main';
+const GH_API  = 'https://api.github.com/repos/' + GH_USER + '/' + GH_REPO + '/contents';
 
-let allReports = [];
-let allWP = [];
-let currentFilter = 'all';
-let allSearchItems = [];
-
-window.addEventListener('DOMContentLoaded', () => {
-  initTheme();
-  initMobileNav();
-  checkSession();
-  loadReports();
-  loadWhitepapers();
-  // check for category filter from URL
-  const params = new URLSearchParams(window.location.search);
-  const cat = params.get('category');
-  if (cat) setFilter(cat);
-});
-
-function updateThemeUI(theme) {
-  const lbl = document.getElementById('theme-label');
-  if (lbl) lbl.textContent = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
+/* SIDEBAR */
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('show');
 }
 
-/* ── LOAD RESEARCH REPORTS ── */
-async function loadReports() {
-  const grid = document.getElementById('reports-grid');
-  try {
-    const config = await fetch(`${GH_RAW}/reports-config.json?_=${Date.now()}`).then(r=>r.json()).catch(()=>[]);
-    allReports = config;
-
-    // Also index whitepapers for search later
-    allSearchItems = config.map(r => ({ title: r.title, file: r.file, category: r.category || 'Research', type: 'REPORT' }));
-
-    renderReports(config);
-    document.getElementById('reports-count-badge').textContent = `${config.length} Report${config.length!==1?'s':''}`;
-    document.getElementById('filter-count').textContent = `${config.length} shown`;
-  } catch(e) {
-    grid.innerHTML = `<div style="grid-column:1/-1"><div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No reports yet</div><div class="empty-sub">Upload PDFs to research-reports/ and add entries to reports-config.json to get started.</div></div></div>`;
-  }
+/* TABS */
+function switchTab(which) {
+  document.getElementById('tab-btn-crypto').classList.toggle('active', which === 'crypto');
+  document.getElementById('tab-btn-airdrop').classList.toggle('active', which === 'airdrop');
+  document.getElementById('panel-crypto').classList.toggle('active', which === 'crypto');
+  document.getElementById('panel-airdrop').classList.toggle('active', which === 'airdrop');
 }
 
-function renderReports(reports) {
-  const grid = document.getElementById('reports-grid');
-  const filtered = currentFilter === 'all' ? reports : reports.filter(r => (r.category||'').includes(currentFilter));
-  document.getElementById('filter-count').textContent = `${filtered.length} shown`;
+/* PDF VIEWER */
+function openPdf(url, name) {
+  document.getElementById('pdf-ttl').textContent = name || 'DOCUMENT';
+  document.getElementById('pdf-dl').href = url;
+  const iframe = document.getElementById('pdf-iframe');
+  iframe.style.display = 'none';
+  document.getElementById('pdf-loading').style.display = 'flex';
+  iframe.src = 'https://docs.google.com/viewer?embedded=true&url=' + encodeURIComponent(url);
+  document.getElementById('pdf-viewer').classList.add('on');
+  document.body.style.overflow = 'hidden';
+  setTimeout(function() {
+    var loading = document.getElementById('pdf-loading');
+    if (loading && loading.style.display !== 'none') showFallback(url, name);
+  }, 12000);
+}
+function showFallback(url, name) {
+  document.querySelector('.pdf-bdy').innerHTML =
+    '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;gap:16px;padding:30px;text-align:center">' +
+    '<div style="font-size:3rem">📄</div>' +
+    '<div style="font-size:0.8rem;color:#f59e0b;font-weight:700">' + (name || 'DOCUMENT') + '</div>' +
+    '<p style="font-size:0.78rem;color:#6b6b80">Cannot preview on this device.</p>' +
+    '<a href="' + url + '" target="_blank" download style="background:#8b5cf6;color:#fff;padding:11px 22px;border-radius:8px;font-size:0.78rem;font-weight:700;text-decoration:none">⬇ Download PDF</a>' +
+    '<a href="' + url + '" target="_blank" style="color:#8b5cf6;border:1px solid rgba(139,92,246,0.3);padding:8px 16px;border-radius:8px;font-size:0.75rem;text-decoration:none">🔗 Open in Browser</a>' +
+    '</div>';
+}
+function closePdf() {
+  document.getElementById('pdf-viewer').classList.remove('on');
+  var iframe = document.getElementById('pdf-iframe');
+  iframe.src = '';
+  iframe.style.display = 'none';
+  document.getElementById('pdf-loading').style.display = 'flex';
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closePdf(); });
 
-  if (!filtered.length) {
-    grid.innerHTML = `<div style="grid-column:1/-1"><div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">No reports in this category</div><div class="empty-sub">Try a different filter or check back soon.</div></div></div>`;
-    return;
-  }
-  grid.innerHTML = '';
-  filtered.forEach((r, i) => {
-    const badgeClass = (r.badge||'').toLowerCase() || 'default';
-    const coverUrl = r.cover ? `${GH_RAW}/${r.cover}` : null;
-    const fileUrl = `${GH_RAW}/${r.file}`;
-    const card = document.createElement('div');
-    card.className = 'report-card reveal';
-    card.onclick = () => openPdf(fileUrl, r.title);
-    card.innerHTML = `
-      <div class="rc-cover">
-        ${coverUrl
-          ? `<img src="${coverUrl}" alt="${r.title}" onerror="this.parentElement.innerHTML='<div class=rc-cover-placeholder>📋</div>'">`
-          : `<div class="rc-cover-placeholder">📋</div>`}
-        ${r.badge ? `<span class="rc-badge ${badgeClass}">${r.badge}</span>` : ''}
-        <button class="rc-star" data-url="${r.file}" data-name="${r.title}"
-          onclick="event.stopPropagation();toggleBookmark('${r.title.replace(/'/g,"\\'")}','${r.file}')">☆</button>
-      </div>
-      <div class="rc-body">
-        <div class="rc-category">${r.category || 'Research'}</div>
-        <div class="rc-title">${r.title}</div>
-        <div class="rc-desc">${r.description || ''}</div>
-        <div class="rc-footer">
-          <span class="rc-date">${r.date ? new Date(r.date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : ''}</span>
-          ${r.readTime ? `<span class="rc-read">🕐 ${r.readTime}</span>` : ''}
-        </div>
-      </div>`;
-    grid.appendChild(card);
-  });
-  initReveal();
-  updateBookmarkButtons();
+/* PLACEHOLDER COVER */
+function placeholderHTML(title) {
+  return '<div class="rc-cover-ph">' +
+    '<div class="rc-cover-ph-nbz">NBZ</div>' +
+    '<div class="rc-cover-ph-title">' + title.toUpperCase() + '</div>' +
+    '</div>';
 }
 
-/* ── LOAD WHITEPAPERS ── */
-async function loadWhitepapers() {
-  const grid = document.getElementById('wp-grid');
-  try {
-    const files = await fetch(`${GH_BASE}/whitepapers`).then(r=>r.json());
-    const pdfs = files.filter(f => f.name.toLowerCase().endsWith('.pdf'));
-    allWP = pdfs;
-    document.getElementById('wp-count-badge').textContent = `${pdfs.length} Paper${pdfs.length!==1?'s':''}`;
-
-    if (!pdfs.length) {
-      grid.innerHTML = `<div style="grid-column:1/-1"><div class="empty-state"><div class="empty-icon">📄</div><div class="empty-title">No white papers yet</div><div class="empty-sub">Upload PDFs to the whitepapers/ folder.</div></div></div>`;
+/* TRY MULTIPLE COVER EXTENSIONS */
+function tryCovers(imgEl, basePath, exts, fallbackHTML) {
+  var i = 0;
+  function tryNext() {
+    if (i >= exts.length) {
+      imgEl.parentElement.innerHTML = fallbackHTML;
       return;
     }
+    imgEl.src = basePath + exts[i];
+    imgEl.onerror = function() { i++; tryNext(); };
+    imgEl.onload = function() { imgEl.onerror = null; };
+    i++;
+  }
+  tryNext();
+}
+
+/* BUILD A SMALL REPORT CARD */
+function buildReportCard(name, pdfUrl, coverFolder, isAirdrop, idx) {
+  var displayName = name.replace(/[-_]/g, ' ').toUpperCase();
+  var coverBase = GH_RAW + '/' + coverFolder + '/' + name;
+  var imgId = 'rc-img-' + (isAirdrop ? 'a' : 'c') + '-' + idx;
+
+  var card = document.createElement('div');
+  card.className = 'rcard' + (isAirdrop ? ' airdrop' : '');
+  card.onclick = function() { openPdf(pdfUrl, displayName); };
+
+  card.innerHTML =
+    '<div class="rc-cover"><img id="' + imgId + '" src="' + coverBase + '.jpg" alt="' + displayName + '"></div>' +
+    '<div class="rc-body">' +
+      '<div class="rc-title">' + displayName + '</div>' +
+      '<div class="rc-sub">' + (isAirdrop ? 'Airdrop Report' : 'Research Report') + '</div>' +
+    '</div>';
+
+  return { card: card, imgId: imgId, coverBase: coverBase, displayName: displayName };
+}
+
+/* LOAD A FOLDER OF PDFS INTO A GRID */
+async function loadFolder(folder, gridId, countId, coverFolder, isAirdrop, emptyIcon, emptyTitle) {
+  var grid = document.getElementById(gridId);
+  var countEl = document.getElementById(countId);
+  try {
+    var res = await fetch(GH_API + '/' + folder);
+    var files = await res.json();
+    if (!Array.isArray(files)) throw new Error('bad response');
+    var pdfs = files.filter(function(f) { return f.name.toLowerCase().endsWith('.pdf'); });
+    countEl.textContent = pdfs.length;
+
+    if (!pdfs.length) {
+      grid.className = '';
+      grid.innerHTML = '<div class="fc-empty"><div class="fc-empty-icon">' + emptyIcon + '</div><div class="fc-empty-title">' + emptyTitle + '</div><div class="fc-empty-sub">Upload PDFs to the ' + folder + '/ folder to show them here.</div></div>';
+      return;
+    }
+
+    // Newest first (reverse of GitHub's alphabetical listing, matching the "latest" logic on the home page)
+    pdfs = pdfs.slice().reverse();
+
+    grid.className = 'grid';
     grid.innerHTML = '';
-    pdfs.forEach((f, i) => {
-      const name = f.name.replace('.pdf','').replace(/[-_]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
-      const coverUrl = `${GH_RAW}/whitepapers-covers/${f.name.replace('.pdf','.jpg')}`;
-      const card = document.createElement('div');
-      card.className = 'wp-card reveal';
-      card.onclick = () => openPdf(f.download_url, name);
-      card.innerHTML = `
-        <div class="wp-cover">
-          <img src="${coverUrl}" alt="${name}" onerror="this.parentElement.innerHTML='<div class=wp-cover-placeholder>📑</div>'">
-        </div>
-        <div class="wp-body">
-          <div class="wp-label">White Paper</div>
-          <div class="wp-title">${name}</div>
-          <div class="wp-footer">
-            <span class="wp-date">Technical Document</span>
-            <span class="wp-arrow">→</span>
-          </div>
-        </div>`;
-      grid.appendChild(card);
-      allSearchItems.push({ title: name, file: f.download_url, type: 'WHITE PAPER', isPdf: true });
+    pdfs.forEach(function(f, idx) {
+      var name = f.name.replace(/\.pdf$/i, '');
+      var built = buildReportCard(name, f.download_url, coverFolder, isAirdrop, idx);
+      grid.appendChild(built.card);
+      var imgEl = document.getElementById(built.imgId);
+      if (imgEl) {
+        tryCovers(imgEl, built.coverBase, ['.jpg', '.jpeg', '.png', '.webp'], placeholderHTML(built.displayName));
+      }
     });
-    initReveal();
-  } catch(e) {
-    grid.innerHTML = `<div style="grid-column:1/-1"><div class="empty-state"><div class="empty-icon">📄</div><div class="empty-title">White papers unavailable</div><div class="empty-sub">Could not load from GitHub. Check your connection.</div></div></div>`;
+  } catch (e) {
+    countEl.textContent = '!';
+    grid.className = '';
+    grid.innerHTML = '<div class="fc-empty"><div class="fc-empty-icon">⚠️</div><div class="fc-empty-title">Could Not Load</div><div class="fc-empty-sub">Check your connection and try again.</div></div>';
   }
 }
 
-/* ── FILTER ── */
-function setFilter(f) {
-  currentFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.textContent === (f === 'all' ? 'All' : f));
-  });
-  renderReports(allReports);
-}
-
-/* ── SEARCH ── */
-function handleSearch(q) {
-  const box = document.getElementById('search-results');
-  q = q.trim().toLowerCase();
-  if (!q) { box.classList.remove('show'); return; }
-  const results = allSearchItems.filter(r => r.title.toLowerCase().includes(q)).slice(0, 8);
-  if (!results.length) { box.innerHTML = '<div class="sr-empty">No results found</div>'; box.classList.add('show'); return; }
-  box.innerHTML = results.map(r => {
-    const isWP = r.type === 'WHITE PAPER';
-    const color = isWP ? 'rgba(245,158,11,0.15)' : 'rgba(139,92,246,0.15)';
-    const tc = isWP ? 'var(--gold)' : 'var(--accent)';
-    const border = isWP ? 'rgba(245,158,11,0.25)' : 'rgba(139,92,246,0.25)';
-    return `<div class="sr-item" onclick="openPdf('${isWP ? r.file : GH_RAW+'/'+r.file}','${r.title}')">
-      <span class="sr-badge" style="background:${color};color:${tc};border:1px solid ${border}">${r.type}</span>
-      <span class="sr-name">${r.title}</span>
-    </div>`;
-  }).join('');
-  box.classList.add('show');
-}
-function showSearchResults() { if (document.getElementById('search-input').value.trim()) document.getElementById('search-results').classList.add('show'); }
-document.addEventListener('click', e => { if (!e.target.closest('.nav-search-wrap') && !e.target.closest('.search-results')) document.getElementById('search-results').classList.remove('show'); });
-
-/* ── AUTH SYNC ── */
-function syncAuthUI(loggedIn) {
-  const authBtn = document.getElementById('auth-btn');
-  const userBadge = document.getElementById('user-badge');
-  const sbAuth = document.getElementById('sb-auth-btn');
-  const sbLogout = document.getElementById('sb-logout-btn');
-  if (loggedIn) {
-    if (authBtn) authBtn.style.display = 'none';
-    if (userBadge) userBadge.classList.add('show');
-    if (sbAuth) sbAuth.style.display = 'none';
-    if (sbLogout) sbLogout.style.display = 'flex';
-  } else {
-    if (authBtn) authBtn.style.display = 'flex';
-    if (userBadge) userBadge.classList.remove('show');
-    if (sbAuth) sbAuth.style.display = 'flex';
-    if (sbLogout) sbLogout.style.display = 'none';
-  }
-}
-const _origIn = setLoggedIn;
-const _origOut = setLoggedOut;
-setLoggedIn = function(u) { _origIn(u); syncAuthUI(true); };
-setLoggedOut = function() { _origOut(); syncAuthUI(false); };
-
-function openBookmarks() { renderBookmarks(); oModal('bookmarks-modal'); }
-function toggleUserDropdown() { document.getElementById('user-dropdown').classList.toggle('show'); }
-function closeUserDropdown() { document.getElementById('user-dropdown')?.classList.remove('show'); }
-document.addEventListener('click', e => { if (!e.target.closest('.user-badge')) closeUserDropdown(); });
-function requireLogin() { if (!currentUser) { openAuth(); return; } }
-function updateBookmarkButtons() {
-  document.querySelectorAll('.rc-star').forEach(btn => {
-    const url = btn.dataset.url;
-    if (isBookmarked(url)) { btn.classList.add('saved'); btn.textContent = '★'; }
-    else { btn.classList.remove('saved'); btn.textContent = '☆'; }
-  });
-}
+window.addEventListener('DOMContentLoaded', function() {
+  loadFolder('research-reports', 'crypto-grid', 'count-crypto', 'covers', false, '📋', 'No Research Reports Yet');
+  loadFolder('airdrop-reports', 'airdrop-grid', 'count-airdrop', 'airdrop-covers', true, '🎁', 'No Airdrop Reports Yet');
+});
 </script>
 </body>
 </html>
