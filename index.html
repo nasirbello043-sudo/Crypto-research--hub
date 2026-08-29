@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NBZ Research — Nasir Bello</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:#0d0d0d;color:#f0f0f0;min-height:100vh;overflow-x:hidden;}
+a{text-decoration:none;color:inherit;}
+button{cursor:pointer;border:none;background:none;font-family:inherit;}
+ul{list-style:none;}
+
+.page{display:flex;min-height:100vh;}
+
+/* ══ SIDEBAR ══ */
+.sidebar{
+  width:260px;flex-shrink:0;
+  background:#111118;
+  border-right:1px solid rgba(139,92,246,0.2);
+  display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;bottom:0;
+  overflow-y:auto;z-index:100;
+  transition:transform 0.3s ease;
+}
+.sidebar::-webkit-scrollbar{width:3px;}
+.sidebar::-webkit-scrollbar-thumb{background:rgba(139,92,246,0.3);}
+.sb-logo-wrap{
+  display:flex;align-items:center;justify-content:center;
+  padding:28px 20px 20px;
+  border-bottom:1px solid rgba(139,92,246,0.15);
+}
+.sb-logo{
+  width:90px;height:90px;border-radius:50%;
+  border:3px solid #8b5cf6;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;background:#1a1a2e;
+  box-shadow:0 0 24px rgba(139,92,246,0.3);
+}
+.sb-logo-nbz{font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:900;color:#fff;letter-spacing:1px;}
+.sb-logo-sub{font-size:0.48rem;letter-spacing:2px;color:#8b5cf6;text-transform:uppercase;margin-top:1px;}
+.sb-section{padding:18px 20px 10px;}
+.sb-section-title{
+  font-size:0.65rem;font-weight:700;letter-spacing:2px;
+  color:#8b5cf6;text-transform:uppercase;
+  display:flex;align-items:center;gap:8px;margin-bottom:12px;
+}
+.sb-text{font-size:0.8rem;color:#a0a0b0;line-height:1.7;}
+.sb-disclaimer{
+  font-size:0.68rem;color:#6b6b80;
+  background:rgba(139,92,246,0.06);
+  border:1px solid rgba(139,92,246,0.15);
+  border-radius:6px;padding:8px 10px;margin-top:8px;
+  line-height:1.6;font-style:italic;
+}
+.sb-do-list{display:flex;flex-direction:column;gap:8px;}
+.sb-do-item{display:flex;align-items:flex-start;gap:9px;font-size:0.78rem;color:#c0c0d0;line-height:1.5;}
+.sb-do-check{
+  width:18px;height:18px;border-radius:50%;
+  background:linear-gradient(135deg,#8b5cf6,#7c3aed);
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.55rem;color:#fff;flex-shrink:0;margin-top:1px;
+}
+.sb-tools-list{display:flex;flex-direction:column;gap:6px;}
+.sb-tool{
+  display:flex;align-items:center;gap:10px;
+  padding:7px 10px;border-radius:8px;
+  background:#1a1a28;border:1px solid rgba(139,92,246,0.1);
+  font-size:0.78rem;color:#c0c0d0;transition:all 0.2s;
+}
+.sb-tool:hover{border-color:rgba(139,92,246,0.3);color:#fff;}
+.sb-tool-icon{font-size:0.9rem;width:18px;text-align:center;flex-shrink:0;}
+.sb-contact-list{display:flex;flex-direction:column;gap:8px;}
+.sb-contact-item{display:flex;align-items:center;gap:9px;font-size:0.78rem;color:#a0a0b0;}
+.sb-contact-icon{font-size:0.85rem;width:18px;text-align:center;flex-shrink:0;}
+.sb-contact-item a{color:#8b5cf6;transition:color 0.2s;}
+.sb-contact-item a:hover{color:#a78bfa;}
+.sb-divider{height:1px;background:rgba(139,92,246,0.1);margin:4px 20px;}
+
+/* ══ MAIN ══ */
+.main{margin-left:260px;flex:1;padding:36px 40px 60px;max-width:900px;}
+
+/* HEADER */
+.header-row{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:32px;}
+.header-left{flex:1;}
+.header-name{font-size:clamp(2rem,4vw,3rem);font-weight:900;line-height:1.1;margin-bottom:4px;}
+.header-name span{color:#8b5cf6;}
+.header-role{font-size:0.82rem;font-weight:600;letter-spacing:2px;color:#8b5cf6;text-transform:uppercase;margin-bottom:12px;}
+.header-desc{font-size:0.88rem;color:#a0a0b0;line-height:1.7;max-width:580px;padding-bottom:18px;border-bottom:1px solid rgba(139,92,246,0.15);}
+.header-logo{display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0;}
+.header-logo-nbz{font-family:'Orbitron',monospace;font-size:1.4rem;font-weight:900;color:#fff;letter-spacing:2px;}
+.header-logo-sub{font-size:0.5rem;letter-spacing:3px;color:#8b5cf6;text-transform:uppercase;margin-top:1px;}
+
+/* SECTION HEADING */
+.section-heading{display:flex;align-items:center;gap:12px;margin-bottom:20px;margin-top:32px;}
+.section-heading-icon{font-size:1.1rem;}
+.section-heading-text{font-size:0.88rem;font-weight:800;letter-spacing:2px;color:#f0f0f0;text-transform:uppercase;}
+.section-heading-line{flex:1;height:1px;background:rgba(139,92,246,0.2);}
+
+/* PROVIDES */
+.provides-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:8px;}
+.provide-card{
+  background:#111120;border:1px solid rgba(139,92,246,0.2);
+  border-radius:12px;padding:20px;transition:border-color 0.2s,transform 0.2s;
+}
+.provide-card:hover{border-color:rgba(139,92,246,0.5);transform:translateY(-2px);}
+.pc-header{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.pc-icon{
+  width:42px;height:42px;border-radius:10px;
+  background:linear-gradient(135deg,rgba(139,92,246,0.2),rgba(124,58,237,0.1));
+  border:1px solid rgba(139,92,246,0.3);
+  display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;
+}
+.pc-title{font-size:0.82rem;font-weight:800;letter-spacing:1px;color:#8b5cf6;text-transform:uppercase;}
+.pc-list{display:flex;flex-direction:column;gap:6px;}
+.pc-list-item{display:flex;align-items:flex-start;gap:8px;font-size:0.76rem;color:#b0b0c0;line-height:1.5;}
+.pc-list-item::before{content:'•';color:#8b5cf6;flex-shrink:0;margin-top:1px;}
+
+/* FEATURED CARD */
+.featured-section{margin-bottom:8px;}
+.featured-label{
+  display:inline-block;font-size:0.62rem;font-weight:700;letter-spacing:1.5px;
+  color:#fff;background:rgba(139,92,246,0.85);
+  padding:3px 10px;border-radius:4px;margin-bottom:14px;text-transform:uppercase;
+}
+.featured-label.airdrop{background:rgba(245,158,11,0.85);}
+.featured-card{
+  background:#111120;border:1px solid rgba(139,92,246,0.2);
+  border-radius:12px;overflow:hidden;cursor:pointer;
+  transition:border-color 0.2s,transform 0.2s;display:grid;
+  grid-template-columns:200px 1fr;
+}
+.featured-card.airdrop{border-color:rgba(245,158,11,0.2);}
+.featured-card:hover{border-color:rgba(139,92,246,0.5);transform:translateY(-2px);}
+.featured-card.airdrop:hover{border-color:rgba(245,158,11,0.5);}
+
+.fc-cover{
+  position:relative;height:220px;overflow:hidden;
+  background:linear-gradient(135deg,#1a0a2e,#0d0820);
+  display:flex;align-items:center;justify-content:center;
+}
+.fc-cover img{width:100%;height:100%;object-fit:cover;display:block;}
+.fc-cover-ph{
+  width:100%;height:100%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:6px;padding:16px;text-align:center;
+}
+.fc-cover-ph-nbz{font-family:'Orbitron',monospace;font-size:0.7rem;font-weight:900;color:#8b5cf6;letter-spacing:2px;}
+.fc-cover-ph-title{font-size:0.82rem;font-weight:800;color:#fff;line-height:1.3;}
+.fc-cover-ph-type{font-size:0.56rem;letter-spacing:2px;color:#8b5cf6;text-transform:uppercase;margin-top:4px;}
+
+.fc-body{padding:18px 20px;display:flex;flex-direction:column;gap:12px;}
+.fc-meta{display:flex;flex-direction:column;gap:8px;}
+.fc-meta-row{display:flex;align-items:flex-start;gap:10px;}
+.fc-meta-icon{font-size:0.85rem;flex-shrink:0;margin-top:1px;}
+.fc-meta-label{font-size:0.7rem;font-weight:600;color:#8b5cf6;min-width:90px;flex-shrink:0;}
+.fc-meta-label.airdrop{color:#f59e0b;}
+.fc-meta-val{font-size:0.75rem;color:#c0c0d0;line-height:1.5;}
+.fc-inside-title{font-size:0.7rem;font-weight:700;color:#8b5cf6;text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;}
+.fc-inside-title.airdrop{color:#f59e0b;}
+.fc-inside-list{display:flex;flex-direction:column;gap:4px;}
+.fc-inside-item{display:flex;align-items:flex-start;gap:7px;font-size:0.72rem;color:#b0b0c0;line-height:1.5;}
+.fc-inside-item::before{content:'•';color:#8b5cf6;flex-shrink:0;}
+.fc-inside-item.airdrop::before{color:#f59e0b;}
+
+.fc-empty{
+  background:#111120;border:1px solid rgba(139,92,246,0.15);
+  border-radius:12px;padding:40px;text-align:center;
+}
+.fc-empty-icon{font-size:2.5rem;margin-bottom:10px;}
+.fc-empty-title{font-size:0.9rem;font-weight:700;color:#f0f0f0;margin-bottom:6px;}
+.fc-empty-sub{font-size:0.78rem;color:#6b6b80;line-height:1.6;}
+
+/* COIN-STYLE REPORT CARDS */
+.coin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:20px 14px;}
+.coin-card{display:flex;flex-direction:column;align-items:center;text-align:center;cursor:pointer;}
+.coin-img-wrap{
+  width:104px;height:104px;border-radius:50%;overflow:hidden;
+  border:3px solid rgba(139,92,246,0.35);
+  background:linear-gradient(135deg,#1a0a2e,#0d0820);
+  box-shadow:0 0 18px rgba(139,92,246,0.12);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:10px;transition:border-color 0.2s,transform 0.2s;
+}
+.coin-card:hover .coin-img-wrap{border-color:#8b5cf6;transform:translateY(-3px);}
+.coin-card.airdrop .coin-img-wrap{border-color:rgba(245,158,11,0.35);}
+.coin-card.airdrop:hover .coin-img-wrap{border-color:#f59e0b;}
+.coin-img-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
+.coin-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:0.62rem;font-weight:900;color:#8b5cf6;}
+.coin-card.airdrop .coin-ph{color:#f59e0b;}
+.coin-title{font-size:0.68rem;font-weight:700;color:#f0f0f0;line-height:1.35;max-width:118px;}
+.coin-sub{font-size:0.56rem;color:#6b6b80;text-transform:uppercase;letter-spacing:1px;margin-top:3px;}
+
+/* CHECKOUT BTN */
+.checkout-wrap{display:flex;justify-content:flex-end;margin-top:12px;}
+.checkout-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  border:1px solid rgba(139,92,246,0.4);color:#8b5cf6;
+  border-radius:8px;padding:9px 18px;font-size:0.75rem;
+  font-weight:600;letter-spacing:0.5px;transition:all 0.2s;
+}
+.checkout-btn:hover{background:rgba(139,92,246,0.12);border-color:#8b5cf6;color:#a78bfa;}
+.checkout-btn.airdrop{border-color:rgba(245,158,11,0.4);color:#f59e0b;}
+.checkout-btn.airdrop:hover{background:rgba(245,158,11,0.08);border-color:#f59e0b;}
+
+/* FOOTER TAGLINE */
+.footer-tagline{
+  margin-top:36px;
+  background:rgba(139,92,246,0.06);
+  border:1px solid rgba(139,92,246,0.15);
+  border-radius:12px;padding:18px 22px;
+  text-align:center;
+}
+.footer-tagline-text{font-size:0.82rem;color:#a0a0b0;line-height:1.7;font-style:italic;}
+.footer-tagline-brand{margin-top:10px;font-family:'Orbitron',monospace;font-size:0.7rem;color:#8b5cf6;letter-spacing:2px;}
+
+/* SKELETON */
+.skeleton{background:linear-gradient(90deg,#1a1a28 25%,#22222f 50%,#1a1a28 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:10px;}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* MOBILE */
+.mob-header{
+  display:none;position:fixed;top:0;left:0;right:0;z-index:200;
+  height:56px;background:#111118;border-bottom:1px solid rgba(139,92,246,0.2);
+  align-items:center;padding:0 16px;gap:12px;
+}
+.mob-logo{font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;color:#fff;letter-spacing:2px;}
+.mob-ham{
+  width:36px;height:36px;background:#1a1a28;
+  border:1px solid rgba(139,92,246,0.2);border-radius:8px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  cursor:pointer;
+}
+.mob-ham-line{width:16px;height:2px;background:#a0a0b0;border-radius:2px;}
+.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99;display:none;backdrop-filter:blur(4px);}
+.sidebar-overlay.show{display:block;}
+
+/* PDF VIEWER */
+.pdf-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.96);z-index:600;display:none;flex-direction:column;}
+.pdf-overlay.on{display:flex;}
+.pdf-hdr{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;border-bottom:1px solid rgba(139,92,246,0.2);background:#111118;flex-shrink:0;}
+.pdf-ttl{font-family:'Orbitron',monospace;font-size:0.7rem;font-weight:700;letter-spacing:2px;color:#f59e0b;}
+.pdf-acts{display:flex;gap:9px;align-items:center;}
+.pdf-dl{font-size:0.7rem;font-weight:600;color:#f59e0b;border:1px solid rgba(245,158,11,0.3);padding:5px 11px;border-radius:6px;text-decoration:none;background:rgba(245,158,11,0.06);}
+.pdf-cl{width:30px;height:30px;background:#1a1a28;border:1px solid rgba(139,92,246,0.2);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.85rem;color:#a0a0b0;}
+.pdf-cl:hover{color:#ef4444;}
+.pdf-bdy{flex:1;position:relative;display:flex;}
+.pdf-bdy iframe{width:100%;height:100%;border:none;display:none;}
+#pdf-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;}
+.pdf-lt{font-size:0.72rem;letter-spacing:2px;color:#f59e0b;}
+.pdf-lb{width:150px;height:2px;background:#1a1a28;border-radius:2px;overflow:hidden;}
+.pdf-lf{height:100%;background:linear-gradient(90deg,#8b5cf6,#06b6d4);animation:pLoad 1.5s ease infinite alternate;}
+@keyframes pLoad{from{width:20%}to{width:85%}}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .sidebar{transform:translateX(-260px);}
+  .sidebar.open{transform:translateX(0);}
+  .main{margin-left:0;padding:76px 18px 50px;}
+  .mob-header{display:flex;}
+  .provides-grid{grid-template-columns:1fr;}
+  .featured-card{grid-template-columns:140px 1fr;}
+  .fc-cover{height:180px;}
+  .header-row{flex-direction:column;}
+}
+@media(max-width:560px){
+  .featured-card{grid-template-columns:1fr;grid-template-rows:180px auto;}
+  .fc-cover{height:180px;}
+  .fc-body{padding:14px;}
+  .main{padding:68px 12px 50px;}
+  .coin-grid{grid-template-columns:repeat(3,1fr);gap:16px 8px;}
+  .coin-img-wrap{width:80px;height:80px;}
+  .coin-title{font-size:0.6rem;max-width:90px;}
+}
+</style>
+</head>
+<body>
+
+<!-- MOBILE HEADER -->
+<div class="mob-header" id="mob-header">
+  <a class="mob-ham" href="portfolio.html" aria-label="View Portfolio">
+    <div class="mob-ham-line"></div>
+    <div class="mob-ham-line"></div>
+    <div class="mob-ham-line"></div>
+  </a>
+  <div class="mob-logo">NBZ RESEARCH</div>
+</div>
+
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-logo-wrap">
+    <div class="sb-logo">
+      <div class="sb-logo-nbz">NBZ</div>
+      <div class="sb-logo-sub">— RESEARCH —</div>
+    </div>
+  </div>
+  <div class="sb-section">
+    <div class="sb-section-title">👤 About Me</div>
+    <p class="sb-text">This is my personal website where I store and share my crypto research. I do this because I genuinely love it — digging into projects, narratives, and airdrops is fun for me, and sharing what I find just makes it better.</p>
+    <div class="sb-disclaimer">⚠ Not financial advice. Always DYOR before investing.</div>
+  </div>
+  <div class="sb-divider"></div>
+  <div class="sb-section">
+    <div class="sb-section-title">📊 What I Do</div>
+    <div class="sb-do-list">
+      <div class="sb-do-item"><div class="sb-do-check">✓</div>In-depth project research and analysis</div>
+      <div class="sb-do-item"><div class="sb-do-check">✓</div>Market &amp; narrative research</div>
+      <div class="sb-do-item"><div class="sb-do-check">✓</div>Airdrop hunting &amp; reporting</div>
+      <div class="sb-do-item"><div class="sb-do-check">✓</div>Data collection &amp; insights</div>
+      <div class="sb-do-item"><div class="sb-do-check">✓</div>Clear, simple and actionable reports</div>
+    </div>
+  </div>
+  <div class="sb-divider"></div>
+  <div class="sb-section">
+    <div class="sb-section-title">⚙ Tools I Use</div>
+    <div class="sb-tools-list">
+      <div class="sb-tool"><span class="sb-tool-icon">📊</span>CoinMarketCap</div>
+      <div class="sb-tool"><span class="sb-tool-icon">🦎</span>CoinGecko</div>
+      <div class="sb-tool"><span class="sb-tool-icon">🦙</span>DefiLlama</div>
+      <div class="sb-tool"><span class="sb-tool-icon">🔍</span>Dune Analytics</div>
+      <div class="sb-tool"><span class="sb-tool-icon">𝕏</span>X (Twitter)</div>
+      <div class="sb-tool"><span class="sb-tool-icon">💬</span>Discord</div>
+      <div class="sb-tool"><span class="sb-tool-icon">📋</span>Google Sheets</div>
+      <div class="sb-tool"><span class="sb-tool-icon">📝</span>Notion</div>
+    </div>
+  </div>
+  <div class="sb-divider"></div>
+  <div class="sb-section">
+    <div class="sb-section-title">✈ Contact</div>
+    <div class="sb-contact-list">
+      <div class="sb-contact-item"><span class="sb-contact-icon">✉</span><a href="mailto:nasirbello008@gmail.com">nasirbello008@gmail.com</a></div>
+      <div class="sb-contact-item"><span class="sb-contact-icon">𝕏</span><a href="https://twitter.com/NasirBello65107" target="_blank">@NasirBello65107</a></div>
+      <div class="sb-contact-item"><span class="sb-contact-icon">📍</span>Nigeria</div>
+      <div class="sb-contact-item"><span class="sb-contact-icon">🌐</span><a href="https://payhip.com/NBZacademy" target="_blank">payhip.com/NBZacademy</a></div>
+    </div>
+  </div>
+  <div style="height:20px"></div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- HEADER -->
+  <div class="header-row">
+    <div class="header-left">
+      <div class="header-name">NASIR <span>BELLO</span></div>
+      <div class="header-role">Crypto Researcher | Report Writer</div>
+      <p class="header-desc">I research, analyze and simplify the crypto space to help investors, traders and Web3 users make smarter decisions.</p>
+    </div>
+    <div class="header-logo">
+      <div class="header-logo-nbz">NBZ↗</div>
+      <div class="header-logo-sub">— RESEARCH —</div>
+    </div>
+  </div>
+
+  <!-- REPORTS I PROVIDE -->
+  <div class="section-heading">
+    <span class="section-heading-icon">📋</span>
+    <span class="section-heading-text">Reports I Provide</span>
+    <div class="section-heading-line"></div>
+  </div>
+  <div class="provides-grid">
+    <div class="provide-card">
+      <div class="pc-header">
+        <div class="pc-icon">📈</div>
+        <div class="pc-title">Crypto Reports</div>
+      </div>
+      <ul class="pc-list">
+        <li class="pc-list-item">Project deep dives</li>
+        <li class="pc-list-item">Sector &amp; narrative research</li>
+        <li class="pc-list-item">Market trends &amp; analysis</li>
+        <li class="pc-list-item">Competitor analysis</li>
+        <li class="pc-list-item">Investment insights</li>
+        <li class="pc-list-item">Risk assessment</li>
+        <li class="pc-list-item">Future potential reports</li>
+      </ul>
+    </div>
+    <div class="provide-card">
+      <div class="pc-header">
+        <div class="pc-icon">🎁</div>
+        <div class="pc-title">Airdrop Reports</div>
+      </div>
+      <ul class="pc-list">
+        <li class="pc-list-item">Upcoming airdrops</li>
+        <li class="pc-list-item">Confirmed airdrops</li>
+        <li class="pc-list-item">Step-by-step guides</li>
+        <li class="pc-list-item">Eligibility &amp; requirements</li>
+        <li class="pc-list-item">Potential reward analysis</li>
+        <li class="pc-list-item">Scam checks &amp; safety tips</li>
+        <li class="pc-list-item">Airdrop tracking &amp; updates</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- FEATURED REPORTS -->
+  <div class="section-heading">
+    <span class="section-heading-icon">⭐</span>
+    <span class="section-heading-text">Featured Reports</span>
+    <div class="section-heading-line"></div>
+  </div>
+
+  <!-- CRYPTO FEATURED -->
+  <div class="featured-section">
+    <div class="featured-label">Crypto Research Report</div>
+    <div id="crypto-featured" class="coin-grid">
+      <div class="skeleton" style="height:104px;width:104px;border-radius:50%;margin:0 auto"></div>
+      <div class="skeleton" style="height:104px;width:104px;border-radius:50%;margin:0 auto"></div>
+      <div class="skeleton" style="height:104px;width:104px;border-radius:50%;margin:0 auto"></div>
+      <div class="skeleton" style="height:104px;width:104px;border-radius:50%;margin:0 auto"></div>
+      <div class="skeleton" style="height:104px;width:104px;border-radius:50%;margin:0 auto"></div>
+      <div class="skeleton" style="height:104px;width:104px;border-radius:50%;margin:0 auto"></div>
+    </div>
+    <div class="checkout-wrap">
+      <a class="checkout-btn" href="reports.html">Check Out More →</a>
+    </div>
+  </div>
+
+  <!-- AIRDROP FEATURED -->
+  <div class="featured-section" style="margin-top:28px">
+    <div class="featured-label airdrop">Airdrop Report</div>
+    <div id="airdrop-featured" class="coin-grid">
+      <div class="skeleton" style="height:104px;width:104px;border-radius:50%;margin:0 auto"></div>
+      <div class="skeleton" style="height:104px;width:104px;border-radius:50%;margin:0 auto"></div>
+      <div class="skeleton" style="height:104px;width:104px;border-radius:50%;margin:0 auto"></div>
+      <div class="skeleton" style="height:104px;width:104px;border-radius:50%;margin:0 auto"></div>
+      <div class="skeleton" style="height:104px;width:104px;border-radius:50%;margin:0 auto"></div>
+      <div class="skeleton" style="height:104px;width:104px;border-radius:50%;margin:0 auto"></div>
+    </div>
+    <div class="checkout-wrap">
+      <a class="checkout-btn airdrop" href="reports.html">Check Out More →</a>
+    </div>
+  </div>
+
+  <!-- FOOTER TAGLINE -->
+  <div class="footer-tagline">
+    <div class="footer-tagline-text">This is just a personal website where I store my research. Everything here is for informational purposes only — not financial advice.</div>
+    <div class="footer-tagline-brand">NBZ↗ RESEARCH</div>
+  </div>
+
+</main>
+
+<!-- PDF VIEWER -->
+<div class="pdf-overlay" id="pdf-viewer">
+  <div class="pdf-hdr">
+    <span class="pdf-ttl" id="pdf-ttl">DOCUMENT</span>
+    <div class="pdf-acts">
+      <a id="pdf-dl" href="" download target="_blank" class="pdf-dl">⬇ Download</a>
+      <button class="pdf-cl" onclick="closePdf()">✕</button>
+    </div>
+  </div>
+  <div class="pdf-bdy">
+    <div id="pdf-loading">
+      <div class="pdf-lt">LOADING...</div>
+      <div class="pdf-lb"><div class="pdf-lf"></div></div>
+    </div>
+    <iframe id="pdf-iframe" src="" title="PDF"
+      onload="document.getElementById('pdf-loading').style.display='none';this.style.display='block';">
+    </iframe>
+  </div>
+</div>
+
+<script>
+const GH_USER = 'nasirbello043-sudo';
+const GH_REPO = 'Crypto-research--hub';
+const GH_RAW  = 'https://raw.githubusercontent.com/' + GH_USER + '/' + GH_REPO + '/main';
+const GH_API  = 'https://api.github.com/repos/' + GH_USER + '/' + GH_REPO + '/contents';
+
+/* SIDEBAR */
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('show');
+}
+
+/* PDF VIEWER */
+function openPdf(url, name) {
+  document.getElementById('pdf-ttl').textContent = name || 'DOCUMENT';
+  document.getElementById('pdf-dl').href = url;
+  const iframe = document.getElementById('pdf-iframe');
+  iframe.style.display = 'none';
+  document.getElementById('pdf-loading').style.display = 'flex';
+  iframe.src = 'https://docs.google.com/viewer?embedded=true&url=' + encodeURIComponent(url);
+  document.getElementById('pdf-viewer').classList.add('on');
+  document.body.style.overflow = 'hidden';
+  setTimeout(function() {
+    var loading = document.getElementById('pdf-loading');
+    if (loading && loading.style.display !== 'none') showFallback(url, name);
+  }, 12000);
+}
+function showFallback(url, name) {
+  document.querySelector('.pdf-bdy').innerHTML =
+    '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;gap:16px;padding:30px;text-align:center">' +
+    '<div style="font-size:3rem">📄</div>' +
+    '<div style="font-size:0.8rem;color:#f59e0b;font-weight:700">' + (name || 'DOCUMENT') + '</div>' +
+    '<p style="font-size:0.78rem;color:#6b6b80">Cannot preview on this device.</p>' +
+    '<a href="' + url + '" target="_blank" download style="background:#8b5cf6;color:#fff;padding:11px 22px;border-radius:8px;font-size:0.78rem;font-weight:700;text-decoration:none">⬇ Download PDF</a>' +
+    '<a href="' + url + '" target="_blank" style="color:#8b5cf6;border:1px solid rgba(139,92,246,0.3);padding:8px 16px;border-radius:8px;font-size:0.75rem;text-decoration:none">🔗 Open in Browser</a>' +
+    '</div>';
+}
+function closePdf() {
+  document.getElementById('pdf-viewer').classList.remove('on');
+  var iframe = document.getElementById('pdf-iframe');
+  iframe.src = '';
+  iframe.style.display = 'none';
+  document.getElementById('pdf-loading').style.display = 'flex';
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closePdf(); });
+
+/* BUILD FEATURED CARD */
+function buildCard(name, pdfUrl, coverFolder, isAirdrop) {
+  var displayName = name.replace(/[-_]/g, ' ').toUpperCase();
+  var accentColor = isAirdrop ? '#f59e0b' : '#8b5cf6';
+  var coverBase = GH_RAW + '/' + coverFolder + '/' + name;
+
+  var insideItems = isAirdrop
+    ? ['Top upcoming airdrop list', 'How to qualify (step-by-step)', 'Potential rewards', 'Important dates', 'Safety tips &amp; scam alerts', 'Final checklist']
+    : ['Project overview', 'Technology &amp; features', 'Tokenomics', 'Ecosystem &amp; partnerships', 'Market position &amp; competitors', 'Risks &amp; future potential', 'Final verdict'];
+
+  var metaItems = isAirdrop
+    ? [{ icon: '🎁', label: 'Type', val: 'Airdrop Report' }, { icon: '📂', label: 'Report Type', val: 'Airdrop Research' }, { icon: '📅', label: 'Published', val: 'Latest Report' }]
+    : [{ icon: '📦', label: 'Project', val: displayName }, { icon: '📂', label: 'Report Type', val: 'In-Depth Research' }, { icon: '📅', label: 'Published', val: 'Latest Report' }];
+
+  var metaHTML = metaItems.map(function(m) {
+    return '<div class="fc-meta-row"><span class="fc-meta-icon">' + m.icon + '</span>' +
+      '<span class="fc-meta-label' + (isAirdrop ? ' airdrop' : '') + '">' + m.label + ':</span>' +
+      '<span class="fc-meta-val">' + m.val + '</span></div>';
+  }).join('');
+
+  var insideHTML = insideItems.map(function(i) {
+    return '<div class="fc-inside-item' + (isAirdrop ? ' airdrop' : '') + '">' + i + '</div>';
+  }).join('');
+
+  var card = document.createElement('div');
+  card.className = 'featured-card' + (isAirdrop ? ' airdrop' : '');
+  card.onclick = function() { openPdf(pdfUrl, displayName); };
+
+  card.innerHTML =
+    '<div class="fc-cover">' +
+      '<img id="fc-img-' + (isAirdrop ? 'a' : 'c') + '" src="' + coverBase + '.jpg" alt="' + displayName + '">' +
+    '</div>' +
+    '<div class="fc-body">' +
+      '<div class="fc-meta">' + metaHTML + '</div>' +
+      '<div>' +
+        '<div class="fc-inside-title' + (isAirdrop ? ' airdrop' : '') + '">What\'s inside:</div>' +
+        '<div class="fc-inside-list">' + insideHTML + '</div>' +
+      '</div>' +
+    '</div>';
+
+  return card;
+}
+
+/* TRY MULTIPLE COVER EXTENSIONS */
+function tryCovers(imgEl, basePath, exts, fallbackHTML) {
+  var i = 0;
+  function tryNext() {
+    if (i >= exts.length) {
+      imgEl.parentElement.innerHTML = fallbackHTML;
+      return;
+    }
+    imgEl.src = basePath + exts[i];
+    imgEl.onerror = function() { i++; tryNext(); };
+    imgEl.onload = function() { imgEl.onerror = null; };
+    i++;
+  }
+  tryNext();
+}
+
+/* PLACEHOLDER HTML */
+function placeholderHTML(title) {
+  return '<div class="fc-cover-ph">' +
+    '<div class="fc-cover-ph-nbz">NBZ</div>' +
+    '<div class="fc-cover-ph-title">' + title.toUpperCase() + '</div>' +
+    '<div class="fc-cover-ph-type">RESEARCH REPORT</div>' +
+    '</div>';
+}
+
+/* BUILD A COIN-STYLE CARD */
+function buildCoinCard(name, pdfUrl, coverFolder, isAirdrop, idx) {
+  var displayName = name.replace(/[-_]/g, ' ').toUpperCase();
+  var coverBase = GH_RAW + '/' + coverFolder + '/' + name;
+  var imgId = 'coin-img-' + (isAirdrop ? 'a' : 'c') + '-' + idx;
+
+  var card = document.createElement('div');
+  card.className = 'coin-card' + (isAirdrop ? ' airdrop' : '');
+  card.onclick = function() { openPdf(pdfUrl, displayName); };
+
+  card.innerHTML =
+    '<div class="coin-img-wrap"><img id="' + imgId + '" src="' + coverBase + '.jpg" alt="' + displayName + '"></div>' +
+    '<div class="coin-title">' + displayName + '</div>' +
+    '<div class="coin-sub">' + (isAirdrop ? 'Airdrop' : 'Research') + '</div>';
+
+  return { card: card, imgId: imgId, coverBase: coverBase, displayName: displayName };
+}
+
+/* COIN PLACEHOLDER (round) */
+function coinPlaceholderHTML() {
+  return '<div class="coin-ph">NBZ</div>';
+}
+
+/* FIND THE MOST RECENTLY UPLOADED PDF FILENAMES IN A FOLDER,
+   using commit history (newest-first) rather than alphabetical order,
+   which is all the plain folder-contents API can offer.
+   currentSet = filenames that actually still exist in the folder right now,
+   so deleted/renamed files never get picked up as "recent". */
+async function getRecentPdfNames(folder, want, currentSet) {
+  var ordered = [];
+  var seen = {};
+  try {
+    var page = 1;
+    while (ordered.length < want && page <= 3) {
+      var commitsRes = await fetch(GH_API.replace('/contents', '/commits') + '?path=' + folder + '&per_page=30&page=' + page);
+      var commits = await commitsRes.json();
+      if (!Array.isArray(commits) || !commits.length) break;
+
+      for (var i = 0; i < commits.length && ordered.length < want; i++) {
+        try {
+          var detailRes = await fetch(commits[i].url);
+          var detail = await detailRes.json();
+          if (!detail.files) continue;
+          for (var j = 0; j < detail.files.length; j++) {
+            var f = detail.files[j];
+            if (f.status === 'removed') continue;
+            var fn = f.filename;
+            if (fn.indexOf(folder + '/') === 0 && fn.toLowerCase().endsWith('.pdf')) {
+              var short = fn.slice(folder.length + 1);
+              if (!seen[short] && currentSet.has(short)) {
+                seen[short] = true;
+                ordered.push(short);
+              }
+            }
+          }
+        } catch (inner) { /* skip a bad commit, keep going */ }
+      }
+      if (commits.length < 30) break; // no more pages
+      page++;
+    }
+  } catch (e) { /* fall through to whatever we collected, possibly empty */ }
+  return ordered.slice(0, want);
+}
+
+/* LOAD A FEATURED GRID (crypto or airdrop) */
+async function loadFeaturedGrid(folder, containerId, coverFolder, isAirdrop, emptyIcon, emptyTitle) {
+  var container = document.getElementById(containerId);
+  try {
+    // Always get the live folder listing first — this is the source of truth
+    // for what actually exists right now, and also our fallback ordering.
+    var res = await fetch(GH_API + '/' + folder);
+    var files = await res.json();
+    var allNames = Array.isArray(files)
+      ? files.filter(function(f) { return f.name.toLowerCase().endsWith('.pdf'); }).map(function(f) { return f.name; })
+      : [];
+    var currentSet = new Set(allNames);
+
+    var recentNames = allNames.length ? await getRecentPdfNames(folder, 6, currentSet) : [];
+
+    // Fallback if commit-based lookup couldn't find enough (e.g. rate-limited):
+    // fill remaining slots from the plain listing, reversed, skipping dupes.
+    if (recentNames.length < Math.min(6, allNames.length)) {
+      var fallback = allNames.slice().reverse();
+      for (var k = 0; k < fallback.length && recentNames.length < 6; k++) {
+        if (recentNames.indexOf(fallback[k]) === -1) recentNames.push(fallback[k]);
+      }
+    }
+
+    if (!recentNames.length) {
+      container.className = '';
+      container.innerHTML = '<div class="fc-empty"><div class="fc-empty-icon">' + emptyIcon + '</div><div class="fc-empty-title">' + emptyTitle + '</div><div class="fc-empty-sub">Upload PDFs to the ' + folder + '/ folder to show them here.</div></div>';
+      return;
+    }
+
+    container.className = 'coin-grid';
+    container.innerHTML = '';
+    recentNames.forEach(function(fileName, idx) {
+      var name = fileName.replace(/\.pdf$/i, '');
+      var pdfUrl = GH_RAW + '/' + folder + '/' + fileName;
+      var built = buildCoinCard(name, pdfUrl, coverFolder, isAirdrop, idx);
+      container.appendChild(built.card);
+      var imgEl = document.getElementById(built.imgId);
+      if (imgEl) {
+        tryCovers(imgEl, built.coverBase, ['.jpg', '.jpeg', '.png', '.webp'], coinPlaceholderHTML());
+      }
+    });
+  } catch (e) {
+    container.className = '';
+    container.innerHTML = '<div class="fc-empty"><div class="fc-empty-icon">⚠️</div><div class="fc-empty-title">Could Not Load</div><div class="fc-empty-sub">Check your connection and try again.</div></div>';
+  }
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+  loadFeaturedGrid('research-reports', 'crypto-featured', 'covers', false, '📋', 'No Research Reports Yet');
+  loadFeaturedGrid('airdrop-reports', 'airdrop-featured', 'airdrop-covers', true, '🎁', 'No Airdrop Reports Yet');
+});
+</script>
+</body>
+</html>
