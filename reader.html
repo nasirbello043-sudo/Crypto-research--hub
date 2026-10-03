@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Learning Hub</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
 <style>
 :root{--g:#1b4332;--g2:#2d6a4f;--gold:#c9a84c;--bg:#f4f2ed;--card:#fff;--line:#e2ddd4;--tx:#1a1a1a;--soft:#6b6862;--ok:#2d6a4f;--bad:#b3261e}
 *{box-sizing:border-box;margin:0}
@@ -30,6 +33,14 @@ dt{font-weight:600;margin-top:8px}dd{color:var(--soft);margin-bottom:8px}
 .card.flip{background:var(--gold);color:#1a1a1a}
 .btn{display:inline-block;font:600 1rem Inter,sans-serif;background:var(--g);color:#fff;border:0;border-radius:8px;padding:12px 18px;margin:18px 8px 0 0;text-decoration:none}
 .btn.alt{background:none;color:var(--g);border:1px solid var(--g)}
+ul,ol{margin:0 0 12px 22px}code{background:#e9e5da;padding:1px 5px;border-radius:4px;font-size:.88em}pre code{background:none;padding:0}.katex-display{overflow-x:auto;overflow-y:hidden}
+h3{font:600 1.05rem Inter,sans-serif;color:var(--g);margin:18px 0 6px}hr{border:0;border-top:1px solid var(--line);margin:18px 0}.tw{overflow-x:auto;margin-bottom:12px}table{border-collapse:collapse;width:100%;font-size:.9rem}th,td{border:1px solid var(--line);padding:6px 8px;text-align:center;background:var(--card)}th{background:#e9e5da}.katex-display{margin:.8em 0}
+.dg{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin:14px 0}.dgt{font:700 1.05rem Playfair Display,Georgia,serif;color:var(--g);margin-bottom:10px}
+.st{list-style:none;margin:0;padding:0}.st li{display:flex;gap:10px;position:relative;padding-bottom:14px}.st li:not(:last-child)::after{content:"";position:absolute;left:13px;top:30px;bottom:2px;width:2px;background:var(--gold)}
+.n{flex:none;width:28px;height:28px;border-radius:50%;background:var(--g);color:#fff;font:600 .85rem/28px Inter,sans-serif;text-align:center}.lp{color:var(--g2);font-weight:600;font-size:.9rem}
+.cmp,.fc{display:grid;grid-template-columns:1fr 1fr;gap:10px}.cmp>div,.fc>div{background:var(--bg);border-radius:8px;padding:10px;font-size:.9rem}.cmp ul{margin:6px 0 0 16px}.fc>div{display:flex;flex-direction:column}
+.big{font:700 1.3rem Playfair Display,Georgia,serif;color:var(--g)}.pt>div{display:flex;flex-direction:column;padding:8px 0;border-top:1px solid var(--line)}.pt>div:first-child{border-top:0}
+.dg svg{width:100%;height:auto;display:block}.gp{fill:none;stroke:var(--g2);stroke-width:2.2}.ax{stroke:var(--soft);stroke-width:1}.gb{fill:none;stroke:var(--line)}.dot{fill:var(--gold);stroke:var(--g);stroke-width:1.5}.dot.open{fill:#fff}.gl{font:11px Inter,sans-serif;fill:var(--soft)}
 :focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 </style>
 </head>
@@ -42,8 +53,58 @@ const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;',
 const get=async u=>{const r=await fetch(u);if(!r.ok)throw new Error(u);return r.json()};
 let done={};try{done=JSON.parse(localStorage.getItem('done')||'{}')}catch(e){}
 const store=()=>{try{localStorage.setItem('done',JSON.stringify(done))}catch(e){}};
+const inline=t=>esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/`([^`]+)`/g,'<code>$1</code>');
+const isItem=x=>/^([-*]|\d+\.)\s+/.test(x);
+const table=r=>{const c=l=>l.replace(/^\||\|$/g,'').split('|').map(x=>x.trim());
+  const sep=r.length>1&&/^\|?\s*:?-{2,}/.test(r[1]),head=sep?c(r[0]):null,body=r.slice(sep?2:0).map(c);
+  return'<div class="tw"><table>'+(head?'<tr>'+head.map(x=>'<th>'+inline(x)+'</th>').join('')+'</tr>':'')+
+  body.map(x=>'<tr>'+x.map(y=>'<td>'+inline(y)+'</td>').join('')+'</tr>').join('')+'</table></div>'};
+const blocks=t=>{const L=t.split('\n'),out=[];let i=0,para=[];
+  const flush=()=>{if(para.length){out.push('<p>'+inline(para.join(' '))+'</p>');para=[]}};
+  while(i<L.length){const l=L[i].trim();
+    if(!l){flush();i++;continue}
+    if(/^-{3,}$/.test(l)){flush();out.push('<hr>');i++;continue}
+    let m=l.match(/^#{1,6}\s+(.+)$/);
+    if(m){flush();out.push('<h3>'+inline(m[1])+'</h3>');i++;continue}
+    if(/^\|.*\|/.test(l)){flush();const r=[];while(i<L.length&&/^\|.*\|/.test(L[i].trim())){r.push(L[i].trim());i++}out.push(table(r));continue}
+    if(isItem(l)){flush();const ord=/^\d/.test(l),start=parseInt(l)||1,items=[];
+      while(i<L.length){const x=L[i].trim();
+        if(isItem(x)&&/^\d/.test(x)===ord){items.push(x.replace(/^([-*]|\d+\.)\s+/,''));i++}
+        else if(x&&items.length&&!isItem(x)&&!/^(#{1,6}\s|-{3,}$|\|)/.test(x)){items[items.length-1]+=' '+x;i++}
+        else break}
+      out.push((ord?`<ol start="${start}">`:'<ul>')+items.map(x=>'<li>'+inline(x)+'</li>').join('')+(ord?'</ol>':'</ul>'));continue}
+    para.push(l);i++}
+  flush();return out.join('')};
+const dropT=(b,t)=>{const m=String(b).match(/^\s*(?:#+\s*)?\**([^\n]+?)\**\s*\n/);return m&&m[1].trim().toLowerCase()===String(t).trim().toLowerCase()?String(b).slice(m[0].length):b};
+const md=s=>String(s==null?'':s).split(/```\w*\n?([\s\S]*?)```/).map((t,i)=>i%2?`<pre><code>${esc(t)}</code></pre>`:blocks(t)).join('');
+const math=(el=app)=>{if(window.renderMathInElement)renderMathInElement(el,{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false},{left:'$',right:'$',display:false}],throwOnError:false})};
 const count=id=>Object.keys(done).filter(k=>k.startsWith(id+'/')).length;
 
+const SAFE=['x','sin','cos','tan','sqrt','abs','ln','log','exp','pi','e'];
+const mkfn=s=>{s=String(s).toLowerCase().replace(/\^/g,'**').replace(/\bln\b/g,'log');
+  s=s.replace(/(\d|\))\s*(x|\(|[a-z]{2,})/g,'$1*$2').replace(/\bx\s*(\(|x)/g,'x*$1').replace(/\)\s*x/g,')*x');
+  if(!/^[0-9a-z+\-*/().,\s]+$/.test(s)||(s.match(/[a-z]+/g)||[]).some(i=>!SAFE.includes(i)))return null;
+  try{return new Function('x','const {sin,cos,tan,sqrt,abs,log,exp,PI:pi,E:e}=Math;return '+s)}catch(e){return null}};
+const graph=d=>{const f=mkfn(d.fn),x0=+d.xmin,x1=+d.xmax;if(!f||!(x1>x0))return'';
+  const pts=[];for(let i=0;i<=300;i++){const x=x0+(x1-x0)*i/300;let y;try{y=f(x)}catch(e){y=NaN}pts.push([x,y])}
+  const ys=pts.map(p=>p[1]).filter(Number.isFinite).sort((a,b)=>a-b);if(ys.length<10)return'';
+  let lo=ys[Math.floor(ys.length*.02)],hi=ys[Math.ceil(ys.length*.98)-1];const P=(d.points||[]).filter(p=>Number.isFinite(+p.x)&&Number.isFinite(+p.y));
+  P.forEach(p=>{lo=Math.min(lo,+p.y);hi=Math.max(hi,+p.y)});if(hi-lo<1e-9){lo-=1;hi+=1}const pad=(hi-lo)*.12;lo-=pad;hi+=pad;
+  const W=320,H=220,m=24,sx=x=>m+(x-x0)/(x1-x0)*(W-2*m),sy=y=>H-m-(y-lo)/(hi-lo)*(H-2*m);
+  let path='',pen=false,prev=null;
+  pts.forEach(([x,y])=>{if(!(Number.isFinite(y)&&y>=lo&&y<=hi)){pen=false;prev=null;return}
+    if(prev!==null&&Math.abs(y-prev)>(hi-lo)*.5)pen=false;path+=(pen?'L':'M')+sx(x).toFixed(1)+' '+sy(y).toFixed(1);pen=true;prev=y});
+  const ax=(lo<=0&&hi>=0?`<line x1="${m}" x2="${W-m}" y1="${sy(0)}" y2="${sy(0)}" class="ax"/>`:'')+(x0<=0&&x1>=0?`<line y1="${m}" y2="${H-m}" x1="${sx(0)}" x2="${sx(0)}" class="ax"/>`:'');
+  const dots=P.map(p=>`<circle cx="${sx(+p.x)}" cy="${sy(+p.y)}" r="4.5" class="dot${p.open?' open':''}"/>${p.label?`<text x="${Math.min(sx(+p.x)+8,W-4)}" y="${sy(+p.y)-8}" class="gl">${esc(p.label)}</text>`:''}`).join('');
+  return`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(d.title||'Graph')}"><rect x="${m}" y="${m}" width="${W-2*m}" height="${H-2*m}" class="gb"/>${ax}<path d="${path}" class="gp"/>${dots}<text x="${m}" y="${H-8}" class="gl">${x0}</text><text x="${W-m}" y="${H-8}" class="gl" text-anchor="end">${x1}</text></svg>`};
+const diagram=d=>{const t=`<div class="dg"><div class="dgt">${esc(d.title||'')}</div>`;
+  if(d.type==='steps')return t+'<ol class="st">'+d.steps.map((s,i)=>`<li><span class="n">${i+1}</span><div><b>${inline(s.label)}</b>${s.text?`<div class="soft">${inline(s.text)}</div>`:''}</div></li>`).join('')+'</ol>'+(d.loop?'<div class="lp">&#8635; then it repeats from step 1</div>':'')+'</div>';
+  if(d.type==='compare')return t+'<div class="cmp">'+['left','right'].map(k=>`<div><b>${inline(d[k].name)}</b><ul>${d[k].points.map(p=>`<li>${inline(p)}</li>`).join('')}</ul></div>`).join('')+'</div></div>';
+  if(d.type==='facts')return t+'<div class="fc">'+d.items.map(i=>`<div><span class="big">${inline(i.value)}</span><span class="soft">${inline(i.label)}</span></div>`).join('')+'</div></div>';
+  if(d.type==='parts')return t+'<div class="pt">'+d.items.map(i=>`<div><b>${inline(i.name)}</b><span class="soft">${inline(i.role||'')}</span></div>`).join('')+'</div></div>';
+  if(d.type==='graph'){const g=graph(d);return g?t+g+(d.caption?`<p class="soft">${inline(d.caption)}</p>`:'')+'</div>':''}
+  return''};
+const dgs=(d,si)=>(d.diagrams||[]).filter(x=>(Number.isInteger(x.after)?Math.min(Math.max(x.after,0),d.sections.length-1):d.sections.length-1)===si).map(x=>{try{return diagram(x)}catch(e){return''}}).join('');
 async function home(){
   const list=await get('courses/index.json');
   app.innerHTML='<h1>Courses</h1><p class="soft">Pick a course and work through it lesson by lesson.</p>'+
@@ -67,7 +128,7 @@ async function lesson(id,n){
   app.innerHTML=`<p class="soft"><a href="#/c/${id}">${esc(c.title)}</a> / Lesson ${n}</p><h1>${esc(d.title)}</h1>
   ${d.reviewed?'':'<div class="note">This lesson has not been checked by a teacher yet.</div>'}
   <p>${esc(d.summary)}</p>
-  ${d.sections.map(s=>`<h2>${esc(s.heading)}</h2>${String(s.body).split(/\n\n+/).map(p=>`<p>${esc(p)}</p>`).join('')}${s.code?`<pre><code>${esc(s.code)}</code></pre>`:''}`).join('')}
+  ${d.sections.map((s,si)=>`<h2>${esc(s.heading)}</h2>${md(dropT(s.body,s.heading))}${s.code?`<pre><code>${esc(s.code)}</code></pre>`:''}${dgs(d,si)}`).join('')}
   <h2>Key terms</h2><dl>${(d.key_terms||[]).map(k=>`<dt>${esc(k.term)}</dt><dd>${esc(k.meaning)}</dd>`).join('')}</dl>
   <h2>Quick quiz</h2>${d.quiz.map((q,qi)=>`<div class="q" data-a="${q.answer}"><b>${esc(q.q)}</b>
     ${q.options.map((o,oi)=>`<button data-o="${oi}">${esc(o)}</button>`).join('')}<div class="why" hidden>${esc(q.why)}</div></div>`).join('')}
@@ -78,8 +139,9 @@ async function lesson(id,n){
   app.querySelectorAll('.q').forEach(q=>q.onclick=e=>{const b=e.target.closest('button');if(!b||q.dataset.done)return;
     q.dataset.done=1;const a=+q.dataset.a;b.classList.add(+b.dataset.o===a?'ok':'bad');
     q.querySelectorAll('button')[a].classList.add('ok');q.querySelector('.why').hidden=false});
-  app.querySelectorAll('.card').forEach(b=>b.onclick=()=>{const f=b.classList.toggle('flip');b.textContent=f?b.dataset.b:b.dataset.f});
+  app.querySelectorAll('.card').forEach(b=>b.onclick=()=>{const f=b.classList.toggle('flip');b.textContent=f?b.dataset.b:b.dataset.f;math(b)});
   document.getElementById('fin').onclick=e=>{done[id+'/'+n]=1;store();e.target.textContent='Finished'};
+  math();
 }
 
 async function route(){
@@ -87,7 +149,7 @@ async function route(){
   try{ if(p[0]==='c'&&p[2])await lesson(p[1],+p[2]); else if(p[0]==='c'&&p[1])await course(p[1]); else await home(); }
   catch(e){app.innerHTML='<p class="note">Could not load this page. Check your connection and try again.</p>'}
 }
-addEventListener('hashchange',route);route();
+addEventListener('hashchange',route);addEventListener('load',()=>math());route();
 </script>
 </body>
 </html>
